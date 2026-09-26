@@ -52,6 +52,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (mounted) {
         setSession(data.session);
         setLoading(false);
+
+        if (!data.session) {
+          setProfile(null);
+        }
       }
     });
 
@@ -61,6 +65,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (mounted) {
         setSession(nextSession);
         setLoading(false);
+
+        if (!nextSession) {
+          setProfile(null);
+        }
       }
     });
 
@@ -89,7 +97,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     let mounted = true;
 
     if (!session?.user.id) {
-      setProfile(null);
       return () => {
         mounted = false;
       };
