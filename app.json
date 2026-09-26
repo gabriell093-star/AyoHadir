@@ -1,0 +1,21 @@
+{
+  "expo": {
+    "name": "AyoHadir",
+    "slug": "ayohadir",
+    "version": "0.2.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "scheme": "ayohadir",
+    "android": {
+      "package": "com.ayohadir.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#FFFFFF"
+      }
+    },
+    "plugins": ["expo-router", "expo-secure-store"],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "newArchEnabled": true
+  }
+}

@@ -1,53 +1,51 @@
 # AyoHadir — Project Instructions
 
 ## Project
-AyoHadir is a Flutter Android attendance application built from scratch. The backend target is Supabase. Development must stay modular and incremental.
+AyoHadir is an Android-first attendance application built with Expo React Native and TypeScript. Supabase is the backend target.
 
-## Current stage
-Foundation only. Do not add authentication, QR scanning/generation, GPS, offline sync, realtime, or other product features unless explicitly requested.
+## Source of truth
+- docs/PRD_Aplikasi_Absensi_QR.md
+- docs/UIUX_Absensi_QR.md
+- docs/stitch/dashboard_utama_ayo_hadir.html
+- assets/images/ayo-hadir-logo.svg
 
 ## Technology
-- Flutter / Dart
-- Material 3
-- Supabase will be integrated later
-- Android release target
+- Expo SDK 57
+- React Native
+- TypeScript
+- Expo Router
+- NativeWind v4
+- Zustand
+- Supabase
+- expo-sqlite
+- expo-secure-store
 
 ## Architecture
-- `lib/core/`: cross-feature concerns such as constants, models, routing, services, theme, and shared widgets.
-- `lib/features/`: feature modules. Keep feature-specific UI and logic inside its feature folder.
-- `lib/test/` or `test/`: tests corresponding to application behavior.
+- app/: routes only
+- src/components/: reusable UI
+- src/features/: feature-specific logic
+- src/lib/: integrations/infrastructure
+- src/state/: Zustand stores
+- src/theme/: design tokens
 
-## Coding rules
-- Keep code null-safe and analyzer-clean.
-- Prefer small, testable widgets and services.
-- Do not place secrets in source control.
-- Never hard-code Supabase service-role keys or other private credentials.
-- Do not rewrite unrelated files when implementing a task.
-- Preserve existing behavior unless the task explicitly changes it.
-- Run formatting, static analysis, and tests after meaningful changes.
-- Use clear, conventional Dart naming.
+## Security
+- Client may use only the Supabase publishable/anon key.
+- Never commit Supabase service-role keys or other secrets.
+- Attendance authorization and validation must remain server-enforced.
 
-## Git workflow
-- Work in small, reviewable commits.
-- Commit messages should describe the change clearly.
-- Avoid committing generated build artifacts.
+## Product constraints
+- No Admin role/dashboard unless explicitly added to the PRD.
+- Every user can create and scan QR.
+- Offline attendance preserves the original scan time and syncs later.
+- Use the user-facing status wording “Sinkronisasi tertunda”.
 
-## Build verification
-Expected checks for a Flutter project:
+## Validation
+Do not claim validation passed without actual command or CI evidence.
 
-```text
-flutter pub get
-dart format --output=none --set-exit-if-changed .
-flutter analyze
-flutter test
-flutter build apk --release
-```
-
-The repository's GitHub Actions workflow is the authoritative automated check when available.
-
-## Agent behavior
-Before changing code:
-1. Read the relevant files and understand existing structure.
-2. Make the smallest complete change for the requested task.
-3. Validate the change.
-4. Summarize files changed and any validation that could not be run.
+Expected checks:
+npm install
+npx expo-doctor
+npm run typecheck
+npm run lint
+npx expo prebuild --platform android --non-interactive
+cd android && ./gradlew assembleRelease

@@ -1,39 +1,55 @@
 # AyoHadir
 
-Aplikasi absensi Android berbasis Flutter.
+Aplikasi absensi QR Android-first menggunakan **Expo React Native + TypeScript**.
 
 ## Status
 
-Repository kerja utama AyoHadir. Foundation Flutter dari source AyoHadir sebelumnya telah dipindahkan ke repository ini tanpa direkonstruksi.
+Repository ini sekarang mengikuti arah pengembangan Expo. Foundation Flutter lama tidak lagi menjadi source project aktif.
 
-Source yang diimpor berasal dari commit publik:
-- Repository: `primacynfachy-ai/AyoHadir`
-- Commit: `35e1dd2b0315104fe574ad15b5fcb4480aaa7597`
-- Scope saat source tersebut dibuat: **Foundation only**
-
-Foundation yang diimpor meliputi `pubspec.yaml`, entry point Flutter, tema/konstanta, struktur feature/core, test widget, aturan agent, dan GitHub Actions Flutter CI.
-
-## Source of truth produk
+### Source of truth produk
 
 - `docs/PRD_Aplikasi_Absensi_QR.md`
 - `docs/UIUX_Absensi_QR.md`
 - `docs/stitch/dashboard_utama_ayo_hadir.html`
 - `assets/images/ayo-hadir-logo.svg`
 
-## Tahap saat ini
+### Stack foundation
 
-Foundation belum mengimplementasikan autentikasi, QR scanning/generation, GPS, offline sync, realtime, Supabase, riwayat, pembatalan, atau notifikasi. Fitur-fitur tersebut harus dibangun bertahap sesuai PRD dan UI/UX.
+- Expo SDK 57
+- React Native 0.86
+- TypeScript
+- Expo Router
+- NativeWind 4
+- Zustand
+- Supabase
+- expo-sqlite
+- expo-secure-store
+
+Expo SDK 57 saat ini menargetkan React Native 0.86 dan Android API level 36. NativeWind 4.2.7 adalah jalur stabil untuk Expo SDK 57; NativeWind 5 masih pre-release.
+
+## Foundation
+
+Repository saat ini menyediakan:
+- routing Expo Router dengan lima tab dasar
+- styling NativeWind
+- struktur `src/` untuk komponen, state, theme, dan integrasi
+- Supabase client berbasis SecureStore tanpa service-role key
+- konfigurasi CNG untuk Android
+- GitHub Actions untuk doctor, typecheck, lint, prebuild Android, dan release APK build
+
+Fitur produk seperti Auth, QR dinamis, GPS, attendance, offline sync, riwayat, pembatalan, dan notifikasi **belum dianggap selesai** pada tahap foundation.
 
 ## Validasi
 
-Repository memiliki GitHub Actions yang menjalankan:
+Jangan menganggap build berhasil hanya karena workflow tersedia. Status harus dibuktikan dari GitHub Actions.
+
+Perintah lokal:
 
 ```text
-flutter pub get
-dart format --output=none --set-exit-if-changed lib test
-flutter analyze
-flutter test
-flutter build apk --release
+npm install
+npx expo-doctor
+npm run typecheck
+npm run lint
+npx expo prebuild --platform android --non-interactive
+cd android && ./gradlew assembleRelease
 ```
-
-Folder Android dibuat oleh workflow bila belum ada. Status lulus/gagal build harus dibuktikan dari workflow run, bukan diasumsikan dari keberadaan file source.
