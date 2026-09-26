@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <!-- Latar Belakang lingkaran Orange -->
+  <circle cx="250" cy="250" r="240" fill="#FA6003" />
+
+  <!-- Garis Orbit Outer & Node Titik -->
+  <circle cx="250" cy="250" r="180" fill="none" stroke="#FFFFFF" stroke-width="7" stroke-dasharray="105 45 105 45 105 45 105 45" stroke-dashoffset="25"/>
+  <circle cx="123" cy="123" r="14" fill="#FFFFFF" />
+  <circle cx="377" cy="123" r="14" fill="#FFFFFF" />
+  <circle cx="123" cy="377" r="14" fill="#FFFFFF" />
+  <circle cx="377" cy="377" r="14" fill="#FFFFFF" />
+
+  <!-- Frame Lingkaran Tengah -->
+  <circle cx="250" cy="245" r="95" fill="none" stroke="#FFFFFF" stroke-width="16" />
+
+  <!-- Profil Pengguna di Tengah -->
+  <circle cx="250" cy="195" r="32" fill="#FFFFFF" />
+  <path d="M 190 285 C 190 230, 310 230, 310 285 Z" fill="#FFFFFF" />
+
+  <!-- Ikon Centang (Checkmark) -->
+  <path d="M 205 300 L 245 340 L 320 255" fill="none" stroke="#FFFFFF" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 205 300 L 245 340 L 320 255" fill="none" stroke="#FA6003" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- Ikon Jam (Atas) -->
+  <g transform="translate(250, 95)">
+    <circle cx="0" cy="0" r="42" fill="#FA6003" stroke="#FFFFFF" stroke-width="12" />
+    <path d="M 0 -22 V 0 L 16 16" fill="none" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+
+  <!-- Ikon ID Card (Kiri) -->
+  <g transform="translate(100, 255)">
+    <path d="M -16 -48 H 16 V -34 H -16 Z" fill="#FFFFFF" />
+    <path d="M -8 -56 H 8 V -46 H -8 Z" fill="#FA6003" />
+    <rect x="-46" y="-34" width="92" height="72" rx="12" fill="#FFFFFF" />
+    <circle cx="-22" cy="-6" r="10" fill="#FA6003" />
+    <path d="M -34 18 C -34 6, -10 6, -10 18 Z" fill="#FA6003" />
+    <rect x="4" y="-12" width="26" height="6" rx="3" fill="#FA6003" />
+    <rect x="4" y="2" width="26" height="6" rx="3" fill="#FA6003" />
+  </g>
+
+  <!-- Ikon Smartphone & QR Code (Kanan) -->
+  <g transform="translate(400, 255)">
+    <rect x="-40" y="-68" width="80" height="136" rx="16" fill="#FFFFFF" />
+    <rect x="-12" y="-60" width="24" height="4" rx="2" fill="#FA6003" />
+    <rect x="-26" y="-36" width="20" height="20" fill="none" stroke="#FA6003" stroke-width="4" />
+    <rect x="-22" y="-32" width="12" height="12" fill="#FA6003" />
+    <rect x="6" y="-36" width="20" height="20" fill="none" stroke="#FA6003" stroke-width="4" />
+    <rect x="10" y="-32" width="12" height="12" fill="#FA6003" />
+    <rect x="-26" y="-4" width="20" height="20" fill="none" stroke="#FA6003" stroke-width="4" />
+    <rect x="-22" y="0" width="12" height="12" fill="#FA6003" />
+    <rect x="6" y="-4" width="6" height="6" fill="#FA6003" />
+    <rect x="18" y="-4" width="8" height="6" fill="#FA6003" />
+    <rect x="6" y="8" width="10" height="8" fill="#FA6003" />
+    <rect x="20" y="10" width="6" height="6" fill="#FA6003" />
+    <path d="M -32 -42 H -36 V -38 M 32 -42 H 36 V -38 M -32 26 H -36 V 22 M 32 26 H 36 V 22" fill="none" stroke="#FA6003" stroke-width="3" stroke-linecap="round" />
+  </g>
+
+  <!-- Ikon Pin Lokasi (Bawah) -->
+  <g transform="translate(250, 410)">
+    <ellipse cx="0" cy="30" rx="36" ry="12" fill="none" stroke="#FFFFFF" stroke-width="7" />
+    <path d="M 0 24 C -26 0, -30 -20, -30 -34 C -30 -52, -16 -66, 0 -66 C 16 -66, 30 -52, 30 -34 C 30 -20, 26 0, 0 24 Z" fill="#FFFFFF" />
+    <circle cx="0" cy="-34" r="13" fill="#FA6003" />
+  </g>
+</svg>
