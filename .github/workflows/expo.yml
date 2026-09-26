@@ -40,9 +40,32 @@ jobs:
         working-directory: android
         run: ./gradlew assembleRelease
 
+      - name: Verify APK runtime and prepare named artifact
+        working-directory: android
+        run: |
+          python3 - <<'PY'
+          import zipfile
+          from pathlib import Path
+
+          apk = Path("app/build/outputs/apk/release/app-release.apk")
+          if not apk.is_file():
+              raise SystemExit("Release APK tidak ditemukan.")
+          with zipfile.ZipFile(apk) as z:
+              names = z.namelist()
+              if not any("libexpo-modules-core.so" in n for n in names):
+                  raise SystemExit("APK tidak mengandung runtime Expo yang diharapkan.")
+              flutter_markers = ("flutter_assets", "libflutter.so", "io/flutter")
+              if any(any(marker in n.lower() for marker in flutter_markers) for n in names):
+                  raise SystemExit("Terdeteksi artefak Flutter di APK; build dihentikan.")
+          print(f"Verified Expo APK: {apk} ({apk.stat().st_size} bytes)")
+          PY
+          VERSION=$(node -p "require('../package.json').version")
+          mkdir -p ../artifacts
+          cp app/build/outputs/apk/release/app-release.apk "../artifacts/AyoHadir-Expo-v\${VERSION}.apk"
+
       - name: Upload release APK
         uses: actions/upload-artifact@v4
         with:
-          name: ayohadir-release-apk
-          path: android/app/build/outputs/apk/release/app-release.apk
+          name: ayohadir-expo-release-apk
+          path: artifacts/AyoHadir-Expo-v*.apk
           if-no-files-found: error
