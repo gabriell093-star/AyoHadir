@@ -1,5 +1,12 @@
-import { useEffect, useState } from "react";
-import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { useState } from "react";
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View
+} from "react-native";
 import { useRouter } from "expo-router";
 
 import { useAuth } from "@/auth/auth-context";
@@ -8,13 +15,11 @@ import { supabase } from "@/lib/supabase";
 export default function ProfileScreen() {
   const router = useRouter();
   const { profile, user, updateDisplayName } = useAuth();
-  const [displayName, setDisplayName] = useState("");
+  const [draftName, setDraftName] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
 
-  useEffect(() => {
-    setDisplayName(profile?.display_name ?? "");
-  }, [profile?.display_name]);
+  const displayName = draftName ?? profile?.display_name ?? "";
 
   const saveProfile = async () => {
     setNotice(null);
@@ -22,6 +27,7 @@ export default function ProfileScreen() {
 
     try {
       await updateDisplayName(displayName);
+      setDraftName(null);
       setNotice("Profil berhasil diperbarui.");
     } catch (error) {
       setNotice(
@@ -74,18 +80,22 @@ export default function ProfileScreen() {
 
           <View className="rounded-full bg-emerald-50 px-3 py-1.5">
             <Text className="text-sm font-semibold text-emerald-700">
-              {emailVerified ? "Email Terverifikasi" : "Email Belum Terverifikasi"}
+              {emailVerified
+                ? "Email Terverifikasi"
+                : "Email Belum Terverifikasi"}
             </Text>
           </View>
         </View>
       </View>
 
       <View className="rounded-[24px] border border-gray-100 bg-white p-5 shadow-sm">
-        <Text className="text-base font-bold text-gray-950">Nama tampilan</Text>
+        <Text className="text-base font-bold text-gray-950">
+          Nama tampilan
+        </Text>
         <TextInput
           className="mt-3 rounded-2xl border border-gray-200 bg-gray-50 px-4 py-4 text-base text-gray-950"
           value={displayName}
-          onChangeText={setDisplayName}
+          onChangeText={setDraftName}
           placeholder="Nama lengkap"
           placeholderTextColor="#9CA3AF"
           autoCapitalize="words"
