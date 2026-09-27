@@ -1,6 +1,6 @@
 {
   "name": "ayohadir",
-  "version": "0.3.0",
+  "version": "0.3.4",
   "private": true,
   "main": "expo-router/entry",
   "scripts": {
