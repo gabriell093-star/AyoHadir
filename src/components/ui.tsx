@@ -547,7 +547,7 @@ export function Segmented({
 export function QrVisual({
   size = 236,
   label = "QR",
-  value = "ayohadir:demo-session-token"
+  value = "AyoHadir QR"
 }: {
   size?: number;
   label?: string;
