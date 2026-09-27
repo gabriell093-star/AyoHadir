@@ -56,8 +56,14 @@ export default function UpdatePasswordScreen() {
     setBusy(true);
 
     if (!isRecovery) {
+      if (!user?.email) {
+        setNotice("Email akun tidak tersedia. Silakan masuk kembali.");
+        setBusy(false);
+        return;
+      }
+
       const { error: verifyError } = await supabase.auth.signInWithPassword({
-        email: user?.email ?? "",
+        email: user.email,
         password: currentPassword
       });
       if (verifyError) {
