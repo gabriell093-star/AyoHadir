@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Pindai QR</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "outline": "#75777d",
+                      "outline-variant": "#c5c6cd",
+                      "tertiary-fixed": "#fadfb8",
+                      "on-error": "#ffffff",
+                      "on-background": "#1b1b1d",
+                      "on-error-container": "#93000a",
+                      "on-primary-fixed": "#111c2d",
+                      "on-secondary": "#ffffff",
+                      "on-primary-container": "#8590a6",
+                      "surface-container": "#f0edef",
+                      "surface-tint": "#545f73",
+                      "on-primary-fixed-variant": "#3c475a",
+                      "tertiary": "#1e1200",
+                      "on-tertiary-container": "#a38c6a",
+                      "tertiary-container": "#35260c",
+                      "secondary-fixed-dim": "#6bd8cb",
+                      "surface-variant": "#e4e2e3",
+                      "on-primary": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "on-secondary-fixed": "#00201d",
+                      "inverse-surface": "#303032",
+                      "surface-gray": "#F8FAFC",
+                      "error": "#ba1a1a",
+                      "secondary-container": "#86f2e4",
+                      "primary-container": "#1e293b",
+                      "surface-container-high": "#eae7e9",
+                      "primary": "#091426",
+                      "surface-dim": "#dcd9db",
+                      "on-secondary-fixed-variant": "#005049",
+                      "inverse-primary": "#bcc7de",
+                      "surface": "#fbf8fa",
+                      "on-secondary-container": "#006f66",
+                      "surface-container-highest": "#e4e2e3",
+                      "surface-container-lowest": "#ffffff",
+                      "error-rose": "#E11D48",
+                      "on-surface-variant": "#45474c",
+                      "secondary-fixed": "#89f5e7",
+                      "background": "#fbf8fa",
+                      "success-emerald": "#10B981",
+                      "secondary": "#006a61",
+                      "surface-bright": "#fbf8fa",
+                      "primary-fixed-dim": "#bcc7de",
+                      "on-tertiary-fixed": "#271902",
+                      "on-tertiary-fixed-variant": "#564427",
+                      "on-tertiary": "#ffffff",
+                      "primary-fixed": "#d8e3fb",
+                      "warning-amber": "#F59E0B",
+                      "tertiary-fixed-dim": "#ddc39d",
+                      "inverse-on-surface": "#f3f0f2",
+                      "surface-container-low": "#f5f3f4",
+                      "on-surface": "#1b1b1d",
+                      "border-subtle": "#E2E8F0"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "gutter": "16px",
+                      "container-padding": "24px",
+                      "stack-lg": "24px",
+                      "base": "8px",
+                      "stack-sm": "4px",
+                      "stack-md": "12px"
+              },
+              "fontFamily": {
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "display-lg": [
+                              "Inter"
+                      ],
+                      "headline-lg-mobile": [
+                              "Inter"
+                      ],
+                      "label-sm": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "title-md": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "title-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        /* Camera overlay styles */
+        .camera-mask {
+            mask-image: radial-gradient(transparent 150px, black 150px);
+            -webkit-mask-image: radial-gradient(transparent 150px, black 150px);
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+        
+        /* Focus bracket styles */
+        .focus-bracket {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-color: #86f2e4; /* secondary-container / Teal */
+            border-style: solid;
+        }
+        .bracket-tl { top: 0; left: 0; border-width: 4px 0 0 4px; border-top-left-radius: 8px; }
+        .bracket-tr { top: 0; right: 0; border-width: 4px 4px 0 0; border-top-right-radius: 8px; }
+        .bracket-bl { bottom: 0; left: 0; border-width: 0 0 4px 4px; border-bottom-left-radius: 8px; }
+        .bracket-br { bottom: 0; right: 0; border-width: 0 4px 4px 0; border-bottom-right-radius: 8px; }
+
+        /* Hide scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-primary text-on-primary w-full h-screen overflow-hidden flex flex-col font-body-md antialiased select-none">
+<!-- App Bar (Top Navigation) -->
+<header class="flex justify-between items-center h-16 px-gutter w-full sticky top-0 z-50 bg-transparent text-on-primary">
+<button aria-label="Back" class="w-10 h-10 flex items-center justify-center rounded-full bg-primary-container/50 backdrop-blur-sm text-on-primary hover:bg-primary-container/70 transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+<h1 class="text-title-md font-title-md font-bold">Pindai QR</h1>
+<div class="w-10 h-10 flex items-center justify-center rounded-full bg-primary-container/50 backdrop-blur-sm">
+<span class="material-symbols-outlined text-success-emerald text-sm mr-1" style="font-variation-settings: 'FILL' 1;">cloud_done</span>
+<span class="text-label-sm font-label-sm text-on-primary">Online</span>
+</div>
+</header>
+<!-- Main Camera Area -->
+<main class="flex-1 relative w-full h-full flex flex-col items-center justify-center">
+<!-- Simulated Camera Feed Background -->
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover" data-alt="A slightly blurred, abstract view of an office desk environment seen through a smartphone camera lens. The scene includes a white desk surface, a portion of a laptop keyboard, and a coffee cup, all softly out of focus to simulate a camera preview searching for a QR code. The lighting is bright and even, typical of a modern office space in light mode." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDeqehzyyu2j3RWKjzuNIe0l3NlgWR8qXji1_tmgJVfMjZjJi8XrWonEXjyZ6viZIKehPjB-2qxop-spqEU8bqPs78QrkQ3f_QAT2oCVg1BnBjRC4mWQm0Xf7PxdIYMwBcuZr_sn1fYvH_RVA06I4Qeur7XI4l8_XGPUsODQJRO8iTSUoaLz_thIEM5LRYynDLU8oyfdbYQOS_ETL5YofRAUBHLLC0Qjygvklkj-BARoiND3M211S1w"/>
+</div>
+<!-- Dark Overlay with Cutout -->
+<div class="absolute inset-0 z-10 camera-mask"></div>
+<!-- Scanning Frame (Positioned over the cutout) -->
+<div class="relative z-20 w-[300px] h-[300px] flex items-center justify-center mt-[-60px]">
+<div class="focus-bracket bracket-tl"></div>
+<div class="focus-bracket bracket-tr"></div>
+<div class="focus-bracket bracket-bl"></div>
+<div class="focus-bracket bracket-br"></div>
+<!-- Scanning Line Animation (CSS) -->
+<div class="w-full h-[2px] bg-secondary-container absolute top-0 left-0 animate-[scan_2s_ease-in-out_infinite]"></div>
+<style>
+                @keyframes scan {
+                    0% { top: 0%; opacity: 0; }
+                    10% { opacity: 1; }
+                    90% { opacity: 1; }
+                    100% { top: 100%; opacity: 0; }
+                }
+            </style>
+</div>
+<!-- Instructions -->
+<div class="relative z-20 mt-8 text-center px-6">
+<p class="text-body-md font-body-md text-on-primary drop-shadow-md">Posisikan kode QR di dalam bingkai</p>
+</div>
+<!-- Camera Controls -->
+<div class="relative z-20 mt-auto mb-24 flex items-center gap-6">
+<button class="w-14 h-14 rounded-full bg-primary-container/80 backdrop-blur-md flex flex-col items-center justify-center text-on-primary hover:bg-surface-tint transition-colors border border-outline-variant/30 shadow-lg">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">flashlight_on</span>
+<span class="text-[10px] font-label-sm">Flash</span>
+</button>
+<button class="w-14 h-14 rounded-full bg-primary-container/80 backdrop-blur-md flex flex-col items-center justify-center text-on-primary hover:bg-surface-tint transition-colors border border-outline-variant/30 shadow-lg">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">keyboard</span>
+<span class="text-[10px] font-label-sm">Manual</span>
+</button>
+</div>
+</main>
+<!-- Bottom Navigation Bar (Generated from JSON, 'Scan' is active) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-20 px-2 pb-safe bg-surface dark:bg-background border-t border-border-subtle md:hidden">
+<!-- Home (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">home</span>
+<span class="text-label-sm font-label-sm mt-1">Home</span>
+</a>
+<!-- Scan (Active) -->
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1 scale-95 transition-transform duration-100" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">qr_code_scanner</span>
+<span class="text-label-sm font-label-sm mt-1">Scan</span>
+</a>
+<!-- History (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">history</span>
+<span class="text-label-sm font-label-sm mt-1">History</span>
+</a>
+<!-- Profile (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">person</span>
+<span class="text-label-sm font-label-sm mt-1">Profile</span>
+</a>
+</nav>
+<!-- Desktop Navigation Drawer (Hidden on mobile) -->
+<aside class="hidden md:flex fixed inset-y-0 left-0 z-[60] flex-col py-6 h-full w-80 rounded-r-xl bg-surface shadow-lg">
+<div class="px-6 mb-8 flex items-center gap-4">
+<img class="w-12 h-12 rounded-full object-cover" data-alt="A professional headshot of a corporate employee smiling subtly. The background is a clean, minimal light gray office wall. The lighting is bright and even, reflecting a corporate modernism aesthetic suitable for a high-end enterprise tool." src="https://lh3.googleusercontent.com/aida-public/AB6AXuABNNJddohupAQNYxSAoXOw1Vyra9kDOfLVikeLQ04QhDqk1xZ-X_ECeh7EYg_ib6nktLcS7NeFS46jXSVb4eWW7WR0zbEpLQcLuLH5YnCAGnrPeyFhHl7zgyYVMxQ21Oy7dTONZRDVcdCSFWQi36o1NusFCJ47GT3O24MtaeaVVP8JJGsN55AzP6FbOixMKxM_YSr9qsBmqBUdHDQHeRT47O97qFDQTNli-AT-yvYvKOP08B-rvNuv"/>
+<div>
+<h2 class="text-title-md font-title-md font-bold text-primary">Admin User</h2>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Organization Member</p>
+<p class="text-[10px] text-outline mt-1">v1.0.4</p>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-2 overflow-y-auto">
+<!-- Dashboard (Inactive) -->
+<a class="flex items-center gap-4 text-on-surface-variant px-4 py-3 mx-2 rounded-lg hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">dashboard</span>
+<span class="text-body-md font-body-md">Dashboard</span>
+</a>
+<!-- Create QR (Active - conceptually closest to Scanning context if considered a generic action, but usually scan isn't in desktop nav directly. We'll leave all inactive except for a semantic match, but none perfectly match 'Scan' contextually here. Let's make Create QR active for demonstration of the component styling) -->
+<a class="flex items-center gap-4 bg-primary-container text-on-primary-container rounded-full px-4 py-3 mx-2 scale-[0.98] transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add_box</span>
+<span class="text-body-md font-body-md">Create QR</span>
+</a>
+<!-- My Attendance (Inactive) -->
+<a class="flex items-center gap-4 text-on-surface-variant px-4 py-3 mx-2 rounded-lg hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">fact_check</span>
+<span class="text-body-md font-body-md">My Attendance</span>
+</a>
+<!-- Offline Sync (Inactive) -->
+<a class="flex items-center gap-4 text-on-surface-variant px-4 py-3 mx-2 rounded-lg hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">sync_saved_locally</span>
+<span class="text-body-md font-body-md">Offline Sync</span>
+</a>
+<!-- Settings (Inactive) -->
+<a class="flex items-center gap-4 text-on-surface-variant px-4 py-3 mx-2 rounded-lg hover:bg-surface-container-high transition-colors mt-auto" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>
+<span class="text-body-md font-body-md">Settings</span>
+</a>
+</nav>
+</aside>
+</body></html>

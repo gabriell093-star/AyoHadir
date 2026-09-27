@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CheckIn Pro - QR Success</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#002107",
+                        "on-secondary-container": "#446e47",
+                        "on-error": "#ffffff",
+                        "tertiary-container": "#646552",
+                        "tertiary": "#4c4d3b",
+                        "inverse-on-surface": "#f2f1ee",
+                        "surface-container-highest": "#e3e2e0",
+                        "primary": "#3e5219",
+                        "on-primary": "#ffffff",
+                        "surface": "#faf9f6",
+                        "on-error-container": "#93000a",
+                        "error": "#ba1a1a",
+                        "surface-variant": "#e3e2e0",
+                        "on-surface-variant": "#45483c",
+                        "on-tertiary-container": "#e2e3ca",
+                        "on-secondary-fixed-variant": "#274f2c",
+                        "outline-variant": "#c5c8b8",
+                        "secondary": "#3e6842",
+                        "surface-container-high": "#e9e8e5",
+                        "surface-container": "#efeeeb",
+                        "surface-bright": "#faf9f6",
+                        "surface-container-low": "#f4f3f1",
+                        "secondary-fixed-dim": "#a4d2a4",
+                        "on-surface": "#1a1c1a",
+                        "secondary-fixed": "#bfefbe",
+                        "outline": "#75796b",
+                        "primary-container": "#556b2f",
+                        "surface-tint": "#50652a",
+                        "tertiary-fixed-dim": "#c8c8b0",
+                        "inverse-primary": "#b6d088",
+                        "secondary-container": "#bfefbe",
+                        "surface-dim": "#dbdad7",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed": "#d2eca2",
+                        "primary-fixed-dim": "#b6d088",
+                        "on-primary-fixed-variant": "#394d14",
+                        "on-primary-fixed": "#131f00",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-surface": "#2f312f",
+                        "on-background": "#1a1c1a",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed": "#e4e4cc",
+                        "on-tertiary-fixed": "#1b1d0e",
+                        "background": "#faf9f6",
+                        "on-tertiary-fixed-variant": "#474836",
+                        "on-primary-container": "#d0eba1",
+                        "error-container": "#ffdad6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "24px",
+                        "margin-mobile": "16px",
+                        "xs": "8px",
+                        "lg": "40px",
+                        "gutter": "24px",
+                        "xl": "64px",
+                        "sm": "16px",
+                        "base": "4px",
+                        "margin-desktop": "80px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "caption": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-xl": ["Inter"],
+                        "label-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "caption": ["12px", { "lineHeight": "1.4", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-xl": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+        }
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen flex flex-col items-center justify-center bg-background px-margin-mobile md:px-margin-desktop py-xl">
+<!-- Main Container -->
+<main class="w-full max-w-lg mx-auto flex flex-col items-center text-center bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-lg pt-xl">
+<!-- Success Icon -->
+<div class="mb-md flex items-center justify-center w-24 h-24 rounded-full bg-secondary-container/20 text-primary">
+<span class="material-symbols-outlined" data-icon="check_circle" style="font-size: 64px; font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<!-- Heading -->
+<h1 class="text-headline-lg-mobile md:text-headline-lg font-headline-lg text-primary mb-sm">
+            QR Berhasil Dibuat!
+        </h1>
+<!-- Subheading -->
+<p class="text-body-md font-body-md text-on-surface-variant mb-xl">
+            Sesi absensi siap digunakan. Peserta dapat mulai memindai kode ini.
+        </p>
+<!-- QR Display Container -->
+<div class="w-full max-w-sm bg-surface-container-low rounded-lg p-md mb-lg border border-outline-variant/50 relative overflow-hidden flex flex-col items-center justify-center">
+<!-- Placeholder for dynamic QR code image -->
+<img alt="Dynamic QR Code" class="w-48 h-48 mb-md object-contain border border-outline-variant/30 p-2 bg-white rounded-md" data-alt="A clean, crisp QR code presented in a minimalist, high-end professional UI context. The QR code itself is dark olive green on a stark white background. Soft studio lighting highlights the matte texture of the surrounding interface. Mossy Valley aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDn08ibCfrJpfMTsYnJG_GEAP-TBLwoJazhEW9uKLtft3VxeRaA8vtNp9Gre1h73uI9vJmiKYQY9TL5UirLyluteGbN1hu2l5WZCSVUtVNcqDxHck7ZntaNNenlFXjg-diP_UmsSrIsguHMSBJzEgpPeprnM_hOH39SoWLiYYAsBDg1FCNA5ZHdKiFUJsLQGCIxdRDPJUOMbAmVNtR4LV7jVYTjkvEdxiqI47RwaJV6cMWXOfj5mbtK"/>
+<div class="flex items-center gap-xs text-caption font-caption text-secondary">
+<span class="material-symbols-outlined text-sm" data-icon="timer">timer</span>
+<span>Token diperbarui setiap 10 menit</span>
+</div>
+</div>
+<!-- Actions -->
+<div class="w-full flex flex-col gap-sm mt-md">
+<button class="w-full flex items-center justify-center gap-2 bg-primary text-on-primary font-label-md text-label-md py-3 px-6 rounded-lg hover:bg-primary/90 transition-colors">
+<span class="material-symbols-outlined" data-icon="share">share</span>
+                Share QR
+            </button>
+<button class="w-full flex items-center justify-center gap-2 border border-outline text-primary font-label-md text-label-md py-3 px-6 rounded-lg hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined" data-icon="download">download</span>
+                Download as Image
+            </button>
+<button class="w-full flex items-center justify-center gap-2 text-on-surface-variant font-label-md text-label-md py-3 px-6 rounded-lg hover:bg-surface-container transition-colors mt-xs">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+                View Session History
+            </button>
+</div>
+</main>
+</body></html>

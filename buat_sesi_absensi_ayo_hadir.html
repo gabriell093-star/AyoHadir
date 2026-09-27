@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Create QR Session - Ayo Hadir</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-container": "#556b2f",
+                    "inverse-surface": "#2f312f",
+                    "inverse-on-surface": "#f2f1ee",
+                    "tertiary-container": "#646552",
+                    "on-secondary-container": "#446e47",
+                    "surface-container-lowest": "#ffffff",
+                    "on-surface": "#1a1c1a",
+                    "on-tertiary": "#ffffff",
+                    "on-tertiary-container": "#e2e3ca",
+                    "primary-fixed": "#d2eca2",
+                    "secondary-container": "#bfefbe",
+                    "background": "#faf9f6",
+                    "surface-variant": "#e3e2e0",
+                    "tertiary": "#4c4d3b",
+                    "surface-container-high": "#e9e8e5",
+                    "on-primary": "#ffffff",
+                    "on-surface-variant": "#45483c",
+                    "secondary": "#3e6842",
+                    "on-primary-fixed": "#131f00",
+                    "on-secondary-fixed": "#002107",
+                    "secondary-fixed-dim": "#a4d2a4",
+                    "on-tertiary-fixed": "#1b1d0e",
+                    "on-primary-fixed-variant": "#394d14",
+                    "on-secondary-fixed-variant": "#274f2c",
+                    "tertiary-fixed": "#e4e4cc",
+                    "error": "#ba1a1a",
+                    "surface-dim": "#dbdad7",
+                    "error-container": "#ffdad6",
+                    "surface-container-highest": "#e3e2e0",
+                    "on-background": "#1a1c1a",
+                    "secondary-fixed": "#bfefbe",
+                    "surface": "#faf9f6",
+                    "surface-container": "#efeeeb",
+                    "primary-fixed-dim": "#b6d088",
+                    "outline": "#75796b",
+                    "on-primary-container": "#d0eba1",
+                    "on-secondary": "#ffffff",
+                    "surface-tint": "#50652a",
+                    "primary": "#3e5219",
+                    "on-tertiary-fixed-variant": "#474836",
+                    "surface-bright": "#faf9f6",
+                    "surface-container-low": "#f4f3f1",
+                    "outline-variant": "#c5c8b8",
+                    "inverse-primary": "#b6d088",
+                    "on-error-container": "#93000a",
+                    "tertiary-fixed-dim": "#c8c8b0",
+                    "on-error": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "24px",
+                    "margin-mobile": "16px",
+                    "base": "4px",
+                    "xl": "64px",
+                    "gutter": "24px",
+                    "margin-desktop": "80px",
+                    "sm": "16px",
+                    "xs": "8px",
+                    "lg": "40px"
+            },
+            "fontFamily": {
+                    "headline-md": [
+                            "Inter"
+                    ],
+                    "headline-lg": [
+                            "Inter"
+                    ],
+                    "caption": [
+                            "Inter"
+                    ],
+                    "body-lg": [
+                            "Inter"
+                    ],
+                    "body-md": [
+                            "Inter"
+                    ],
+                    "headline-lg-mobile": [
+                            "Inter"
+                    ],
+                    "label-md": [
+                            "Inter"
+                    ],
+                    "headline-xl": [
+                            "Inter"
+                    ]
+            },
+            "fontSize": {
+                    "headline-md": [
+                            "24px",
+                            {
+                                    "lineHeight": "1.3",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "headline-lg": [
+                            "32px",
+                            {
+                                    "lineHeight": "1.2",
+                                    "letterSpacing": "-0.01em",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "caption": [
+                            "12px",
+                            {
+                                    "lineHeight": "1.4",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "body-lg": [
+                            "18px",
+                            {
+                                    "lineHeight": "1.6",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "body-md": [
+                            "16px",
+                            {
+                                    "lineHeight": "1.6",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-lg-mobile": [
+                            "28px",
+                            {
+                                    "lineHeight": "1.2",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "label-md": [
+                            "14px",
+                            {
+                                    "lineHeight": "1.2",
+                                    "letterSpacing": "0.05em",
+                                    "fontWeight": "500"
+                            }
+                    ],
+                    "headline-xl": [
+                            "48px",
+                            {
+                                    "lineHeight": "1.1",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        /* Custom range slider styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #3e5219; /* primary */
+            cursor: pointer;
+            margin-top: -8px;
+            border: 2px solid #faf9f6; /* background */
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #c5c8b8; /* outline-variant */
+            border-radius: 2px;
+        }
+        
+        input[type=range]:focus {
+            outline: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface min-h-screen pb-32">
+<!-- TopAppBar (Transactional - Hidden on Web, using back button style) -->
+<header class="fixed top-0 w-full z-50 bg-background border-b border-primary/10 flex items-center justify-between px-margin-mobile h-16 md:px-margin-desktop">
+<div class="flex items-center gap-4">
+<button class="p-2 -ml-2 rounded-full hover:bg-surface-container-low transition-colors text-on-surface-variant active:scale-95 duration-150">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary font-bold">Buat Sesi Absensi</h1>
+</div>
+<button class="p-2 -mr-2 rounded-full hover:bg-surface-container-low transition-colors text-on-surface-variant active:scale-95 duration-150">
+<span class="material-symbols-outlined">close</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-24 px-margin-mobile md:px-margin-desktop max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Left Column: Primary Settings -->
+<div class="md:col-span-7 flex flex-col gap-lg">
+<!-- Session Title -->
+<section class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface" for="session-title">Session Title</label>
+<input class="w-full bg-transparent border border-outline-variant rounded-DEFAULT px-4 py-3 font-body-md text-body-md text-on-surface focus:border-primary focus:border-2 focus:outline-none transition-all placeholder:text-outline" id="session-title" placeholder="e.g. Weekly All Hands" type="text"/>
+</section>
+<!-- Target Participants Toggle -->
+<section class="flex flex-col gap-sm">
+<label class="font-label-md text-label-md text-on-surface">Target Participants</label>
+<div class="flex p-1 bg-surface-container-low border border-outline-variant/30 rounded-lg">
+<button class="flex-1 py-2 px-4 rounded-DEFAULT bg-primary text-on-primary font-label-md text-label-md transition-colors text-center">
+                        All Employees
+                    </button>
+<button class="flex-1 py-2 px-4 rounded-DEFAULT text-on-surface-variant hover:bg-surface-variant/50 font-label-md text-label-md transition-colors text-center">
+                        Specific Group
+                    </button>
+</div>
+</section>
+<!-- Duration Slider -->
+<section class="flex flex-col gap-sm p-md border border-outline-variant/30 rounded-xl bg-surface-container-lowest">
+<div class="flex justify-between items-center">
+<label class="font-label-md text-label-md text-on-surface">Session Duration</label>
+<span class="font-body-md text-body-md text-primary font-semibold" id="duration-val">8 Hours</span>
+</div>
+<div class="pt-2">
+<input class="w-full" id="duration-slider" max="24" min="1" type="range" value="8"/>
+</div>
+<div class="flex justify-between font-caption text-caption text-outline">
+<span>1h</span>
+<span>12h</span>
+<span>24h</span>
+</div>
+</section>
+<!-- Late Threshold -->
+<section class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface" for="late-time">Late Threshold</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">schedule</span>
+<input class="w-full bg-transparent border border-outline-variant rounded-DEFAULT pl-12 pr-4 py-3 font-body-md text-body-md text-on-surface focus:border-primary focus:border-2 focus:outline-none transition-all" id="late-time" type="time" value="09:15"/>
+</div>
+<p class="font-caption text-caption text-outline mt-1">Attendees scanning after this time will be marked as late.</p>
+</section>
+</div>
+<!-- Right Column: Geofencing & Action -->
+<div class="md:col-span-5 flex flex-col gap-lg">
+<!-- Geofencing Card -->
+<section class="flex flex-col gap-md p-md border border-outline-variant/30 rounded-xl bg-surface-container-lowest">
+<div class="flex justify-between items-center">
+<div class="flex flex-col">
+<h3 class="font-label-md text-label-md text-on-surface">GPS &amp; Geofencing</h3>
+<p class="font-caption text-caption text-outline">Restrict attendance to a specific location</p>
+</div>
+<!-- Toggle Switch -->
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<!-- Radius Slider -->
+<div class="flex flex-col gap-sm">
+<div class="flex justify-between items-center">
+<label class="font-caption text-caption text-on-surface-variant">Allowed Radius</label>
+<span class="font-caption text-caption text-primary font-semibold">150m</span>
+</div>
+<input class="w-full" max="3000" min="5" type="range" value="150"/>
+</div>
+<!-- Map Preview -->
+<div class="relative w-full h-48 rounded-lg overflow-hidden border border-outline-variant/20">
+<img class="object-cover w-full h-full opacity-80 mix-blend-multiply" data-alt="A detailed, clean, top-down map view of a modern urban business district. The map styling is minimalist, utilizing a soft color palette of light beige backgrounds and pale sage green accents for parks. A subtle, translucent olive green circle indicates a geofenced area in the center. The visual aesthetic is professional, refined, and aligns with high-end environmental consulting firm interfaces." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_UdsKR7lNcwsRHviL677SdNsADcqnwnw35BCtqcPXszVGt0kyqn4y_1lp8ESVeM87dSEorGSjsxtyWSZILf7k1G8CAwxnS4jYIjVAEmkBJhbVUXMHAHXAOI2Ve2rROROjbfiv7K4Fl-UbEO-AeQp-2T_LU_3BF6bgL4ap6XqrFNIhOKcLD1ps7G_LDOTwP4uuD9NkLxLq1KyOaQ7TTZH15qiOwErxRhfVI2krXK48odwrI5zh8QXr"/>
+<div class="absolute inset-0 bg-primary/5 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-3xl drop-shadow-md" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</div>
+</div>
+<p class="font-caption text-caption text-outline flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">info</span>
+                    Using current office location (HQ).
+                </p>
+</section>
+</div>
+</main>
+<!-- Bottom Action Bar -->
+<div class="fixed bottom-0 w-full z-50 bg-surface/95 backdrop-blur-sm border-t border-primary/10 px-margin-mobile py-4 md:px-margin-desktop flex justify-end items-center gap-4">
+<button class="px-6 py-3 rounded-DEFAULT border border-secondary text-secondary font-label-md text-label-md hover:bg-surface-variant transition-colors">
+            Cancel
+        </button>
+<button class="px-8 py-3 rounded-DEFAULT bg-primary text-on-primary font-label-md text-label-md hover:bg-on-primary-fixed-variant transition-colors flex items-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-[20px]">qr_code</span>
+            Generate QR
+        </button>
+</div>
+<script>
+        // Simple slider interaction
+        const durationSlider = document.getElementById('duration-slider');
+        const durationVal = document.getElementById('duration-val');
+        
+        if(durationSlider && durationVal) {
+            durationSlider.addEventListener('input', (e) => {
+                durationVal.textContent = `${e.target.value} Hours`;
+            });
+        }
+    </script>
+</body></html>

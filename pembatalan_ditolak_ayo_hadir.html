@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Status Pembatalan - Ditolak</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline": "#75796b",
+                        "tertiary-fixed-dim": "#c8c8b0",
+                        "background": "#faf9f6",
+                        "primary-container": "#556b2f",
+                        "secondary": "#3e6842",
+                        "on-primary-fixed": "#131f00",
+                        "on-secondary-container": "#446e47",
+                        "on-primary-container": "#d0eba1",
+                        "outline-variant": "#c5c8b8",
+                        "on-tertiary-fixed": "#1b1d0e",
+                        "on-tertiary-fixed-variant": "#474836",
+                        "on-secondary": "#ffffff",
+                        "surface-bright": "#faf9f6",
+                        "on-surface": "#1a1c1a",
+                        "surface-container-high": "#e9e8e5",
+                        "surface-tint": "#50652a",
+                        "surface-variant": "#e3e2e0",
+                        "primary-fixed-dim": "#b6d088",
+                        "surface-container-low": "#f4f3f1",
+                        "tertiary": "#4c4d3b",
+                        "inverse-primary": "#b6d088",
+                        "on-error-container": "#93000a",
+                        "inverse-on-surface": "#f2f1ee",
+                        "secondary-container": "#bfefbe",
+                        "surface-container-highest": "#e3e2e0",
+                        "tertiary-container": "#646552",
+                        "surface": "#faf9f6",
+                        "on-background": "#1a1c1a",
+                        "on-secondary-fixed": "#002107",
+                        "secondary-fixed": "#bfefbe",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed-dim": "#a4d2a4",
+                        "on-tertiary-container": "#e2e3ca",
+                        "on-error": "#ffffff",
+                        "primary": "#3e5219",
+                        "primary-fixed": "#d2eca2",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#394d14",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed": "#e4e4cc",
+                        "surface-container": "#efeeeb",
+                        "surface-dim": "#dbdad7",
+                        "on-secondary-fixed-variant": "#274f2c",
+                        "error": "#ba1a1a",
+                        "inverse-surface": "#2f312f",
+                        "on-primary": "#ffffff",
+                        "on-surface-variant": "#45483c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "16px",
+                        "margin-mobile": "16px",
+                        "base": "4px",
+                        "margin-desktop": "80px",
+                        "gutter": "24px",
+                        "xs": "8px",
+                        "lg": "40px",
+                        "md": "24px",
+                        "xl": "64px"
+                    },
+                    "fontFamily": {
+                        "headline-xl": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "caption": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "label-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-xl": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "caption": ["12px", { "lineHeight": "1.4", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "label-md": ["14px", { "lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background antialiased min-h-screen flex flex-col pt-16">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface shadow-sm border-b border-outline-variant flex justify-between items-center px-4 md:px-margin-desktop h-16 w-full">
+<button class="text-primary hover:bg-surface-container-low transition-colors p-2 rounded-full active:scale-95 duration-100 flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Detail Kehadiran</h1>
+<button class="text-primary hover:bg-surface-container-low transition-colors p-2 rounded-full active:scale-95 duration-100 flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+</button>
+</header>
+<!-- Main Content -->
+<main class="flex-grow p-4 md:px-margin-desktop md:py-md max-w-4xl mx-auto w-full flex flex-col gap-md">
+<!-- Status Badge Container -->
+<div class="bg-surface-container-highest border border-outline-variant rounded-xl p-md flex flex-col items-center justify-center text-center gap-xs">
+<div class="bg-error-container text-on-error-container rounded-full px-4 py-2 font-label-md text-label-md flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="cancel" style="font-variation-settings: 'FILL' 1;">cancel</span>
+                Pembatalan Ditolak
+            </div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2">Permintaan pembatalan kehadiran Anda tidak disetujui.</p>
+</div>
+<!-- Details Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Attendance Info Card -->
+<div class="bg-surface rounded-xl border border-outline-variant p-md flex flex-col gap-sm">
+<h2 class="font-headline-md text-headline-md text-primary-container border-b border-surface-container-high pb-2">Informasi Kehadiran</h2>
+<div class="flex flex-col gap-1">
+<span class="font-caption text-caption text-on-surface-variant">Tanggal</span>
+<span class="font-body-md text-body-md text-on-surface">15 Agustus 2024</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="font-caption text-caption text-on-surface-variant">Waktu Masuk</span>
+<span class="font-body-md text-body-md text-on-surface">08:05 WIB</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="font-caption text-caption text-on-surface-variant">Lokasi</span>
+<span class="font-body-md text-body-md text-on-surface flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="location_on">location_on</span>
+                        Kantor Pusat (Lantai 3)
+                    </span>
+</div>
+</div>
+<!-- Rejection Reason Card -->
+<div class="bg-surface rounded-xl border border-outline-variant p-md flex flex-col gap-sm">
+<h2 class="font-headline-md text-headline-md text-primary-container border-b border-surface-container-high pb-2">Alasan Penolakan</h2>
+<div class="flex flex-col gap-1">
+<span class="font-caption text-caption text-on-surface-variant">Ditinjau Oleh</span>
+<span class="font-body-md text-body-md text-on-surface">Bpk. Sudirman (Manajer HR)</span>
+</div>
+<div class="flex flex-col gap-1 mt-2">
+<span class="font-caption text-caption text-on-surface-variant">Catatan</span>
+<div class="bg-surface-container-low p-3 rounded-lg border border-surface-container-high font-body-md text-body-md text-on-surface">
+                        Mohon maaf, bukti yang dilampirkan tidak sesuai dengan kebijakan perusahaan untuk pembatalan kehadiran pada hari tersebut. Silakan hubungi HRD untuk klarifikasi lebih lanjut.
+                    </div>
+</div>
+</div>
+</div>
+<!-- Action Button -->
+<div class="mt-4 flex justify-end">
+<button class="bg-primary text-on-primary font-body-md text-body-md rounded-lg px-6 py-3 hover:bg-secondary transition-colors duration-200">
+                Kembali ke Riwayat
+            </button>
+</div>
+</main>
+</body></html>

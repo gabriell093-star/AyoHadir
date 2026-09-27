@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bukti Absensi - Ayo Hadir</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline": "#75796b",
+                        "tertiary-fixed-dim": "#c8c8b0",
+                        "background": "#faf9f6",
+                        "primary-container": "#556b2f",
+                        "secondary": "#3e6842",
+                        "on-primary-fixed": "#131f00",
+                        "on-secondary-container": "#446e47",
+                        "on-primary-container": "#d0eba1",
+                        "outline-variant": "#c5c8b8",
+                        "on-tertiary-fixed": "#1b1d0e",
+                        "on-tertiary-fixed-variant": "#474836",
+                        "on-secondary": "#ffffff",
+                        "surface-bright": "#faf9f6",
+                        "on-surface": "#1a1c1a",
+                        "surface-container-high": "#e9e8e5",
+                        "surface-tint": "#50652a",
+                        "surface-variant": "#e3e2e0",
+                        "primary-fixed-dim": "#b6d088",
+                        "surface-container-low": "#f4f3f1",
+                        "tertiary": "#4c4d3b",
+                        "inverse-primary": "#b6d088",
+                        "on-error-container": "#93000a",
+                        "inverse-on-surface": "#f2f1ee",
+                        "secondary-container": "#bfefbe",
+                        "surface-container-highest": "#e3e2e0",
+                        "tertiary-container": "#646552",
+                        "surface": "#faf9f6",
+                        "on-background": "#1a1c1a",
+                        "on-secondary-fixed": "#002107",
+                        "secondary-fixed": "#bfefbe",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed-dim": "#a4d2a4",
+                        "on-tertiary-container": "#e2e3ca",
+                        "on-error": "#ffffff",
+                        "primary": "#3e5219",
+                        "primary-fixed": "#d2eca2",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#394d14",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed": "#e4e4cc",
+                        "surface-container": "#efeeeb",
+                        "surface-dim": "#dbdad7",
+                        "on-secondary-fixed-variant": "#274f2c",
+                        "error": "#ba1a1a",
+                        "inverse-surface": "#2f312f",
+                        "on-primary": "#ffffff",
+                        "on-surface-variant": "#45483c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "16px",
+                        "margin-mobile": "16px",
+                        "base": "4px",
+                        "margin-desktop": "80px",
+                        "gutter": "24px",
+                        "xs": "8px",
+                        "lg": "40px",
+                        "md": "24px",
+                        "xl": "64px"
+                    },
+                    "fontFamily": {
+                        "headline-xl": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "caption": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "label-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-xl": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "caption": ["12px", { "lineHeight": "1.4", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "label-md": ["14px", { "lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+        body {
+            background-color: #faf9f6; /* background */
+            color: #1a1c1a; /* on-background */
+        }
+        
+        /* Specific mossy valley refined minimalism styles */
+        .moss-card {
+            border: 1px solid rgba(85, 107, 47, 0.1); /* primary-container at 10% */
+            background-color: rgba(245, 245, 220, 0.3); /* subtle beige */
+        }
+        .moss-input {
+            border: 1px solid #c5c8b8; /* outline-variant */
+        }
+        .moss-input:focus {
+            border: 2px solid #3e5219; /* primary */
+            outline: none;
+        }
+        .moss-divider {
+            border-bottom: 1px solid #e9e8e5; /* surface-container-high */
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="antialiased min-h-screen flex flex-col items-center">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 shadow-sm border-b border-outline-variant bg-surface flex justify-between items-center px-gutter h-16 transition-colors duration-100">
+<div class="flex items-center gap-xs">
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-colors active:scale-95 text-on-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md font-bold text-primary tracking-tight">Ayo Hadir</h1>
+</div>
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-colors active:scale-95 text-on-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="cloud_sync">cloud_sync</span>
+</button>
+</header>
+<!-- Main Content Canvas (Transactional/Focused page, so Nav Shell is suppressed per rules) -->
+<main class="w-full max-w-2xl mx-auto pt-24 pb-32 px-margin-mobile md:px-margin-desktop flex flex-col gap-lg">
+<!-- Header Section -->
+<section class="flex flex-col gap-xs text-center items-center">
+<div class="w-16 h-16 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center mb-sm">
+<span class="material-symbols-outlined text-[32px]" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Bukti Absensi</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Data absensi telah berhasil direkam dalam sistem.</p>
+</section>
+<!-- Bento-style Details Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 gap-sm">
+<!-- User Identity Card -->
+<div class="moss-card p-md rounded-xl col-span-1 md:col-span-2 flex flex-col md:flex-row gap-md items-start md:items-center">
+<div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-outline" data-icon="person">person</span>
+</div>
+<div class="flex-grow">
+<p class="font-caption text-caption text-outline uppercase tracking-wider mb-1">Nama Pegawai</p>
+<p class="font-body-lg text-body-lg text-on-surface font-medium">Budi Santoso</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Divisi Teknologi Informasi</p>
+</div>
+<div class="rounded-full bg-primary-container bg-opacity-15 px-4 py-1 self-start md:self-center border border-primary-container border-opacity-20">
+<span class="font-label-md text-label-md text-primary">Hadir</span>
+</div>
+</div>
+<!-- Time & Date -->
+<div class="moss-card p-md rounded-xl flex flex-col gap-sm justify-between">
+<div>
+<p class="font-caption text-caption text-outline uppercase tracking-wider mb-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="calendar_today">calendar_today</span>
+                        Waktu Rekam
+                     </p>
+<p class="font-headline-md text-headline-md text-on-surface">08:14 <span class="font-body-md text-body-md text-on-surface-variant">WIB</span></p>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant pt-2 moss-divider">Senin, 24 Oktober 2023</p>
+</div>
+<!-- Verification Code -->
+<div class="moss-card p-md rounded-xl flex flex-col gap-sm justify-between">
+<div>
+<p class="font-caption text-caption text-outline uppercase tracking-wider mb-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="tag">tag</span>
+                        Kode Unik
+                     </p>
+<p class="font-headline-md text-headline-md text-primary font-mono tracking-widest">ABS-7K4P9X</p>
+</div>
+<p class="font-caption text-caption text-on-surface-variant pt-2 moss-divider">Gunakan kode ini untuk referensi silang HR.</p>
+</div>
+<!-- Device Info -->
+<div class="moss-card p-md rounded-xl col-span-1 md:col-span-2">
+<p class="font-caption text-caption text-outline uppercase tracking-wider mb-4 flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="devices">devices</span>
+                    Informasi Perangkat &amp; Lokasi
+                 </p>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-outline mt-0.5" data-icon="smartphone">smartphone</span>
+<div>
+<p class="font-body-md text-body-md text-on-surface">iPhone 14 Pro Max</p>
+<p class="font-caption text-caption text-on-surface-variant">Aplikasi Ayo Hadir v2.1.0</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary mt-0.5" data-icon="location_on">location_on</span>
+<div>
+<p class="font-body-md text-body-md text-on-surface">Akurasi Tinggi (GPS)</p>
+<p class="font-caption text-caption text-on-surface-variant">Lat: -6.2088, Long: 106.8456</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Action Area -->
+<section class="mt-lg flex justify-center w-full">
+<button class="w-full md:w-auto px-8 py-3 rounded-lg border border-outline-variant text-tertiary font-label-md text-label-md bg-transparent hover:bg-surface-container-low transition-colors duration-200 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="cancel">cancel</span>
+                Ajukan Pembatalan
+            </button>
+</section>
+</main>
+</body></html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Detail Sesi QR - Ayo Hadir</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "surface-tint": "#50652a",
+                        "inverse-surface": "#2f312f",
+                        "inverse-on-surface": "#f2f1ee",
+                        "on-secondary-container": "#446e47",
+                        "on-tertiary-fixed-variant": "#474836",
+                        "tertiary-container": "#646552",
+                        "secondary-fixed-dim": "#a4d2a4",
+                        "surface-variant": "#e3e2e0",
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#d2eca2",
+                        "on-tertiary-fixed": "#1b1d0e",
+                        "on-primary-fixed-variant": "#394d14",
+                        "error": "#ba1a1a",
+                        "on-tertiary": "#ffffff",
+                        "on-surface": "#1a1c1a",
+                        "secondary-container": "#bfefbe",
+                        "surface-container-high": "#e9e8e5",
+                        "primary-container": "#556b2f",
+                        "on-surface-variant": "#45483c",
+                        "secondary": "#3e6842",
+                        "surface-container-lowest": "#ffffff",
+                        "background": "#faf9f6",
+                        "surface-container-highest": "#e3e2e0",
+                        "on-tertiary-container": "#e2e3ca",
+                        "on-secondary-fixed": "#002107",
+                        "surface-container-low": "#f4f3f1",
+                        "on-background": "#1a1c1a",
+                        "secondary-fixed": "#bfefbe",
+                        "on-primary-fixed": "#131f00",
+                        "tertiary-fixed": "#e4e4cc",
+                        "primary": "#3e5219",
+                        "error-container": "#ffdad6",
+                        "surface-dim": "#dbdad7",
+                        "on-primary-container": "#d0eba1",
+                        "outline": "#75796b",
+                        "surface-bright": "#faf9f6",
+                        "surface": "#faf9f6",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#4c4d3b",
+                        "inverse-primary": "#b6d088",
+                        "tertiary-fixed-dim": "#c8c8b0",
+                        "outline-variant": "#c5c8b8",
+                        "surface-container": "#efeeeb",
+                        "primary-fixed-dim": "#b6d088",
+                        "on-secondary-fixed-variant": "#274f2c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "16px",
+                        "xs": "8px",
+                        "lg": "40px",
+                        "margin-mobile": "16px",
+                        "margin-desktop": "80px",
+                        "xl": "64px",
+                        "gutter": "24px",
+                        "md": "24px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "caption": ["Inter"],
+                        "headline-xl": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "caption": ["12px", { "lineHeight": "1.4", "fontWeight": "400" }],
+                        "headline-xl": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "label-md": ["14px", { "lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md text-body-md antialiased selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar (JSON Sourced) -->
+<nav class="fixed top-0 w-full z-50 border-b border-primary/10 bg-background dark:bg-on-surface flex items-center justify-between px-margin-mobile h-16">
+<div class="flex items-center gap-sm">
+<button class="text-primary dark:text-primary-fixed hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors active:scale-95 duration-150 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="A minimalist, top-down shot of a dense mossy valley floor, capturing deep olive greens and subtle earth tones in high contrast, reflecting a serene and professional organic aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOv0FeWv0a0fwiOY0KwnV9RRRiQVURojjbRISoAD_9iq7rEFgLo8ZjwxOW-aXF_bVr38r3pwnA5XaVOyrBeQu9sY6u1SlIvnaxwH6WXGsV_BF3yNSEG-beJXkAoyIla7LIADrpNjOtIAclmFhEGt2pwXhmuh6lm6lZ_Zw-ru9tCBJDOU4q96NEg-NrVPgl0jBSTUO1iGZsRlJOw3H7Jl2ecRnlBnKRaMuVPk0Fsj0IRN0SYapf8KIU"/>
+</div>
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">Ayo Hadir</span>
+</div>
+<button class="text-primary dark:text-primary-fixed hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors active:scale-95 duration-150 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+</nav>
+<!-- Main Content Canvas (Navigation Shell Suppressed due to Detail Page context) -->
+<main class="pt-[80px] pb-xl px-margin-mobile md:px-margin-desktop max-w-7xl mx-auto min-h-screen">
+<!-- Header Context -->
+<header class="mb-lg flex flex-col md:flex-row md:items-end justify-between gap-sm">
+<div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-primary mb-xs">Pelatihan Keberlanjutan Q3</h1>
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span> 15 Agustus 2024, 09:00 WIB
+                </p>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex flex-col items-end">
+<span class="font-caption text-caption text-on-surface-variant mb-1">Berakhir dalam</span>
+<span class="font-headline-md text-headline-md text-primary font-mono tracking-tight" id="session-countdown">02:45:12</span>
+</div>
+<div class="bg-secondary-container/30 border border-secondary-container text-primary px-4 py-2 rounded-full flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="font-label-md text-label-md">Aktif</span>
+</div>
+</div>
+</header>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Core Feature: QR Card (Left Column) -->
+<section class="lg:col-span-7 flex flex-col gap-sm">
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl flex flex-col items-center justify-center h-full relative overflow-hidden">
+<!-- Subtle background texture -->
+<div class="absolute inset-0 opacity-5 pointer-events-none" style="background-image: radial-gradient(circle at 2px 2px, #3e5219 1px, transparent 0); background-size: 24px 24px;"></div>
+<h2 class="font-headline-md text-headline-md text-primary mb-lg text-center z-10">Pindai untuk Hadir</h2>
+<!-- Dynamic QR Container -->
+<div class="bg-white p-4 rounded-lg border-2 border-primary/10 shadow-sm z-10 w-64 h-64 flex items-center justify-center mb-lg relative">
+<img alt="Dynamic QR Code" class="w-full h-full object-contain mix-blend-multiply" data-alt="A clean, high-contrast, perfectly square QR code rendered in deep olive green against a pristine off-white background, embodying the 'Mossy Valley' minimalist aesthetic. The image is flat, precise, and devoid of shadows, resembling a high-end print on matte paper." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBMDafjXuGBS7IlUPsxijvr3IDHGrDzqVB__hBte9W1YtXfbcUPBb07AIl2B3-kNawadS8PmNGeAs2dv5JEVC4A5mQtgaeRQghFjIXAHJfumcEFJiY7gEgmn-zUQtflX9LI-QfvR-7m9eRyh0PSgm8KmfD0zfP4kHoFzC2DM11z6WyDALJGZkYqdZNW1E7510rxiSZCW9EhF0g9F2xdCRR8JExv1_2GqtkgASRIihD6nv-torf5vLdQ"/>
+<!-- Scanning indicator line (simulated) -->
+<div class="absolute top-0 left-0 w-full h-1 bg-secondary opacity-50 animate-[scan_2s_ease-in-out_infinite]"></div>
+</div>
+<!-- Dynamic Token Indicator -->
+<div class="w-full max-w-sm z-10">
+<div class="flex justify-between items-center mb-2">
+<span class="font-caption text-caption text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">sync</span> Token dinamis
+                            </span>
+<span class="font-label-md text-label-md text-primary" id="token-countdown">08:45</span>
+</div>
+<div class="w-full h-1 bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[85%] transition-all duration-1000 ease-linear" id="token-progress"></div>
+</div>
+<p class="font-caption text-caption text-center text-outline mt-2">QR Code diperbarui otomatis untuk keamanan.</p>
+</div>
+</div>
+<!-- Primary Actions Row -->
+<div class="grid grid-cols-2 gap-sm">
+<button class="border border-outline-variant text-primary hover:bg-surface-container-low transition-colors px-4 py-3 rounded-lg font-label-md text-label-md flex justify-center items-center gap-2">
+<span class="material-symbols-outlined">share</span> Share QR
+                    </button>
+<button class="border border-outline-variant text-primary hover:bg-surface-container-low transition-colors px-4 py-3 rounded-lg font-label-md text-label-md flex justify-center items-center gap-2">
+<span class="material-symbols-outlined">download</span> Download Image
+                    </button>
+</div>
+</section>
+<!-- Management & Meta (Right Column) -->
+<section class="lg:col-span-5 flex flex-col gap-gutter">
+<!-- Attendance Summary Card -->
+<div class="bg-surface-container-low border border-outline/10 p-md rounded-xl">
+<h3 class="font-label-md text-label-md text-on-surface-variant mb-4 flex items-center gap-2 uppercase tracking-widest">
+<span class="material-symbols-outlined text-[18px]">group</span> Status Kehadiran
+                    </h3>
+<div class="flex items-end gap-2 mb-sm">
+<span class="font-headline-xl text-headline-xl text-primary">42</span>
+<span class="font-body-md text-body-md text-outline pb-1">/ 50 Peserta</span>
+</div>
+<button class="w-full bg-primary text-on-primary px-4 py-3 rounded-lg font-label-md text-label-md flex justify-center items-center gap-2 hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors">
+                        Lihat Riwayat Kehadiran <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+<!-- Location Map -->
+<div class="border border-outline-variant rounded-xl overflow-hidden relative group">
+<div class="h-32 w-full bg-surface-variant">
+<img alt="Peta Lokasi Sesi" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" data-location="Jakarta Selatan, Indonesia" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCQD4Z1Nl2TMILyxMDy__OVs3gmNFjmMFcFzpUbWVDl7EwPQ23WRn8ZKamZqC5oqyMNfh1eGryY-yU0Kb_fMUSLS8x4ehOD3VCI2rTzWCbGNSOFKZnL7qSpSkejY825uyizOSYAOzW8bmjs6WxjTARTddyRlT7xDfmqsr6xMbOHoJ1VuGXEE05da_iQA0QFBRHYFguG_Xqi4W3M_728yn5VhwwQpuEHfrGUH3ZzQVSOuoloAM91VFW"/>
+</div>
+<div class="absolute bottom-0 w-full bg-gradient-to-t from-black/60 to-transparent p-sm pt-8">
+<p class="font-label-md text-label-md text-white flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">location_on</span> Ruang Auditorium Utama
+                        </p>
+</div>
+<button class="absolute top-2 right-2 bg-white/90 text-primary p-2 rounded-full border border-outline/10 hover:bg-white transition-colors backdrop-blur-sm">
+<span class="material-symbols-outlined text-[18px]">open_in_new</span>
+</button>
+</div>
+<!-- Management List -->
+<div class="border border-outline-variant rounded-xl overflow-hidden bg-surface-bright">
+<button class="w-full flex items-center justify-between p-4 border-b border-outline/10 hover:bg-surface-container-lowest transition-colors text-left group">
+<div class="flex items-center gap-3 text-on-surface">
+<span class="material-symbols-outlined text-primary group-hover:text-secondary transition-colors">edit</span>
+<span class="font-body-md text-body-md">Edit Detail Sesi</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</button>
+<button class="w-full flex items-center justify-between p-4 border-b border-outline/10 hover:bg-surface-container-lowest transition-colors text-left group">
+<div class="flex items-center gap-3 text-on-surface">
+<span class="material-symbols-outlined text-primary group-hover:text-secondary transition-colors">settings_applications</span>
+<span class="font-body-md text-body-md">Pengaturan Batasan Wilayah</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</button>
+</div>
+<!-- Danger Zone -->
+<div class="mt-auto pt-lg">
+<button class="w-full border border-error/30 text-error px-4 py-3 rounded-lg font-label-md text-label-md flex justify-center items-center gap-2 hover:bg-error-container/20 transition-colors">
+<span class="material-symbols-outlined">delete</span> Hapus Sesi
+                    </button>
+</div>
+</section>
+</div>
+</main>
+<style>
+        @keyframes scan {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(256px); } /* Approximate height of QR container */
+            100% { transform: translateY(0); }
+        }
+    </style>
+<script>
+        // Lightweight interaction for dynamic feel
+        document.addEventListener('DOMContentLoaded', () => {
+            // Simulate Token Progress
+            const tokenProgress = document.getElementById('token-progress');
+            const tokenCountdown = document.getElementById('token-countdown');
+            let width = 85;
+            
+            setInterval(() => {
+                width -= 0.1;
+                if(width <= 0) width = 100;
+                tokenProgress.style.width = width + '%';
+                
+                // Mock time update
+                let minutes = Math.floor(width / 10);
+                let seconds = Math.floor((width % 10) * 6);
+                tokenCountdown.textContent = `0${minutes}:${seconds < 10 ? '0'+seconds : seconds}`;
+            }, 1000);
+        });
+    </script>
+</body></html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ayo Hadir - Notifikasi</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-dim": "#dbdad7",
+                        "secondary": "#3e6842",
+                        "surface-bright": "#faf9f6",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#474836",
+                        "on-error-container": "#93000a",
+                        "surface-container": "#efeeeb",
+                        "tertiary": "#4c4d3b",
+                        "inverse-primary": "#b6d088",
+                        "error-container": "#ffdad6",
+                        "surface-tint": "#50652a",
+                        "surface-variant": "#e3e2e0",
+                        "on-primary-fixed": "#131f00",
+                        "surface": "#faf9f6",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#c5c8b8",
+                        "primary": "#3e5219",
+                        "on-surface-variant": "#45483c",
+                        "primary-container": "#556b2f",
+                        "on-secondary-fixed": "#002107",
+                        "tertiary-container": "#646552",
+                        "tertiary-fixed-dim": "#c8c8b0",
+                        "outline": "#75796b",
+                        "secondary-fixed-dim": "#a4d2a4",
+                        "surface-container-highest": "#e3e2e0",
+                        "secondary-container": "#bfefbe",
+                        "on-secondary-fixed-variant": "#274f2c",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed": "#1b1d0e",
+                        "primary-fixed": "#d2eca2",
+                        "secondary-fixed": "#bfefbe",
+                        "inverse-on-surface": "#f2f1ee",
+                        "on-background": "#1a1c1a",
+                        "on-primary-fixed-variant": "#394d14",
+                        "surface-container-high": "#e9e8e5",
+                        "on-tertiary": "#ffffff",
+                        "background": "#faf9f6",
+                        "surface-container-low": "#f4f3f1",
+                        "on-surface": "#1a1c1a",
+                        "inverse-surface": "#2f312f",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed": "#e4e4cc",
+                        "on-secondary-container": "#446e47",
+                        "on-primary-container": "#d0eba1",
+                        "error": "#ba1a1a",
+                        "primary-fixed-dim": "#b6d088",
+                        "on-tertiary-container": "#e2e3ca"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "80px",
+                        "gutter": "24px",
+                        "sm": "16px",
+                        "base": "4px",
+                        "xs": "8px",
+                        "lg": "40px",
+                        "margin-mobile": "16px",
+                        "md": "24px",
+                        "xl": "64px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-xl": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "caption": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.surface-bright');
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface-bright text-on-surface">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface docked full-width top-0 sticky z-50 border-b border-primary/10 dark:border-outline-variant/20 flat no shadows flex justify-between items-center w-full px-margin-mobile h-16">
+<button class="text-on-surface-variant p-2 rounded-full hover:bg-surface-container-low transition-colors active:opacity-80">
+<span class="material-symbols-outlined" data-icon="notifications_active">notifications_active</span>
+</button>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">Ayo Hadir</h1>
+<button class="text-on-surface-variant p-2 rounded-full hover:bg-surface-container-low transition-colors active:opacity-80">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</header>
+<!-- Main Content -->
+<main class="flex-grow p-margin-mobile md:px-margin-desktop space-y-md pb-24 md:pb-8">
+<div class="flex items-center justify-between mb-sm">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface">Notifikasi</h2>
+<button class="font-label-md text-label-md text-primary hover:text-primary-container transition-colors">Tandai semua dibaca</button>
+</div>
+<!-- Notification List -->
+<div class="space-y-sm">
+<!-- Absensi Berhasil (Unread) -->
+<div class="group relative flex gap-sm p-4 bg-surface-container-lowest rounded-xl border border-primary/10 hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="absolute top-4 right-4 w-2 h-2 rounded-full bg-primary"></div>
+<div class="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-full bg-primary-container/10 text-primary">
+<span class="material-symbols-outlined" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="flex-grow pr-6">
+<div class="flex justify-between items-baseline mb-1">
+<h3 class="font-label-md text-label-md text-on-surface">Absensi Berhasil</h3>
+<span class="font-caption text-caption text-on-surface-variant">2 mnt</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">Selamat! Absensi Anda untuk sesi "Rapat Mingguan" telah berhasil direkam.</p>
+</div>
+</div>
+<!-- QR Hampir Kedaluwarsa (Unread) -->
+<div class="group relative flex gap-sm p-4 bg-surface-container-lowest rounded-xl border border-primary/10 hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="absolute top-4 right-4 w-2 h-2 rounded-full bg-primary"></div>
+<div class="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-full bg-tertiary/10 text-tertiary">
+<span class="material-symbols-outlined" data-icon="timer" style="font-variation-settings: 'FILL' 1;">timer</span>
+</div>
+<div class="flex-grow pr-6">
+<div class="flex justify-between items-baseline mb-1">
+<h3 class="font-label-md text-label-md text-on-surface">QR Hampir Kedaluwarsa</h3>
+<span class="font-caption text-caption text-on-surface-variant">15 mnt</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">Sesi QR "Pelatihan Q3" akan berakhir dalam 15 menit. Segera lakukan absensi.</p>
+</div>
+</div>
+<!-- Sinkronisasi -->
+<div class="group relative flex gap-sm p-4 bg-surface-container-lowest rounded-xl border border-primary/10 hover:bg-surface-container-low transition-colors cursor-pointer opacity-80">
+<div class="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-full bg-secondary/10 text-secondary">
+<span class="material-symbols-outlined" data-icon="cloud_done" style="font-variation-settings: 'FILL' 1;">cloud_done</span>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-baseline mb-1">
+<h3 class="font-label-md text-label-md text-on-surface font-normal">Sinkronisasi</h3>
+<span class="font-caption text-caption text-on-surface-variant">1 jam</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">Data absensi offline Anda telah berhasil disinkronkan ke server.</p>
+</div>
+</div>
+<!-- Permintaan Pembatalan -->
+<div class="group relative flex gap-sm p-4 bg-surface-container-lowest rounded-xl border border-primary/10 hover:bg-surface-container-low transition-colors cursor-pointer opacity-80">
+<div class="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary">
+<span class="material-symbols-outlined" data-icon="assignment_late" style="font-variation-settings: 'FILL' 1;">assignment_late</span>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-baseline mb-1">
+<h3 class="font-label-md text-label-md text-on-surface font-normal">Permintaan Pembatalan</h3>
+<span class="font-caption text-caption text-on-surface-variant">2 jam</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">Ada permintaan pembatalan baru dari Budi Santoso pada sesi "Audit Lapangan".</p>
+</div>
+</div>
+<!-- QR Kedaluwarsa -->
+<div class="group relative flex gap-sm p-4 bg-surface-container-lowest rounded-xl border border-primary/10 hover:bg-surface-container-low transition-colors cursor-pointer opacity-80">
+<div class="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-full bg-outline/10 text-outline">
+<span class="material-symbols-outlined" data-icon="lock_clock" style="font-variation-settings: 'FILL' 1;">lock_clock</span>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-baseline mb-1">
+<h3 class="font-label-md text-label-md text-on-surface font-normal">QR Kedaluwarsa</h3>
+<span class="font-caption text-caption text-on-surface-variant">Kmrn</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">Sesi QR "Workshop UI/UX" telah berakhir.</p>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 border-t border-primary/10 dark:border-outline-variant/20 flat no shadows flex justify-around items-center h-16 bg-surface dark:bg-surface-container-lowest pb-safe">
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:text-primary dark:hover:text-primary-fixed transition-colors active:scale-95 transition-transform duration-200 w-full">
+<span class="material-symbols-outlined mb-1" data-icon="home">home</span>
+<span class="font-label-md text-[10px]">Beranda</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:text-primary dark:hover:text-primary-fixed transition-colors active:scale-95 transition-transform duration-200 w-full">
+<span class="material-symbols-outlined mb-1" data-icon="qr_code_scanner">qr_code_scanner</span>
+<span class="font-label-md text-[10px]">Presensi</span>
+</button>
+<!-- Active Tab: Notifikasi -->
+<button class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary-container-low text-on-primary-container rounded-full px-4 py-1 hover:text-primary dark:hover:text-primary-fixed transition-colors active:scale-95 transition-transform duration-200 w-full mx-2">
+<span class="material-symbols-outlined mb-1" data-icon="notifications" style="font-variation-settings: 'FILL' 1;">notifications</span>
+<span class="font-label-md text-[10px]">Notifikasi</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:text-primary dark:hover:text-primary-fixed transition-colors active:scale-95 transition-transform duration-200 w-full">
+<span class="material-symbols-outlined mb-1" data-icon="person">person</span>
+<span class="font-label-md text-[10px]">Profil</span>
+</button>
+</nav>
+<style>
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+    </style>
+</body></html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cancellation Request Form</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline": "#75796b",
+                        "tertiary-fixed-dim": "#c8c8b0",
+                        "background": "#faf9f6",
+                        "primary-container": "#556b2f",
+                        "secondary": "#3e6842",
+                        "on-primary-fixed": "#131f00",
+                        "on-secondary-container": "#446e47",
+                        "on-primary-container": "#d0eba1",
+                        "outline-variant": "#c5c8b8",
+                        "on-tertiary-fixed": "#1b1d0e",
+                        "on-tertiary-fixed-variant": "#474836",
+                        "on-secondary": "#ffffff",
+                        "surface-bright": "#faf9f6",
+                        "on-surface": "#1a1c1a",
+                        "surface-container-high": "#e9e8e5",
+                        "surface-tint": "#50652a",
+                        "surface-variant": "#e3e2e0",
+                        "primary-fixed-dim": "#b6d088",
+                        "surface-container-low": "#f4f3f1",
+                        "tertiary": "#4c4d3b",
+                        "inverse-primary": "#b6d088",
+                        "on-error-container": "#93000a",
+                        "inverse-on-surface": "#f2f1ee",
+                        "secondary-container": "#bfefbe",
+                        "surface-container-highest": "#e3e2e0",
+                        "tertiary-container": "#646552",
+                        "surface": "#faf9f6",
+                        "on-background": "#1a1c1a",
+                        "on-secondary-fixed": "#002107",
+                        "secondary-fixed": "#bfefbe",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed-dim": "#a4d2a4",
+                        "on-tertiary-container": "#e2e3ca",
+                        "on-error": "#ffffff",
+                        "primary": "#3e5219",
+                        "primary-fixed": "#d2eca2",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#394d14",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed": "#e4e4cc",
+                        "surface-container": "#efeeeb",
+                        "surface-dim": "#dbdad7",
+                        "on-secondary-fixed-variant": "#274f2c",
+                        "error": "#ba1a1a",
+                        "inverse-surface": "#2f312f",
+                        "on-primary": "#ffffff",
+                        "on-surface-variant": "#45483c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "16px",
+                        "margin-mobile": "16px",
+                        "base": "4px",
+                        "margin-desktop": "80px",
+                        "gutter": "24px",
+                        "xs": "8px",
+                        "lg": "40px",
+                        "md": "24px",
+                        "xl": "64px"
+                    },
+                    "fontFamily": {
+                        "headline-xl": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "caption": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "label-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-xl": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "caption": ["12px", { "lineHeight": "1.4", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "label-md": ["14px", { "lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen font-body-md">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface dark:bg-surface-dim border-b border-outline-variant dark:border-outline shadow-sm flex justify-between items-center px-gutter h-16 transition-colors">
+<button class="text-on-surface-variant hover:bg-surface-container-low transition-colors active:scale-95 duration-100 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">
+            Ayo Hadir
+        </h1>
+<button class="text-on-surface-variant hover:bg-surface-container-low transition-colors active:scale-95 duration-100 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="cloud_sync">cloud_sync</span>
+</button>
+</header>
+<!-- Main Content Area -->
+<main class="pt-[104px] pb-32 px-margin-mobile md:px-margin-desktop max-w-4xl mx-auto flex flex-col gap-lg md:gap-xl">
+<section class="flex flex-col gap-sm">
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary">
+                Form Pengajuan Pembatalan
+            </h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">
+                Silakan isi alasan pembatalan Anda di bawah ini dengan jelas.
+            </p>
+</section>
+<!-- Form Card -->
+<section class="bg-surface-container-low border border-outline-variant rounded-xl p-md md:p-lg flex flex-col gap-md relative overflow-hidden">
+<!-- Decorative subtle organic blob -->
+<div class="absolute -top-20 -right-20 w-64 h-64 bg-secondary-container/30 rounded-full blur-3xl pointer-events-none"></div>
+<form class="flex flex-col gap-lg relative z-10">
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface" for="alasan-pembatalan">
+                        Alasan Pembatalan <span class="text-error">*</span>
+</label>
+<textarea class="w-full bg-surface border border-outline-variant/60 rounded-lg p-sm font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all resize-y shadow-sm" id="alasan-pembatalan" name="alasan-pembatalan" placeholder="Tuliskan alasan secara detail..." required="" rows="5"></textarea>
+</div>
+<!-- Warning Callout -->
+<div class="flex items-start gap-sm bg-error-container/20 border border-error-container p-sm rounded-lg">
+<span class="material-symbols-outlined text-error mt-1" data-icon="warning">warning</span>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-error">Perhatian</span>
+<p class="font-caption text-caption text-on-surface-variant">
+                            Semua tindakan pada form ini direkam oleh sistem untuk keperluan audit dan keamanan data. Pastikan alasan yang diberikan valid.
+                        </p>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex flex-col sm:flex-row justify-end gap-sm mt-4 border-t border-outline-variant/30 pt-md">
+<button class="px-md py-sm border border-secondary text-secondary rounded-lg font-label-md text-label-md hover:bg-secondary/5 transition-colors text-center" type="button">
+                        Batal
+                    </button>
+<button class="px-md py-sm bg-primary text-on-primary rounded-lg font-label-md text-label-md font-semibold hover:bg-primary/90 transition-colors shadow-sm flex items-center justify-center gap-2" type="submit">
+<span class="material-symbols-outlined text-[18px]" data-icon="send">send</span>
+                        Kirim Pengajuan
+                    </button>
+</div>
+</form>
+</section>
+</main>
+<!-- BottomNavBar (Mobile only) -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 bg-surface dark:bg-surface-container-lowest border-t border-outline-variant dark:border-outline shadow-lg flex justify-around items-center h-20 pb-safe pb-4 pt-2">
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-4 py-1 hover:bg-surface-container dark:hover:bg-surface-variant active:scale-90 transition-transform rounded-xl">
+<span class="material-symbols-outlined mb-1" data-icon="dashboard">dashboard</span>
+<span class="font-label-sm text-[11px]">Dashboard</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-4 py-1 hover:bg-surface-container dark:hover:bg-surface-variant active:scale-90 transition-transform rounded-xl">
+<span class="material-symbols-outlined mb-1" data-icon="qr_code_scanner">qr_code_scanner</span>
+<span class="font-label-sm text-[11px]">QR Scan</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-4 py-1 hover:bg-surface-container dark:hover:bg-surface-variant active:scale-90 transition-transform rounded-xl">
+<span class="material-symbols-outlined mb-1" data-icon="history">history</span>
+<span class="font-label-sm text-[11px]">History</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-4 py-1 hover:bg-surface-container dark:hover:bg-surface-variant active:scale-90 transition-transform rounded-xl">
+<span class="material-symbols-outlined mb-1" data-icon="sync_lock">sync_lock</span>
+<span class="font-label-sm text-[11px]">Sync</span>
+</button>
+</nav>
+<!-- Navigation Drawer (Desktop layout helper - hidden here as it's a specific task page, but structure provided if needed based on JSON) -->
+<aside class="hidden xl:flex fixed inset-y-0 left-0 z-[60] flex-col p-md h-full w-80 bg-surface dark:bg-surface-dim shadow-xl rounded-r-xl border-r border-outline-variant/20 pt-[104px]">
+<div class="flex flex-col gap-sm mb-lg border-b border-outline-variant/30 pb-md">
+<div class="w-16 h-16 rounded-full bg-secondary-container flex items-center justify-center overflow-hidden border border-outline-variant">
+<span class="material-symbols-outlined text-3xl text-on-secondary-container">person</span>
+</div>
+<div>
+<h3 class="font-label-md text-label-md font-bold text-primary">Admin User</h3>
+<p class="font-caption text-caption text-on-surface-variant">Sync Status: Online</p>
+<p class="font-caption text-[10px] text-tertiary">v1.0.4</p>
+</div>
+</div>
+<nav class="flex flex-col gap-xs flex-grow">
+<a class="flex items-center gap-md px-sm py-xs text-on-surface-variant hover:bg-surface-container-high transition-all active:opacity-80 rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors" data-icon="person">person</span>
+<span class="font-body-md text-body-md">Profile</span>
+</a>
+<a class="flex items-center gap-md px-sm py-xs text-on-surface-variant hover:bg-surface-container-high transition-all active:opacity-80 rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors" data-icon="settings_remote">settings_remote</span>
+<span class="font-body-md text-body-md">Attendance Mode</span>
+</a>
+<a class="flex items-center gap-md px-sm py-xs text-on-surface-variant hover:bg-surface-container-high transition-all active:opacity-80 rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors" data-icon="cloud_off">cloud_off</span>
+<span class="font-body-md text-body-md">Offline Settings</span>
+</a>
+<a class="flex items-center gap-md px-sm py-xs text-on-surface-variant hover:bg-surface-container-high transition-all active:opacity-80 rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors" data-icon="ios_share">ios_share</span>
+<span class="font-body-md text-body-md">Export Data</span>
+</a>
+</nav>
+<div class="mt-auto pt-md border-t border-outline-variant/30">
+<a class="flex items-center gap-md px-sm py-xs text-on-surface-variant hover:bg-surface-container-high transition-all active:opacity-80 rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors" data-icon="help">help</span>
+<span class="font-body-md text-body-md">Help</span>
+</a>
+</div>
+</aside>
+</body></html>

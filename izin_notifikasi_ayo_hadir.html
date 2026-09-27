@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ayo Hadir - Enable Notifications</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-on-surface": "#f2f1ee",
+                        "secondary-container": "#bfefbe",
+                        "on-secondary-container": "#446e47",
+                        "secondary-fixed-dim": "#a4d2a4",
+                        "tertiary-fixed": "#e4e4cc",
+                        "outline-variant": "#c5c8b8",
+                        "primary-fixed": "#d2eca2",
+                        "tertiary-container": "#646552",
+                        "outline": "#75796b",
+                        "primary": "#3e5219",
+                        "surface-bright": "#faf9f6",
+                        "primary-fixed-dim": "#b6d088",
+                        "error-container": "#ffdad6",
+                        "background": "#faf9f6",
+                        "surface": "#faf9f6",
+                        "on-tertiary-container": "#e2e3ca",
+                        "on-secondary-fixed": "#002107",
+                        "secondary-fixed": "#bfefbe",
+                        "error": "#ba1a1a",
+                        "tertiary": "#4c4d3b",
+                        "primary-container": "#556b2f",
+                        "surface-container-low": "#f4f3f1",
+                        "on-surface": "#1a1c1a",
+                        "on-primary-container": "#d0eba1",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed-variant": "#394d14",
+                        "surface-tint": "#50652a",
+                        "surface-container-high": "#e9e8e5",
+                        "inverse-primary": "#b6d088",
+                        "on-tertiary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-background": "#1a1c1a",
+                        "surface-container": "#efeeeb",
+                        "secondary": "#3e6842",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed": "#1b1d0e",
+                        "surface-variant": "#e3e2e0",
+                        "surface-dim": "#dbdad7",
+                        "on-error": "#ffffff",
+                        "surface-container-highest": "#e3e2e0",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface-variant": "#45483c",
+                        "inverse-surface": "#2f312f",
+                        "tertiary-fixed-dim": "#c8c8b0",
+                        "on-tertiary-fixed-variant": "#474836",
+                        "on-secondary-fixed-variant": "#274f2c",
+                        "on-primary-fixed": "#131f00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "16px",
+                        "gutter": "24px",
+                        "md": "24px",
+                        "margin-desktop": "80px",
+                        "xl": "64px",
+                        "lg": "40px",
+                        "xs": "8px",
+                        "margin-mobile": "16px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-xl": ["Inter"],
+                        "caption": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "headline-xl": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "caption": ["12px", { "lineHeight": "1.4", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #faf9f6; color: #1a1c1a; }
+        .glass-card {
+            background: rgba(250, 249, 246, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(117, 121, 107, 0.1);
+        }
+        .moss-gradient {
+            background: linear-gradient(135deg, #f4f3f1 0%, #e9e8e5 100%);
+        }
+        .organic-shape {
+            border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+            animation: morph 8s ease-in-out infinite alternate;
+        }
+        @keyframes morph {
+            0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+            50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+            100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="antialiased min-h-screen flex flex-col justify-center items-center p-margin-mobile md:p-margin-desktop relative overflow-hidden">
+<!-- Ambient Background Elements -->
+<div class="absolute top-0 right-0 w-96 h-96 bg-secondary-container opacity-20 blur-3xl organic-shape -z-10 transform translate-x-1/2 -translate-y-1/2"></div>
+<div class="absolute bottom-0 left-0 w-80 h-80 bg-primary-container opacity-10 blur-3xl organic-shape -z-10 transform -translate-x-1/3 translate-y-1/3"></div>
+<!-- Main Content Container -->
+<main class="w-full max-w-lg mx-auto z-10 flex flex-col items-center">
+<!-- Illustration / Icon Area -->
+<div class="relative mb-lg w-32 h-32 flex items-center justify-center">
+<div class="absolute inset-0 bg-primary-container opacity-10 rounded-full organic-shape animate-[spin_10s_linear_infinite]"></div>
+<div class="absolute inset-2 bg-surface-container-highest rounded-full flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-5xl text-primary" data-icon="notifications_active" data-weight="fill" style="font-variation-settings: 'FILL' 1;">notifications_active</span>
+</div>
+<!-- Notification Dots -->
+<div class="absolute -top-2 right-2 w-4 h-4 bg-error rounded-full border-2 border-surface animate-pulse"></div>
+<div class="absolute top-1/2 -right-4 w-3 h-3 bg-secondary rounded-full border-2 border-surface opacity-60"></div>
+<div class="absolute bottom-4 -left-2 w-2 h-2 bg-primary rounded-full opacity-40"></div>
+</div>
+<!-- Typography -->
+<div class="text-center mb-xl">
+<h1 class="font-headline-xl text-headline-lg-mobile md:text-headline-xl text-on-surface mb-sm tracking-tight">Stay Updated</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-md mx-auto">
+                Enable notifications to ensure you never miss critical updates regarding your attendance and schedules.
+            </p>
+</div>
+<!-- Value Proposition / Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-sm w-full mb-xl">
+<!-- Card 1: Attendance Confirmation -->
+<div class="glass-card rounded-xl p-md flex flex-col items-start hover:bg-surface-container-low transition-colors duration-300">
+<div class="w-10 h-10 rounded-full bg-secondary-container/20 flex items-center justify-center mb-sm">
+<span class="material-symbols-outlined text-secondary" data-icon="how_to_reg">how_to_reg</span>
+</div>
+<h3 class="font-headline-md text-body-lg font-semibold text-on-surface mb-xs">Attendance Confirmation</h3>
+<p class="font-body-md text-caption text-on-surface-variant">Instant alerts when your check-in or check-out is successfully recorded.</p>
+</div>
+<!-- Card 2: Sync Status -->
+<div class="glass-card rounded-xl p-md flex flex-col items-start hover:bg-surface-container-low transition-colors duration-300">
+<div class="w-10 h-10 rounded-full bg-primary-container/10 flex items-center justify-center mb-sm">
+<span class="material-symbols-outlined text-primary" data-icon="sync">sync</span>
+</div>
+<h3 class="font-headline-md text-body-lg font-semibold text-on-surface mb-xs">Sync Status</h3>
+<p class="font-body-md text-caption text-on-surface-variant">Real-time updates if offline records fail to synchronize with the server.</p>
+</div>
+<!-- Card 3: Cancellation Updates (Spans full width on mobile, 2 cols on desktop) -->
+<div class="glass-card rounded-xl p-md flex flex-col md:flex-row items-start md:items-center md:col-span-2 gap-sm hover:bg-surface-container-low transition-colors duration-300">
+<div class="w-10 h-10 rounded-full bg-error-container/50 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-error" data-icon="event_busy">event_busy</span>
+</div>
+<div>
+<h3 class="font-headline-md text-body-lg font-semibold text-on-surface mb-xs">Schedule Changes</h3>
+<p class="font-body-md text-caption text-on-surface-variant">Immediate notifications regarding unexpected cancellations or modifications to your assigned shifts.</p>
+</div>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex flex-col w-full gap-sm sm:flex-row sm:justify-center">
+<button class="w-full sm:w-auto px-lg py-sm bg-primary text-on-primary rounded-full font-label-md text-label-md hover:bg-surface-tint active:scale-95 transition-all duration-200 shadow-sm flex items-center justify-center gap-xs">
+<span class="material-symbols-outlined text-xl" data-icon="notifications">notifications</span>
+                Enable Notifications
+            </button>
+<button class="w-full sm:w-auto px-lg py-sm border border-outline text-primary rounded-full font-label-md text-label-md hover:bg-surface-container-highest active:scale-95 transition-all duration-200">
+                Not Now
+            </button>
+</div>
+<p class="mt-md font-caption text-caption text-outline text-center">
+            You can always change this later in your device settings.
+        </p>
+</main>
+</body></html>

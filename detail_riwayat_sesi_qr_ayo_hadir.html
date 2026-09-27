@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Detail Riwayat Sesi QR - Ayo Hadir</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-container": "#556b2f",
+                        "inverse-surface": "#2f312f",
+                        "inverse-on-surface": "#f2f1ee",
+                        "tertiary-container": "#646552",
+                        "on-secondary-container": "#446e47",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface": "#1a1c1a",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-container": "#e2e3ca",
+                        "primary-fixed": "#d2eca2",
+                        "secondary-container": "#bfefbe",
+                        "background": "#faf9f6",
+                        "surface-variant": "#e3e2e0",
+                        "tertiary": "#4c4d3b",
+                        "surface-container-high": "#e9e8e5",
+                        "on-primary": "#ffffff",
+                        "on-surface-variant": "#45483c",
+                        "secondary": "#3e6842",
+                        "on-primary-fixed": "#131f00",
+                        "on-secondary-fixed": "#002107",
+                        "secondary-fixed-dim": "#a4d2a4",
+                        "on-tertiary-fixed": "#1b1d0e",
+                        "on-primary-fixed-variant": "#394d14",
+                        "on-secondary-fixed-variant": "#274f2c",
+                        "tertiary-fixed": "#e4e4cc",
+                        "error": "#ba1a1a",
+                        "surface-dim": "#dbdad7",
+                        "error-container": "#ffdad6",
+                        "surface-container-highest": "#e3e2e0",
+                        "on-background": "#1a1c1a",
+                        "secondary-fixed": "#bfefbe",
+                        "surface": "#faf9f6",
+                        "surface-container": "#efeeeb",
+                        "primary-fixed-dim": "#b6d088",
+                        "outline": "#75796b",
+                        "on-primary-container": "#d0eba1",
+                        "on-secondary": "#ffffff",
+                        "surface-tint": "#50652a",
+                        "primary": "#3e5219",
+                        "on-tertiary-fixed-variant": "#474836",
+                        "surface-bright": "#faf9f6",
+                        "surface-container-low": "#f4f3f1",
+                        "outline-variant": "#c5c8b8",
+                        "inverse-primary": "#b6d088",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed-dim": "#c8c8b0",
+                        "on-error": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "24px",
+                        "margin-mobile": "16px",
+                        "base": "4px",
+                        "xl": "64px",
+                        "gutter": "24px",
+                        "margin-desktop": "80px",
+                        "sm": "16px",
+                        "xs": "8px",
+                        "lg": "40px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "caption": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-xl": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "caption": ["12px", { "lineHeight": "1.4", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "label-md": ["14px", { "lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "headline-xl": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #faf9f6; /* background */
+            color: #1a1c1a; /* on-background */
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen pb-24 md:pb-8 flex flex-col items-center">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-background dark:bg-on-surface border-b border-primary/10 flex items-center justify-between px-margin-mobile h-16 w-full">
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-primary hover:bg-surface-container-low transition-colors rounded-full p-2 active:scale-95 duration-150" onclick="window.history.back()">arrow_back</button>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">Ayo Hadir</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="material-symbols-outlined text-primary hover:bg-surface-container-low transition-colors rounded-full p-2 active:scale-95 duration-150" data-icon="settings">settings</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="w-full max-w-[1200px] mt-24 px-margin-mobile md:px-margin-desktop flex-grow flex flex-col gap-lg">
+<!-- Header Section -->
+<section class="flex flex-col gap-2">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-primary">Team Sync &amp; Workshop</h2>
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined" style="font-size: 18px;">calendar_today</span>
+                October 24, 2023 • 09:00 AM - 11:30 AM
+            </p>
+</section>
+<!-- Summary Cards (Bento style) -->
+<section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+<div class="bg-surface-container-lowest border border-outline/10 rounded-xl p-md flex flex-col justify-between hover:bg-surface-container-low transition-colors">
+<div class="flex items-center justify-between mb-4">
+<span class="font-label-md text-label-md text-on-surface-variant">Total Present</span>
+<span class="material-symbols-outlined text-primary">check_circle</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="font-headline-lg text-headline-lg text-primary">42</span>
+<span class="font-body-md text-body-md text-outline">/ 50</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline/10 rounded-xl p-md flex flex-col justify-between hover:bg-surface-container-low transition-colors">
+<div class="flex items-center justify-between mb-4">
+<span class="font-label-md text-label-md text-on-surface-variant">Late</span>
+<span class="material-symbols-outlined text-error">schedule</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="font-headline-lg text-headline-lg text-error">3</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline/10 rounded-xl p-md flex flex-col justify-between hover:bg-surface-container-low transition-colors">
+<div class="flex items-center justify-between mb-4">
+<span class="font-label-md text-label-md text-on-surface-variant">Absent</span>
+<span class="material-symbols-outlined text-outline">person_off</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="font-headline-lg text-headline-lg text-on-surface">5</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline/10 rounded-xl p-md flex flex-col justify-between hover:bg-surface-container-low transition-colors">
+<div class="flex items-center justify-between mb-4">
+<span class="font-label-md text-label-md text-on-surface-variant">Location</span>
+<span class="material-symbols-outlined text-secondary">pin_drop</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface truncate">Main Office HQ</p>
+</div>
+</section>
+<!-- Attendees List Section -->
+<section class="flex flex-col gap-4">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-outline/10 pb-4">
+<h3 class="font-headline-md text-headline-md text-primary">Attendee List</h3>
+<!-- Filter Chips -->
+<div class="flex flex-wrap gap-2">
+<button class="px-4 py-2 rounded-full font-label-md text-label-md bg-secondary/15 text-primary border border-transparent transition-colors">All</button>
+<button class="px-4 py-2 rounded-full font-label-md text-label-md bg-transparent text-on-surface-variant border border-outline hover:bg-surface-container-low transition-colors">Present</button>
+<button class="px-4 py-2 rounded-full font-label-md text-label-md bg-transparent text-on-surface-variant border border-outline hover:bg-surface-container-low transition-colors">Late</button>
+</div>
+</div>
+<!-- List Items -->
+<div class="flex flex-col gap-0 border border-outline/10 rounded-xl overflow-hidden bg-surface-container-lowest">
+<!-- Item 1 -->
+<div class="flex items-center justify-between p-4 border-b border-outline/10 hover:bg-[#F5F5DC] transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
+<img alt="Profile photo" class="w-full h-full object-cover" data-alt="A professional headshot of a young woman in a brightly lit modern office setting, wearing a smart casual sage green blouse, smiling subtly at the camera. The background is slightly blurred with light neutral tones, evoking a clean, high-end corporate environment. Soft natural lighting enhances her features." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCF9__w1xejapsMF4-5DsgEndr9OJhfE618twasXaZgkpGXBsTgby3aUPhcCrcr56AXXQvrPdJW_JgKUcNpiBxUA9ls67m52j6oPYBHiFzfAn0JpNEnAV4zsMCqf22iiZZise-LzijrHi1E-ycbuiMLcmNbbX7MVqUfqRfGrFuFzy2vIgWZ61lNLyLnjkLnEO6EXo0-tbXntFdbZXoFwbroLDpBVZG8lrAuJUll2sih8ieLUS4D-N-3"/>
+</div>
+<div class="flex flex-col">
+<span class="font-body-lg text-body-lg font-medium text-on-surface">Sarah Jenkins</span>
+<span class="font-caption text-caption text-on-surface-variant">Product Designer</span>
+</div>
+</div>
+<div class="flex flex-col items-end gap-1">
+<div class="flex items-center gap-2">
+<span class="font-body-md text-body-md text-on-surface">08:55 AM</span>
+<span class="material-symbols-outlined text-secondary" style="font-size: 16px;" title="GPS Verified">my_location</span>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-secondary/15 text-primary font-caption text-caption">Present</span>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="flex items-center justify-between p-4 border-b border-outline/10 hover:bg-[#F5F5DC] transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 bg-surface-variant flex items-center justify-center">
+<span class="font-body-lg text-body-lg text-on-surface-variant">MR</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-lg text-body-lg font-medium text-on-surface">Michael Rodriguez</span>
+<span class="font-caption text-caption text-on-surface-variant">Senior Engineer</span>
+</div>
+</div>
+<div class="flex flex-col items-end gap-1">
+<div class="flex items-center gap-2">
+<span class="font-body-md text-body-md text-on-surface">09:15 AM</span>
+<span class="material-symbols-outlined text-outline" style="font-size: 16px;" title="No GPS Data">location_off</span>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-error/15 text-error font-caption text-caption">Late</span>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="flex items-center justify-between p-4 border-b border-outline/10 hover:bg-[#F5F5DC] transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
+<img alt="Profile photo" class="w-full h-full object-cover" data-alt="A portrait of a middle-aged man with short grey hair and glasses, wearing a tailored navy blazer over a white shirt. He is situated in a minimalist architectural space with soft, warm white lighting that reflects off matte surfaces, embodying a refined and grounded professional aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOT26RH8bmbd1LYFwE4Au-_gbMVShU-5maBYVgmfgEkREittXBjX3koWHX4P9F7Ac7Y8Zua_8lDN_Yc6aUoCo41hgd-XWRV0dbTiU_M8RL4cFHpVQeritvgzW24LcrKsiiOAL4kGbDf_nheIRdXCZYBs9irue_C9Ix3ctyF6uwFTFLb_RRVFMwRDsyYRDbvK1JpOIk1h8hiX-tbwAKuj_QeRqcS10MjWXpZnx8EbhqCV-2brCGzxLF"/>
+</div>
+<div class="flex flex-col">
+<span class="font-body-lg text-body-lg font-medium text-on-surface">David Chen</span>
+<span class="font-caption text-caption text-on-surface-variant">Marketing Director</span>
+</div>
+</div>
+<div class="flex flex-col items-end gap-1">
+<div class="flex items-center gap-2">
+<span class="font-body-md text-body-md text-on-surface">08:45 AM</span>
+<span class="material-symbols-outlined text-secondary" style="font-size: 16px;" title="GPS Verified">my_location</span>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-secondary/15 text-primary font-caption text-caption">Present</span>
+</div>
+</div>
+<!-- Item 4 -->
+<div class="flex items-center justify-between p-4 hover:bg-[#F5F5DC] transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 bg-surface-variant flex items-center justify-center">
+<span class="font-body-lg text-body-lg text-on-surface-variant">AL</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-lg text-body-lg font-medium text-on-surface">Amanda Lee</span>
+<span class="font-caption text-caption text-on-surface-variant">HR Specialist</span>
+</div>
+</div>
+<div class="flex flex-col items-end gap-1">
+<div class="flex items-center gap-2">
+<span class="font-body-md text-body-md text-on-surface">09:02 AM</span>
+<span class="material-symbols-outlined text-secondary" style="font-size: 16px;" title="GPS Verified">my_location</span>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-error/15 text-error font-caption text-caption">Late</span>
+</div>
+</div>
+</div>
+<div class="flex justify-center mt-4">
+<button class="px-6 py-2 rounded border border-secondary text-primary font-label-md text-label-md hover:bg-[#F5F5DC] transition-colors">Load More</button>
+</div>
+</section>
+</main>
+</body></html>

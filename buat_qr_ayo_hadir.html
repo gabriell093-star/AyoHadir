@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Create QR Session - CheckIn Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed": "#002107",
+                    "on-secondary-container": "#446e47",
+                    "on-error": "#ffffff",
+                    "tertiary-container": "#646552",
+                    "tertiary": "#4c4d3b",
+                    "inverse-on-surface": "#f2f1ee",
+                    "surface-container-highest": "#e3e2e0",
+                    "primary": "#3e5219",
+                    "on-primary": "#ffffff",
+                    "surface": "#faf9f6",
+                    "on-error-container": "#93000a",
+                    "error": "#ba1a1a",
+                    "surface-variant": "#e3e2e0",
+                    "on-surface-variant": "#45483c",
+                    "on-tertiary-container": "#e2e3ca",
+                    "on-secondary-fixed-variant": "#274f2c",
+                    "outline-variant": "#c5c8b8",
+                    "secondary": "#3e6842",
+                    "surface-container-high": "#e9e8e5",
+                    "surface-container": "#efeeeb",
+                    "surface-bright": "#faf9f6",
+                    "surface-container-low": "#f4f3f1",
+                    "secondary-fixed-dim": "#a4d2a4",
+                    "on-surface": "#1a1c1a",
+                    "secondary-fixed": "#bfefbe",
+                    "outline": "#75796b",
+                    "primary-container": "#556b2f",
+                    "surface-tint": "#50652a",
+                    "tertiary-fixed-dim": "#c8c8b0",
+                    "inverse-primary": "#b6d088",
+                    "secondary-container": "#bfefbe",
+                    "surface-dim": "#dbdad7",
+                    "on-secondary": "#ffffff",
+                    "primary-fixed": "#d2eca2",
+                    "primary-fixed-dim": "#b6d088",
+                    "on-primary-fixed-variant": "#394d14",
+                    "on-primary-fixed": "#131f00",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-surface": "#2f312f",
+                    "on-background": "#1a1c1a",
+                    "on-tertiary": "#ffffff",
+                    "tertiary-fixed": "#e4e4cc",
+                    "on-tertiary-fixed": "#1b1d0e",
+                    "background": "#faf9f6",
+                    "on-tertiary-fixed-variant": "#474836",
+                    "on-primary-container": "#d0eba1",
+                    "error-container": "#ffdad6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "24px",
+                    "margin-mobile": "16px",
+                    "xs": "8px",
+                    "lg": "40px",
+                    "gutter": "24px",
+                    "xl": "64px",
+                    "sm": "16px",
+                    "base": "4px",
+                    "margin-desktop": "80px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "caption": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-xl": ["Inter"],
+                    "label-md": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "caption": ["12px", {"lineHeight": "1.4", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "headline-xl": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .custom-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #3e5219;
+            cursor: pointer;
+            border: 2px solid #faf9f6;
+            box-shadow: 0 0 0 1px #3e5219;
+        }
+        .custom-range::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #3e5219;
+            cursor: pointer;
+            border: 2px solid #faf9f6;
+            box-shadow: 0 0 0 1px #3e5219;
+        }
+        
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #3e5219;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #3e5219;
+        }
+        .toggle-checkbox:checked + .toggle-label:after {
+            transform: translateX(100%);
+            border-color: white;
+        }
+        .toggle-label {
+            width: 44px;
+            height: 24px;
+            background-color: #e3e2e0;
+            border-radius: 9999px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .toggle-label:after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border-radius: 50%;
+            transition: transform 0.2s ease-in-out;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background antialiased min-h-screen flex flex-col md:flex-row">
+<!-- Navigation Drawer (Desktop) -->
+<aside class="hidden md:flex fixed inset-y-0 left-0 z-[60] flex-col py-6 bg-surface h-full w-80 rounded-r-xl shadow-lg border-r border-outline-variant/10">
+<div class="px-md mb-lg">
+<h1 class="text-headline-lg font-headline-lg font-bold text-primary">CheckIn Pro</h1>
+</div>
+<div class="px-md mb-md flex items-center gap-4">
+<img class="w-12 h-12 rounded-full object-cover border border-outline-variant" data-alt="A professional headshot of a corporate user in a modern office setting, soft natural lighting, high-end corporate aesthetic, mossy valley theme." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB8jU-IFkB1K76h0Uae-NfOtyyXLFNBJZBGQeFtRCqPZlwAIfzfQLIImQNEzdg93JhwaobOEx2RVYPObQOHuuVdgsB8EFe1gyflRnjPzm0V4bTkDVjDsbf2hjXiA5L_W8Tvabd_pyM3gVopGcxcCeS5dB1HH2gmFv9OK_EL_1awRRHeyLxd5FbuZAe_QF_k4X31mciwS_6oy24QbvDZf9OthWQ_yquG16OeCwEoBRzHSAD-sXaSdT4X"/>
+<div>
+<p class="text-label-md font-label-md text-on-surface">Admin User</p>
+<p class="text-caption font-caption text-on-surface-variant">Organization Member</p>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-2">
+<a class="flex items-center gap-4 text-on-surface-variant px-4 py-3 mx-2 hover:bg-surface-container-high rounded-full transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">dashboard</span>
+<span class="text-label-md font-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-4 bg-primary-container text-on-primary-container rounded-full px-4 py-3 mx-2 scale-[0.98] transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add_box</span>
+<span class="text-label-md font-label-md font-semibold">Create QR</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface-variant px-4 py-3 mx-2 hover:bg-surface-container-high rounded-full transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">fact_check</span>
+<span class="text-label-md font-label-md">My Attendance</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface-variant px-4 py-3 mx-2 hover:bg-surface-container-high rounded-full transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">sync_saved_locally</span>
+<span class="text-label-md font-label-md">Offline Sync</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface-variant px-4 py-3 mx-2 hover:bg-surface-container-high rounded-full transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>
+<span class="text-label-md font-label-md">Settings</span>
+</a>
+</nav>
+<div class="px-md mt-auto">
+<p class="text-caption font-caption text-on-surface-variant">v1.0.4</p>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-80 flex flex-col min-h-screen">
+<!-- TopAppBar (Mobile) -->
+<header class="md:hidden flex justify-between items-center h-16 px-margin-mobile w-full sticky top-0 z-50 bg-surface border-b border-border-subtle">
+<button class="text-on-surface-variant">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="text-title-md font-title-md font-bold text-primary">CheckIn Pro</h1>
+<img class="w-8 h-8 rounded-full object-cover" data-alt="A professional headshot of a corporate user in a modern office setting, soft natural lighting, high-end corporate aesthetic, mossy valley theme." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpl11_4O0bOVpjjLBch8obcjnEQyQoT0YINkm3ka8uJAygttnJMlMunGmKThN4tZ23Uo4kT9Dh50o4kcx8iGXEB15guzV9eIgbxzs3S9SOL9zXBABBs4gKpkaqw77LFVQ7TyBMDnduWsX0r1Zb08dgU1Tqh7rqVbDdT-ZFqG1IUCjApvOlVvqEdACr40RZZvzFpg8-YgyYF_SRRxRpAf1z3xPHB13pAYEMOSBtMghdIddCOb-uWSIw"/>
+</header>
+<!-- Page Canvas -->
+<div class="flex-1 px-margin-mobile md:px-margin-desktop py-lg pb-32 md:pb-lg max-w-4xl mx-auto w-full">
+<div class="mb-lg">
+<h2 class="text-headline-lg-mobile md:text-headline-lg font-headline-lg-mobile md:font-headline-lg text-on-surface mb-xs">Create QR Session</h2>
+<p class="text-body-md font-body-md text-on-surface-variant">Configure details for your new attendance tracking session.</p>
+</div>
+<!-- Bento-style Form Layout -->
+<form class="grid grid-cols-1 md:grid-cols-2 gap-md" onsubmit="event.preventDefault();">
+<!-- Basic Info Card -->
+<div class="col-span-1 md:col-span-2 bg-surface-bright rounded-xl border border-outline-variant/30 p-md flex flex-col gap-md">
+<div class="flex flex-col gap-xs">
+<label class="text-label-md font-label-md text-on-surface" for="session-title">Session Title (Nama QR)</label>
+<input class="w-full bg-surface border border-outline-variant/50 rounded-lg px-4 py-3 text-body-md font-body-md text-on-surface focus:outline-none focus:border-primary focus:border-2 transition-all" id="session-title" placeholder="e.g., Weekly Team Sync" type="text"/>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<div class="flex flex-col gap-xs">
+<label class="text-label-md font-label-md text-on-surface">Target Participants</label>
+<div class="relative">
+<select class="w-full appearance-none bg-surface border border-outline-variant/50 rounded-lg px-4 py-3 text-body-md font-body-md text-on-surface focus:outline-none focus:border-primary focus:border-2 transition-all">
+<option value="all">All Users</option>
+<option value="specific">Specific Users (1-100)</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+</div>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-md font-label-md text-on-surface" for="late-threshold">Late Threshold (minutes)</label>
+<input class="w-full bg-surface border border-outline-variant/50 rounded-lg px-4 py-3 text-body-md font-body-md text-on-surface focus:outline-none focus:border-primary focus:border-2 transition-all" id="late-threshold" min="0" placeholder="15" type="number"/>
+</div>
+</div>
+<div class="flex flex-col gap-xs pt-sm border-t border-surface-variant">
+<div class="flex justify-between items-center mb-2">
+<label class="text-label-md font-label-md text-on-surface">Session Duration</label>
+<span class="text-label-md font-label-md text-primary bg-primary-container/20 px-3 py-1 rounded-full" id="duration-val">8h</span>
+</div>
+<input class="w-full h-1 bg-surface-variant rounded-lg appearance-none cursor-pointer custom-range" max="24" min="1" oninput="document.getElementById('duration-val').textContent = this.value + 'h'" type="range" value="8"/>
+<div class="flex justify-between text-caption font-caption text-on-surface-variant mt-1">
+<span>1h</span>
+<span>24h</span>
+</div>
+</div>
+</div>
+<!-- GPS & Location Card -->
+<div class="col-span-1 md:col-span-2 bg-surface-bright rounded-xl border border-outline-variant/30 p-md flex flex-col gap-md">
+<div class="flex items-center justify-between border-b border-surface-variant pb-sm">
+<div>
+<h3 class="text-body-lg font-body-lg text-on-surface font-semibold">Location Validation</h3>
+<p class="text-caption font-caption text-on-surface-variant">Require users to be near this location to check in.</p>
+</div>
+<div class="relative inline-block w-11 h-6 align-middle select-none">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer opacity-0 z-10" id="gps-toggle" name="toggle" onchange="toggleGPS()" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer" for="gps-toggle"></label>
+</div>
+</div>
+<div class="flex flex-col gap-md transition-all duration-300 overflow-hidden" id="gps-settings">
+<div class="flex flex-col gap-xs">
+<div class="flex justify-between items-center mb-2">
+<label class="text-label-md font-label-md text-on-surface">Valid Radius</label>
+<span class="text-label-md font-label-md text-primary bg-primary-container/20 px-3 py-1 rounded-full" id="radius-val">50m</span>
+</div>
+<input class="w-full h-1 bg-surface-variant rounded-lg appearance-none cursor-pointer custom-range" max="3000" min="5" oninput="document.getElementById('radius-val').textContent = this.value + 'm'" type="range" value="50"/>
+<div class="flex justify-between text-caption font-caption text-on-surface-variant mt-1">
+<span>5m</span>
+<span>3,000m</span>
+</div>
+</div>
+<div class="rounded-lg overflow-hidden border border-outline-variant/30 h-64 relative">
+<!-- Map Placeholder with Location Data -->
+<img class="w-full h-full object-cover" data-alt="A clean, minimalist topographic map UI showing a localized area, muted sage green and beige tones, subtle glowing radius circle in the center, professional organic aesthetic." data-location="Jakarta" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_dChO8pKrOksYaiYtOTn9rudLIxphKYghg9Zoxm-KwqkzsvF6omaAkpAJCz2mWk2ESrO4z3RTHTCn7CTjuYV5nte-zR5HQ9L2NR7nQpY6paXTWVVqRVkSRsqyV29ey7fA6I0bFXWkdnjfMDf5wwR5kRYCbAuJrsJ5jbJsL1P7I-K_YCv7felmJGxNnlnsAlf4TiaRulTMRv1V9r6RLjNWcqGNZxSgahwbQxAhKfth-9zoqLw5Aho3"/>
+<!-- Center Marker Overlay -->
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+<div class="w-32 h-32 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-3xl drop-shadow-md" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Submit Action -->
+<div class="col-span-1 md:col-span-2 pt-sm flex justify-end gap-4">
+<button class="px-6 py-3 rounded-lg border border-secondary text-primary font-label-md text-label-md hover:bg-surface-container-low transition-colors" type="button">
+                        Cancel
+                    </button>
+<button class="px-6 py-3 rounded-lg bg-primary text-on-primary font-label-md text-label-md shadow-sm hover:opacity-90 transition-opacity flex items-center gap-2" type="submit">
+<span class="material-symbols-outlined text-[20px]">qr_code_2</span>
+                        Generate QR
+                    </button>
+</div>
+</form>
+</div>
+</main>
+<!-- BottomNavBar (Mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-20 px-2 pb-safe bg-surface border-t border-border-subtle">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">home</span>
+<span class="text-label-sm font-label-sm mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1 scale-95 transition-transform duration-100" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add_box</span>
+<span class="text-label-sm font-label-sm mt-1">Create</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">history</span>
+<span class="text-label-sm font-label-sm mt-1">History</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">person</span>
+<span class="text-label-sm font-label-sm mt-1">Profile</span>
+</a>
+</nav>
+<script>
+        function toggleGPS() {
+            const toggle = document.getElementById('gps-toggle');
+            const settings = document.getElementById('gps-settings');
+            
+            if (toggle.checked) {
+                settings.style.opacity = '1';
+                settings.style.maxHeight = '500px';
+                settings.style.marginTop = '24px';
+            } else {
+                settings.style.opacity = '0';
+                settings.style.maxHeight = '0';
+                settings.style.marginTop = '0';
+            }
+        }
+        
+        // Initialize state
+        toggleGPS();
+    </script>
+</body></html>
