@@ -21,7 +21,7 @@ export default function UpdatePasswordScreen() {
   const mode = Array.isArray(params.mode) ? params.mode[0] : params.mode;
   const isRecovery = mode === "recovery";
 
-  const [current_password, setCurrentPassword] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
   const [password, setPassword] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const [busy, setBusy] = useState(false);
