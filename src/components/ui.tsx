@@ -2,7 +2,98 @@
 import type { PropsWithChildren, ReactNode } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { SymbolView } from "expo-symbols";
+import QRCode from "react-native-qrcode-svg";
 import { useRouter } from "expo-router";
+
+export type AppIconName =
+  | "home"
+  | "history"
+  | "qr"
+  | "notifications"
+  | "person"
+  | "settings"
+  | "arrow_back"
+  | "close"
+  | "share"
+  | "download"
+  | "edit"
+  | "delete"
+  | "location_on"
+  | "camera_alt"
+  | "flash_on"
+  | "keyboard"
+  | "check_circle"
+  | "error"
+  | "sync"
+  | "logout"
+  | "help"
+  | "info"
+  | "description"
+  | "tune"
+  | "devices"
+  | "schedule"
+  | "more_vert"
+  | "chevron_right"
+  | "person_add"
+  | "photo_camera";
+
+const APP_ICON_IOS: Record<AppIconName, string> = {
+  home: "house",
+  history: "clock.arrow.circlepath",
+  qr: "qrcode",
+  notifications: "bell",
+  person: "person",
+  settings: "gearshape",
+  arrow_back: "chevron.left",
+  close: "xmark",
+  share: "square.and.arrow.up",
+  download: "arrow.down.circle",
+  edit: "pencil",
+  delete: "trash",
+  location_on: "location",
+  camera_alt: "camera",
+  flash_on: "bolt.fill",
+  keyboard: "keyboard",
+  check_circle: "checkmark.circle.fill",
+  error: "exclamationmark.circle.fill",
+  sync: "arrow.triangle.2.circlepath",
+  logout: "rectangle.portrait.and.arrow.right",
+  help: "questionmark.circle",
+  info: "info.circle",
+  description: "doc.text",
+  tune: "slider.horizontal.3",
+  devices: "iphone",
+  schedule: "clock",
+  more_vert: "ellipsis",
+  chevron_right: "chevron.right",
+  person_add: "person.badge.plus",
+  photo_camera: "camera.circle"
+};
+
+export function AppIcon({
+  name,
+  size = 22,
+  color = UI.greenDark
+}: {
+  name: AppIconName;
+  size?: number;
+  color?: string;
+}) {
+  return (
+    <SymbolView
+      name={{
+        ios: APP_ICON_IOS[name],
+        android: name,
+        web: name
+      }}
+      size={size}
+      tintColor={color}
+      type="monochrome"
+      fallback={<View style={{ width: size, height: size }} />}
+    />
+  );
+}
 
 export const UI = {
   bg: "#FFFFFF",
@@ -174,7 +265,7 @@ export function BackHeader({
   return (
     <View className="flex-row items-center justify-between border-b border-emerald-100/70 bg-white px-4 py-3">
       <Pressable onPress={() => router.back()} className="h-10 w-10 items-center justify-center rounded-full bg-gray-50">
-        <Text className="text-xl font-semibold text-gray-700">‹</Text>
+        <AppIcon name="arrow_back" size={22} color={UI.text} />
       </Pressable>
       <Text className="flex-1 px-3 text-base font-extrabold text-emerald-700">{title}</Text>
       <View className="min-w-10 items-end">{right}</View>
@@ -187,38 +278,48 @@ type NavKey = "home" | "history" | "qr" | "notifications" | "profile";
 export function BottomNav({ active }: { active: NavKey }) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const items: Array<{ key: NavKey; label: string; icon: string; route: string }> = [
-    { key: "home", label: "Beranda", icon: "⌂", route: "/" },
-    { key: "history", label: "Riwayat", icon: "◷", route: "/history" },
-    { key: "qr", label: "QR", icon: "▦", route: "/qr" },
-    { key: "notifications", label: "Notifikasi", icon: "•", route: "/notifications" },
-    { key: "profile", label: "Profil", icon: "◉", route: "/profile" }
+  const items: Array<{ key: NavKey; label: string; icon: AppIconName; route: string }> = [
+    { key: "home", label: "Beranda", icon: "home", route: "/" },
+    { key: "history", label: "Riwayat", icon: "history", route: "/history" },
+    { key: "qr", label: "QR", icon: "qr", route: "/qr" },
+    { key: "notifications", label: "Notifikasi", icon: "notifications", route: "/notifications" },
+    { key: "profile", label: "Profil", icon: "person", route: "/profile" }
   ];
 
   return (
     <View
-      className="flex-row items-center justify-around border-t border-gray-100 bg-white px-2 pt-2"
-      style={{ paddingBottom: Math.max(insets.bottom, 10) }}
+      className="border-t border-gray-200 bg-white"
+      style={{ paddingBottom: Math.max(insets.bottom, 8) }}
     >
-      {items.map((item) => {
-        const selected = active === item.key;
-        return (
-          <Pressable
-            key={item.key}
-            onPress={() => router.push(item.route as any)}
-            className={"min-w-[58px] items-center rounded-2xl px-2 py-1.5 " + (selected ? "bg-emerald-50" : "")}
-          >
-            {item.key === "qr" ? (
-              <View className="-mt-6 h-14 w-14 items-center justify-center rounded-full bg-emerald-500 shadow-sm">
-                <Text className="text-2xl font-black text-white">▦</Text>
-              </View>
-            ) : (
-              <Text className={"text-lg " + (selected ? "text-emerald-600" : "text-gray-400")}>{item.icon}</Text>
-            )}
-            <Text className={"mt-0.5 text-[10px] font-semibold " + (selected ? "text-emerald-700" : "text-gray-500")}>{item.label}</Text>
-          </Pressable>
-        );
-      })}
+      <View className="flex-row items-center justify-around px-2 pt-2">
+        {items.map((item) => {
+          const selected = active === item.key;
+          return (
+            <Pressable
+              key={item.key}
+              onPress={() => router.push(item.route as any)}
+              className="min-w-[60px] items-center px-2 pb-1"
+            >
+              {item.key === "qr" ? (
+                <View className="-mt-7 h-14 w-14 items-center justify-center rounded-full bg-emerald-500 shadow-lg">
+                  <AppIcon name="qr" size={26} color="#FFFFFF" />
+                </View>
+              ) : (
+                <View className={selected ? "h-9 w-14 items-center justify-center rounded-full bg-emerald-50" : "h-9 w-14 items-center justify-center"}>
+                  <AppIcon
+                    name={item.icon}
+                    size={23}
+                    color={selected ? UI.greenDark : UI.faint}
+                  />
+                </View>
+              )}
+              <Text className={"mt-1 text-[10px] font-semibold " + (selected ? "text-emerald-700" : "text-gray-500")}>
+                {item.label}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
     </View>
   );
 }
@@ -231,6 +332,28 @@ export function SectionTitle({ title, action }: { title: string; action?: ReactN
     </View>
   );
 }
+
+const ICON_ALIASES: Record<string, AppIconName> = {
+  "person": "person",
+  "▣": "devices",
+  "↪": "logout",
+  "⌖": "location_on",
+  "☼": "tune",
+  "🔒": "settings",
+  "?": "help",
+  "i": "info",
+  "§": "description",
+  "✎": "edit",
+  "✓": "check_circle",
+  "↶": "history",
+  "◷": "schedule",
+  "⌗": "qr",
+  "▦": "qr",
+  "⚙": "settings",
+  "◉": "person",
+  "×": "close",
+  "↻": "sync"
+};
 
 export function RowButton({
   icon,
@@ -245,16 +368,23 @@ export function RowButton({
   onPress?: () => void;
   trailing?: string;
 }) {
+  const iconName = ICON_ALIASES[icon] ?? "info";
+  const trailingIcon = trailing === "›" ? "chevron_right" : null;
+
   return (
     <Pressable onPress={onPress} className="flex-row items-center border-b border-gray-100 px-1 py-4">
       <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-emerald-50">
-        <Text className="text-lg text-emerald-700">{icon}</Text>
+        <AppIcon name={iconName} size={19} color={UI.greenDark} />
       </View>
       <View className="flex-1">
         <Text className="text-sm font-bold text-gray-900">{title}</Text>
         {subtitle ? <Text className="mt-1 text-xs leading-4 text-gray-500">{subtitle}</Text> : null}
       </View>
-      <Text className="ml-3 text-xl font-semibold text-gray-300">{trailing}</Text>
+      {trailingIcon ? (
+        <AppIcon name={trailingIcon} size={19} color="#CBD5E1" />
+      ) : (
+        <Text className="ml-3 text-sm text-gray-400">{trailing}</Text>
+      )}
     </Pressable>
   );
 }
@@ -296,41 +426,25 @@ export function Segmented({
   );
 }
 
-export function QrVisual({ size = 236, label = "QR" }: { size?: number; label?: string }) {
-  const cells: ReactNode[] = [];
-  const n = 29;
-  const cell = size / n;
-  const isFinder = (x: number, y: number, ox: number, oy: number) => {
-    if (x < ox || x >= ox + 7 || y < oy || y >= oy + 7) return false;
-    const dx = x - ox;
-    const dy = y - oy;
-    return (
-      dx === 0 || dx === 6 || dy === 0 || dy === 6 ||
-      (dx >= 2 && dx <= 4 && dy >= 2 && dy <= 4)
-    );
-  };
-
-  for (let y = 0; y < n; y += 1) {
-    for (let x = 0; x < n; x += 1) {
-      const inFinder = isFinder(x, y, 0, 0) || isFinder(x, y, n - 7, 0) || isFinder(x, y, 0, n - 7);
-      const reserved = x < 8 || y < 8 || x >= n - 8 || y >= n - 8;
-      const dataBit = ((x * 73 + y * 37 + x * y * 11 + 17) % 13) < 6;
-      const dark = inFinder || (!reserved && dataBit);
-      cells.push(
-        <View
-          key={String(x) + "-" + String(y)}
-          style={{ width: cell, height: cell }}
-          className={dark ? "bg-gray-900" : "bg-white"}
-        />
-      );
-    }
-  }
-
+export function QrVisual({
+  size = 236,
+  label = "QR",
+  value = "ayohadir:demo-session-token"
+}: {
+  size?: number;
+  label?: string;
+  value?: string;
+}) {
   return (
     <View className="items-center justify-center rounded-xl border-2 border-emerald-100 bg-white p-3">
-      <View style={{ width: size, height: size }} className="flex-row flex-wrap overflow-hidden bg-white">
-        {cells}
-      </View>
+      <QRCode
+        value={value}
+        size={size}
+        backgroundColor="#FFFFFF"
+        color="#111827"
+        quietZone={4}
+        ecl="M"
+      />
       <Text className="mt-2 text-[10px] font-bold tracking-[2px] text-gray-300">{label}</Text>
     </View>
   );
