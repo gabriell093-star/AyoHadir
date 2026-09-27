@@ -936,7 +936,7 @@ export function HistoryScreen() {
           <Badge>Sesi Saya</Badge>
           <Text className="mt-3 text-base font-black text-gray-900">Sesi QR Buatan Saya</Text>
           <Text className="mt-2 text-sm leading-5 text-gray-500">Pelatihan Keberlanjutan Q3 · 42/50 peserta</Text>
-          <PrimaryButton className="mt-4" onPress={() => {}}>
+          <PrimaryButton className="mt-4" onPress={() => router.push("/screens/history-session")}>
             <ButtonText>Lihat detail sesi</ButtonText>
           </PrimaryButton>
         </GlassCard>
