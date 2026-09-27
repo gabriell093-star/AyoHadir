@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {
   ActivityIndicator,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -168,10 +169,13 @@ export default function SignInScreen() {
         contentContainerClassName="flex-grow justify-center px-6 py-10"
       >
         <View className="gap-6">
-          <View className="items-center gap-2">
-            <View className="h-16 w-16 items-center justify-center rounded-[22px] bg-emerald-500 shadow-sm">
-              <Text className="text-2xl font-black text-white">A</Text>
-            </View>
+          <View className="items-center gap-3">
+            <Image
+              source={require("../../assets/images/ayo-hadir-icon.png")}
+              className="h-20 w-20 rounded-[26px]"
+              resizeMode="contain"
+              accessibilityLabel="Logo AyoHadir!"
+            />
             <Text className="text-[32px] font-extrabold tracking-tight text-gray-950">
               AyoHadir!
             </Text>
