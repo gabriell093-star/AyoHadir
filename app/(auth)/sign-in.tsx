@@ -14,6 +14,7 @@ import { Link, useRouter } from "expo-router";
 import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
 
+import { AyoHadirLogo } from "@/components/ui";
 import { handleAuthRedirectParams } from "@/lib/auth-redirect";
 import { supabase } from "@/lib/supabase";
 
@@ -170,12 +171,7 @@ export default function SignInScreen() {
       >
         <View className="gap-6">
           <View className="items-center gap-3">
-            <Image
-              source={require("../../assets/images/ayo-hadir-icon.png")}
-              className="h-20 w-20 rounded-[26px]"
-              resizeMode="contain"
-              accessibilityLabel="Logo AyoHadir!"
-            />
+            <AyoHadirLogo size={84} />
             <Text className="text-[32px] font-extrabold tracking-tight text-gray-950">
               AyoHadir!
             </Text>
@@ -184,7 +180,7 @@ export default function SignInScreen() {
             </Text>
           </View>
 
-          <View className="rounded-[28px] border border-gray-100 bg-white p-5 shadow-sm">
+          <View className="rounded-[28px] border border-[#C5C8B8]/40 bg-white p-5 shadow-sm">
             <View className="mb-5 flex-row rounded-2xl bg-gray-50 p-1">
               <Pressable
                 className={[
@@ -285,7 +281,7 @@ export default function SignInScreen() {
             ) : (
               <Link
                 href="/forgot-password"
-                className="mt-3 self-end text-sm font-semibold text-emerald-600"
+                className="mt-3 self-end text-sm font-semibold text-[#3E5219]"
               >
                 Lupa password?
               </Link>
@@ -299,7 +295,7 @@ export default function SignInScreen() {
 
             <Pressable
               className={[
-                "mt-5 items-center rounded-2xl bg-emerald-500 px-4 py-4",
+                "mt-5 items-center rounded-2xl bg-[#3E5219] px-4 py-4",
                 busy ? "opacity-60" : ""
               ].join(" ")}
               onPress={submit}
