@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { ActivityIndicator, AppState, Image, Linking, Modal, PanResponder, Pressable, ScrollView, Switch, Text, TextInput, View, type DimensionValue } from "react-native";
 import { StatusBar } from "expo-status-bar";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Camera, CameraView, useCameraPermissions } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
@@ -659,6 +660,7 @@ export function ExpiredQrScreen() {
 
 export function ScanQrScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const [permission, requestPermission] = useCameraPermissions();
   const [torch, setTorch] = useState(false);
   const [scanned, setScanned] = useState(false);
@@ -745,7 +747,7 @@ export function ScanQrScreen() {
         onMountError={(event) => setCameraError(event.message)}
       >
         <View className="flex-1 bg-black/25">
-          <View className="flex-row items-center justify-between px-4 pt-3">
+          <View className="flex-row items-center justify-between px-4" style={{ paddingTop: insets.top + 12 }}>
             <Pressable onPress={() => router.back()} className="h-10 w-10 items-center justify-center rounded-full bg-[#091426]/65">
               <AppIcon name="arrow_back" size={22} color="#FFFFFF" />
             </Pressable>
@@ -783,7 +785,7 @@ export function ScanQrScreen() {
             ) : null}
           </View>
 
-          <View className="mb-7 px-6">
+          <View className="px-6" style={{ paddingBottom: Math.max(insets.bottom, 18), paddingTop: 10 }}>
             <View className="flex-row gap-3">
               <Pressable
                 onPress={() => setTorch((value) => !value)}
