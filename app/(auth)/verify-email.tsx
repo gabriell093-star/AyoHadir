@@ -1,4 +1,5 @@
 import { useState } from "react";
+import * as Linking from "expo-linking";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 
@@ -28,9 +29,12 @@ export default function VerifyEmailScreen() {
     setBusy(true);
     setNotice("");
 
+    const redirectTo = Linking.createURL("auth/callback");
+
     const { error } = await supabase.auth.resend({
       type: "signup",
-      email
+      email,
+      options: { emailRedirectTo: redirectTo }
     });
 
     if (error) {
