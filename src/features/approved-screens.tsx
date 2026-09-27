@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { ActivityIndicator, AppState, Image, Linking, Modal, PanResponder, Pressable, ScrollView, Switch, Text, TextInput, View, type DimensionValue } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Camera, CameraView, useCameraPermissions } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 
@@ -473,7 +473,7 @@ function RangeSlider({
 
 export function ConfirmQrScreen() {
   const router = useRouter();
-  const params = require("expo-router").useLocalSearchParams<{
+  const params = useLocalSearchParams<{
     title?: string;
     target?: string;
     duration?: string;
@@ -836,7 +836,7 @@ export function AttendanceProofScreen() {
     <Screen bottomNav="history">
       <BackHeader title="Bukti Absensi" right={<Badge>Sync</Badge>} />
       <GlassCard>
-        <View className="items-center"><Image source={logo} resizeMode="contain" className="h-12 w-12 rounded-2xl" /><Text className="mt-2 text-lg font-black text-[#3E5219]">AyoHadir!</Text><Text className="mt-1 text-xs text-gray-500">Bukti Absensi Digital</Text></View>
+        <View className="items-center"><AyoHadirLogo size={56} /><Text className="mt-2 text-lg font-black text-[#3E5219]">AyoHadir!</Text><Text className="mt-1 text-xs text-gray-500">Bukti Absensi Digital</Text></View>
         <View className="my-5 border-t border-dashed border-gray-200" />
         {[
           ["Nama", "Budi Santoso"],
