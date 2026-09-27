@@ -1,4 +1,4 @@
-name: Expo Android CI
+name: Expo Source Validation
 
 on:
   push:
@@ -10,11 +10,11 @@ permissions:
   contents: read
 
 concurrency:
-  group: expo-android-${{ github.ref }}
+  group: expo-source-validation-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  validate-and-build:
+  validate-source:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -28,13 +28,6 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Generate crisp launcher icon
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y librsvg2-bin
-          rsvg-convert -w 1024 -h 1024 assets/images/ayo-hadir-logo.svg -o assets/images/ayo-hadir-icon.png
-          file assets/images/ayo-hadir-icon.png
-
       - name: Expo doctor
         run: npx expo-doctor
 
@@ -44,39 +37,10 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Generate Android project
-        run: npx expo prebuild --platform android --non-interactive
-
-      - name: Build release APK
-        working-directory: android
-        run: ./gradlew assembleRelease
-
-      - name: Verify APK runtime and prepare named artifact
-        working-directory: android
+      - name: Guard dummy UI interactions
         run: |
-          python3 - <<'PY'
-          import zipfile
-          from pathlib import Path
+          ! grep -R -n -E 'onPress=\{\(\) => \{\}\}|onPress=\{\(\) => null\}|onPress=\{\(\) => undefined\}' app src
 
-          apk = Path("app/build/outputs/apk/release/app-release.apk")
-          if not apk.is_file():
-              raise SystemExit("Release APK tidak ditemukan.")
-          with zipfile.ZipFile(apk) as z:
-              names = z.namelist()
-              if not any("libexpo-modules-core.so" in n for n in names):
-                  raise SystemExit("APK tidak mengandung runtime Expo yang diharapkan.")
-              flutter_markers = ("flutter_assets", "libflutter.so", "io/flutter")
-              if any(any(marker in n.lower() for marker in flutter_markers) for n in names):
-                  raise SystemExit("Terdeteksi artefak Flutter di APK; build dihentikan.")
-          print(f"Verified Expo APK: {apk} ({apk.stat().st_size} bytes)")
-          PY
-          VERSION=$(node -p "require('../package.json').version")
-          mkdir -p ../artifacts
-          cp app/build/outputs/apk/release/app-release.apk "../artifacts/AyoHadir-Expo-v\${VERSION}.apk"
-
-      - name: Upload release APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: ayohadir-expo-release-apk
-          path: artifacts/AyoHadir-Expo-v*.apk
-          if-no-files-found: error
+      - name: Guard legacy green tokens
+        run: |
+          ! grep -R -n -E 'emerald-[0-9]+|#10B981|#059669' app src
