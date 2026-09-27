@@ -1,7 +1,7 @@
 
-import { useMemo, useState } from "react";
-import { Image, Linking, Pressable, Switch, Text, TextInput, View } from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useState } from "react";
+import { Image, Linking, Pressable, ScrollView, Switch, Text, TextInput, View } from "react-native";
+import { useRouter } from "expo-router";
 
 import { useAuth } from "@/auth/auth-context";
 import {
@@ -22,8 +22,7 @@ import {
   Segmented,
   SectionTitle,
   SoftCard,
-  StatCard,
-  UI
+  StatCard
 } from "@/components/ui";
 
 const logo = require("../../assets/images/ayo-hadir-icon.png");
@@ -77,7 +76,7 @@ export function LoginFailedScreen() {
           <Text className="mt-1 text-xs leading-5 text-red-600">Periksa kembali data yang dimasukkan, atau gunakan pemulihan password.</Text>
         </View>
         <PrimaryButton className="mt-5" onPress={() => router.replace("/sign-in")}><ButtonText>Masuk lagi</ButtonText></PrimaryButton>
-        <TextButton onPress={() => router.push("/forgot-password")}><TextButton>?</TextButton></TextButton>
+        <TextButton onPress={() => router.push("/forgot-password")}>Lupa Kata Sandi?</TextButton>
       </GlassCard>
     </Screen>
   );
@@ -235,7 +234,7 @@ function ScrollishCreate({
 }
 
 function ScrollViewFallback({ children }: { children: React.ReactNode }) {
-  return <View className="flex-1">{children}</View>;
+  return <ScrollView className="flex-1">{children}</ScrollView>;
 }
 
 export function ConfirmQrScreen() {
