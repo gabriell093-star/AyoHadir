@@ -4,10 +4,15 @@
 AyoHadir is an Android-first attendance application built with Expo React Native and TypeScript. Supabase is the backend target.
 
 ## Source of truth
-- docs/PRD_Aplikasi_Absensi_QR.md
-- docs/UIUX_Absensi_QR.md
-- docs/stitch/dashboard_utama_ayo_hadir.html
-- assets/images/ayo-hadir-logo.svg
+- Product behavior: `docs/PRD_Aplikasi_Absensi_QR.md`
+- UX guidance: `docs/UIUX_Absensi_QR.md`
+- Fixed visual screen references: `docs/ui/screens/`
+- UI baseline and precedence rules: `docs/UI_SOURCE_OF_TRUTH.md`
+- Brand asset: `assets/images/ayo-hadir-logo.svg`
+
+The visual design in `docs/ui/screens/` is frozen. Do not redesign, recolor, rename navigation labels, or replace the visual system unless the user explicitly requests a UI revision. HTML references are not runtime code; translate them into native Expo React Native components.
+
+When a required product screen/state is absent from the approved references, create it by extending the nearest approved screen while preserving the same visual language. Follow the PRD for behavior; never introduce roles or flows that conflict with it.
 
 ## Technology
 - Expo SDK 57
