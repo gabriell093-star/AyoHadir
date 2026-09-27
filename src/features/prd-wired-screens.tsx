@@ -201,7 +201,7 @@ export function AttendanceProofWiredScreen(){
    :(filteredSessions.length?filteredSessions.map(session=><GlassCard key={session.id}>
       <View className="flex-row items-start justify-between"><Text className="flex-1 pr-3 text-base font-black text-gray-900">{session.name}</Text><Badge tone={session.status==="active"?"green":session.status==="expired"?"gray":"red"}>{session.status||""}</Badge></View>
       <Text className="mt-2 text-xs text-gray-500">{session.starts_at} → {session.ends_at}</Text>
-      <PrimaryButton className="mt-4" onPress={()=>router.push({pathname:"/screens/active-qr",params:{qr_id:session.id,title:session.name,starts_at:session.starts_at,ends_at:session.ends_at,gps:String(Boolean(session.gps_enabled))}})}><ButtonText>Lihat Sesi</ButtonText></PrimaryButton>
+      <PrimaryButton className="mt-4" onPress={()=>router.push(session.status==="active"?{pathname:"/screens/active-qr",params:{qr_id:session.id,title:session.name,starts_at:session.starts_at,ends_at:session.ends_at,gps:String(Boolean(session.gps_enabled))}}:{pathname:"/screens/history-session",params:{qr_id:session.id}})}><ButtonText>{session.status==="active"?"Lihat Sesi":"Lihat Riwayat"}</ButtonText></PrimaryButton>
      </GlassCard>):<GlassCard><Text className="font-bold text-gray-900">Belum ada sesi QR yang dibuat.</Text></GlassCard>)}
  </Screen>;
 }
