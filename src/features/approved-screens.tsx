@@ -527,7 +527,7 @@ export function ConfirmQrScreen() {
 
 export function QrSuccessScreen() {
   const router = useRouter();
-  const params = require("expo-router").useLocalSearchParams<{
+  const params = useLocalSearchParams<{
     title?: string;
     target?: string;
     duration?: string;
