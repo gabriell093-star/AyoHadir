@@ -1,6 +1,8 @@
 import "../global.css";
 
 import { Stack, useRouter, useSegments } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { ActivityIndicator, View } from "react-native";
 import { useEffect } from "react";
 
@@ -37,19 +39,22 @@ function RootNavigator() {
   }, [loading, router, segments, session]);
 
   return (
-    <View className="flex-1 bg-white">
-      <Stack
+    <SafeAreaProvider>
+      <StatusBar style="dark" />
+      <View className="flex-1 bg-white">
+        <Stack
         screenOptions={{
           headerShown: false,
           contentStyle: { backgroundColor: "#FFFFFF" }
         }}
       />
-      {loading ? (
-        <View className="absolute inset-0 items-center justify-center bg-white">
-          <ActivityIndicator color="#10B981" size="large" />
-        </View>
-      ) : null}
-    </View>
+        {loading ? (
+          <View className="absolute inset-0 items-center justify-center bg-white">
+            <ActivityIndicator color="#10B981" size="large" />
+          </View>
+        ) : null}
+      </View>
+    </SafeAreaProvider>
   );
 }
 
