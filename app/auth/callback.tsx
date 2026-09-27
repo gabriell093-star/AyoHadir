@@ -18,7 +18,7 @@ export default function AuthCallbackScreen() {
     refresh_token?: string | string[];
     error?: string | string[];
     error_description?: string | string[];
-    next?: string | string[];
+    type?: string | string[];
   }>();
   const processed = useRef(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -30,8 +30,8 @@ export default function AuthCallbackScreen() {
 
     processed.current = true;
 
-    const next = firstParam(params.next);
-    const safeNext = next === "/update-password" ? "/update-password" : "/";
+    const type = firstParam(params.type);
+    const safeNext = type === "recovery" ? "/update-password" : "/";
 
     void handleAuthRedirectParams({
       code: firstParam(params.code),
