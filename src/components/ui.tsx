@@ -396,7 +396,7 @@ type NavKey = "home" | "history" | "qr" | "notifications" | "profile";
 export function BottomNav({ active }: { active: NavKey }) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const items: Array<{ key: NavKey; label: string; icon: AppIconName; route: string }> = [
+  const items: { key: NavKey; label: string; icon: AppIconName; route: string }[] = [
     { key: "home", label: "Beranda", icon: "home", route: "/" },
     { key: "history", label: "Riwayat", icon: "history", route: "/history" },
     { key: "qr", label: "QR", icon: "qr_code_scanner", route: "/qr" },
