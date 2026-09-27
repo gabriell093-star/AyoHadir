@@ -103,7 +103,7 @@ export function DashboardScreen() {
             <Badge tone={online ? "green" : "yellow"}>{online ? "Online" : "Offline"}</Badge>
           </View>
         </View>
-        <Pressable onPress={() => router.push("/profile-settings")} className="h-11 w-11 items-center justify-center rounded-full border border-gray-100 bg-white shadow-sm">
+        <Pressable onPress={() => router.push("/screens/profile-settings")} className="h-11 w-11 items-center justify-center rounded-full border border-gray-100 bg-white shadow-sm">
           <Text className="text-xl text-gray-600">⚙</Text>
         </Pressable>
       </View>
@@ -536,7 +536,7 @@ export function ProfileScreen() {
   const verified = Boolean(user?.email_confirmed_at);
   return (
     <Screen bottomNav="profile">
-      <BackHeader title="Profil" right={<Pressable onPress={() => router.push("/profile-settings")}><Text className="text-lg text-gray-500">⚙</Text></Pressable>} />
+      <BackHeader title="Profil" right={<Pressable onPress={() => router.push("/screens/profile-settings")}><Text className="text-lg text-gray-500">⚙</Text></Pressable>} />
       <GlassCard className="items-center">
         <View className="h-24 w-24 items-center justify-center rounded-full bg-emerald-50"><Text className="text-3xl font-black text-emerald-700">{name.charAt(0)}</Text></View>
         <Text className="mt-4 text-xl font-black text-gray-950">{name}</Text>
@@ -544,9 +544,9 @@ export function ProfileScreen() {
         <Badge tone={verified ? "green" : "yellow"}>{verified ? "Email Terverifikasi" : "Email Belum Terverifikasi"}</Badge>
       </GlassCard>
       <GlassCard>
-        <RowButton icon="person" title="Edit Profil" subtitle="Ubah data diri dan foto profil" onPress={() => router.push("/profile-settings")} />
+        <RowButton icon="person" title="Edit Profil" subtitle="Ubah data diri dan foto profil" onPress={() => router.push("/screens/profile-settings")} />
         <RowButton icon="▣" title="Perangkat" subtitle="Kelola perangkat dan session aplikasi" trailing="›" />
-        <RowButton icon="↪" title="Logout" subtitle="Keluar dari sesi saat ini" trailing="›" />
+        <RowButton icon="↪" title="Logout" subtitle="Keluar dari sesi saat ini" onPress={async () => { const { supabase } = await import("@/lib/supabase"); await supabase.auth.signOut(); }} trailing="›" />
       </GlassCard>
     </Screen>
   );
