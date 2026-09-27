@@ -23,13 +23,13 @@ function RootNavigator() {
     return () => data.subscription.unsubscribe();
   }, [router]);
 
+  const segments = useSegments();
+  const { session, loading } = useAuth();
+
   useEffect(() => {
     const stop = startForegroundSync(session?.user?.id);
     return stop;
   }, [session?.user?.id]);
-
-  const segments = useSegments();
-  const { session, loading } = useAuth();
 
   useEffect(() => {
     if (loading) {
