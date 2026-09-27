@@ -2,7 +2,7 @@
   "expo": {
     "name": "AyoHadir!",
     "slug": "ayohadir",
-    "version": "0.3.2",
+    "version": "0.3.3",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "scheme": "ayohadir",
@@ -14,7 +14,12 @@
         "foregroundImage": "./assets/images/ayo-hadir-icon.png"
       }
     },
-    "plugins": ["expo-router", "expo-secure-store"],
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-camera",
+      "expo-image-picker"
+    ],
     "experiments": {
       "typedRoutes": true
     }
