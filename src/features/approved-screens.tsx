@@ -541,6 +541,7 @@ export function QrSuccessScreen() {
   const duration = Number(params.duration || 8);
   const gps = params.gps === "true";
   const radius = Number(params.radius || 150);
+  const [qrValue] = useState(() => "ayohadir:" + title + ":" + Date.now());
 
   return (
     <Screen bottomNav="home">
