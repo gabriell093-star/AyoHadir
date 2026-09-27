@@ -1,2 +1,2 @@
-import { CancellationRequestScreen } from "@/features/approved-screens";
-export default CancellationRequestScreen;
+import { CancellationRequestWiredScreen } from "@/features/cancellation-wired";
+export default CancellationRequestWiredScreen;
