@@ -1,11 +1,15 @@
 
 import { useState } from "react";
-import { ActivityIndicator, Image, Linking, Pressable, ScrollView, Switch, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Image, Modal, PanResponder, Pressable, ScrollView, Switch, Text, TextInput, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useRouter } from "expo-router";
+import { CameraView, useCameraPermissions } from "expo-camera";
+import * as ImagePicker from "expo-image-picker";
 
 import { useAuth } from "@/auth/auth-context";
+import { supabase } from "@/lib/supabase";
 import {
+  AppIcon,
   Badge,
   BackHeader,
 
@@ -301,26 +305,40 @@ function RangeSlider({
   max: number;
   onChange: (value: number) => void;
 }) {
-  const [trackWidth, setTrackWidth] = useState(0);
+  const [trackWidth, setTrackWidth] = useState(1);
+
+  const updateFromX = (x: number) => {
+    const clamped = Math.max(0, Math.min(trackWidth, x));
+    const ratio = clamped / Math.max(trackWidth, 1);
+    const next = min + ratio * (max - min);
+    onChange(Math.max(min, Math.min(max, Math.round(next))));
+  };
+
+  const panResponder = PanResponder.create({
+    onStartShouldSetPanResponder: () => true,
+    onMoveShouldSetPanResponder: () => true,
+    onPanResponderGrant: (event) => updateFromX(event.nativeEvent.locationX),
+    onPanResponderMove: (event) => updateFromX(event.nativeEvent.locationX)
+  });
+
   const percentage = ((value - min) / (max - min)) * 100;
 
   return (
-    <Pressable
+    <View
       onLayout={(event) => setTrackWidth(event.nativeEvent.layout.width)}
-      onPress={(event) => {
-        const x = event.nativeEvent.locationX;
-        const next = min + (x / Math.max(trackWidth, 1)) * (max - min);
-        onChange(Math.max(min, Math.min(max, Math.round(next))));
-      }}
-      className="relative h-6 w-full justify-center"
+      className="h-8 w-full justify-center"
+      {...panResponder.panHandlers}
     >
-      <View className="absolute inset-x-0 h-1 rounded-full bg-gray-300" />
-      <View className="absolute left-0 h-1 rounded-full bg-emerald-700" style={{ width: `${percentage}%` }} />
+      <View className="absolute inset-x-0 h-1.5 rounded-full bg-[#D7D8CF]" />
       <View
-        className="absolute h-5 w-5 rounded-full border-2 border-white bg-emerald-700 shadow-sm"
-        style={{ left: `${percentage}%`, marginLeft: -10 }}
+        className="absolute left-0 h-1.5 rounded-full bg-[#3E5219]"
+        style={{ width: percentage + "%" }}
       />
-    </Pressable>
+      <View
+        className="absolute h-6 w-6 rounded-full border-2 border-white bg-[#3E5219] shadow-sm"
+        style={{ left: percentage + "%", marginLeft: -12 }}
+      />
+    </View>
   );
 }
 
@@ -349,210 +367,668 @@ export function ConfirmQrScreen() {
 
 export function QrSuccessScreen() {
   const router = useRouter();
-
   return (
-    <Screen>
-      <View className="flex-1 items-center justify-center px-0 py-4">
-        <GlassCard className="w-full items-center rounded-xl border-gray-200 p-6">
-          <View className="mb-6 h-24 w-24 items-center justify-center rounded-full bg-emerald-50">
-            <Text className="text-5xl text-emerald-600">✓</Text>
-          </View>
-
-          <Text className="text-center text-2xl font-semibold text-emerald-800">
-            QR Berhasil Dibuat!
-          </Text>
-          <Text className="mt-2 text-center text-sm leading-6 text-gray-500">
-            Sesi absensi siap digunakan. Peserta dapat mulai memindai kode ini.
-          </Text>
-
-          <View className="mt-6 w-full items-center rounded-xl bg-gray-50 p-5">
-            <QrVisual size={192} label="QR AKTIF" />
-            <View className="mt-4 flex-row items-center gap-2">
-              <Text className="text-sm text-emerald-700">◷</Text>
-              <Text className="text-xs font-semibold text-emerald-700">
-                Token diperbarui setiap 10 menit
-              </Text>
-            </View>
-          </View>
-
-          <View className="mt-6 w-full gap-3">
-            <PrimaryButton>
-              <View className="flex-row items-center gap-2">
-                <Text className="text-lg text-white">↗</Text>
-                <ButtonText>Share QR</ButtonText>
-              </View>
-            </PrimaryButton>
-
-            <SecondaryButton>
-              <View className="flex-row items-center gap-2">
-                <Text className="text-lg text-emerald-700">↓</Text>
-                <Text className="text-sm font-bold text-emerald-800">Download as Image</Text>
-              </View>
-            </SecondaryButton>
-
-            <Pressable
-              onPress={() => router.push("/history")}
-              className="min-h-12 items-center justify-center rounded-2xl px-5 py-3.5"
-            >
-              <View className="flex-row items-center gap-2">
-                <Text className="text-lg text-gray-500">◷</Text>
-                <Text className="text-sm font-bold text-gray-600">View Session History</Text>
-              </View>
-            </Pressable>
-          </View>
-        </GlassCard>
+    <Screen bottomNav="home">
+      <View className="items-center pt-5">
+        <View className="h-20 w-20 items-center justify-center rounded-full bg-emerald-50"><Text className="text-4xl text-emerald-600">✓</Text></View>
+        <Text className="mt-5 text-center text-2xl font-black text-gray-950">QR Berhasil Dibuat!</Text>
+        <Text className="mt-2 text-center text-sm leading-5 text-gray-500">Sesi sudah terdaftar dan siap digunakan.</Text>
       </View>
+      <GlassCard className="items-center">
+        <Text className="text-base font-black text-gray-900">Pelatihan Keberlanjutan Q3</Text>
+        <Text className="mt-1 text-xs text-gray-500">Aktif · 15 Agustus 2024 · 09:00 WIB</Text>
+        <View className="mt-5"><QrVisual size={210} label="QR AKTIF" /></View>
+        <Text className="mt-4 text-center text-xs leading-5 text-gray-500">Bagikan atau unduh QR. Bila GPS tidak aktif, aplikasi akan memberi peringatan keamanan sebelum berbagi.</Text>
+      </GlassCard>
+      <View className="flex-row gap-3">
+        <SecondaryButton className="flex-1"><Text className="text-sm font-bold text-gray-800">↗ Bagikan</Text></SecondaryButton>
+        <SecondaryButton className="flex-1"><Text className="text-sm font-bold text-gray-800">↓ Unduh</Text></SecondaryButton>
+      </View>
+      <PrimaryButton onPress={() => router.push("/screens/active-qr")}><ButtonText>Lihat Sesi</ButtonText></PrimaryButton>
+      <TextButton onPress={() => router.push("/history")}>Lihat Riwayat Sesi</TextButton>
     </Screen>
   );
 }
 
 export function ActiveQrScreen() {
   const router = useRouter();
-
   return (
     <Screen>
-      <BackHeader
-        title="Detail Sesi QR"
-        right={
-          <Pressable className="h-10 w-10 items-center justify-center rounded-full bg-gray-50">
-            <Text className="text-lg text-gray-600">⋮</Text>
-          </Pressable>
-        }
-      />
-
-      <View className="gap-2">
-        <View className="flex-row items-start justify-between gap-3">
-          <View className="flex-1">
-            <Text className="text-2xl font-semibold text-emerald-800">
-              Pelatihan Keberlanjutan Q3
-            </Text>
-            <Text className="mt-2 text-sm text-gray-500">
-              ◷ 15 Agustus 2024, 09:00 WIB
-            </Text>
-          </View>
-
-          <Badge>Aktif</Badge>
-        </View>
-
-        <View className="items-end">
-          <Text className="text-xs font-semibold text-gray-500">Berakhir dalam</Text>
-          <Text className="mt-1 text-2xl font-bold tracking-tight text-emerald-800">
-            02:45:12
-          </Text>
-        </View>
+      <BackHeader title="Detail Sesi QR" />
+      <View className="flex-row items-start justify-between">
+        <View className="flex-1"><Text className="text-2xl font-black text-emerald-700">Pelatihan Keberlanjutan Q3</Text><MiniCalendar date="15 Agustus 2024 · 09:00 WIB" /></View>
+        <Badge>Aktif</Badge>
       </View>
-
-      <GlassCard className="items-center rounded-xl border-gray-200 p-5">
-        <Text className="text-lg font-semibold text-emerald-800">Pindai untuk Hadir</Text>
-
-        <View className="relative mt-5 items-center justify-center rounded-lg border-2 border-emerald-100 bg-white p-4">
-          <QrVisual size={256} label="TOKEN DINAMIS" />
-          <View className="absolute left-4 right-4 top-4 h-1 rounded-full bg-emerald-300/70" />
-        </View>
-
-        <View className="mt-5 w-full">
-          <View className="flex-row items-center justify-between">
-            <Text className="text-xs font-semibold text-gray-500">Token dinamis</Text>
-            <Text className="text-sm font-bold text-emerald-800">08:45</Text>
-          </View>
-          <View className="mt-2">
-            <ProgressBar value={85} />
-          </View>
-          <Text className="mt-2 text-center text-xs text-gray-400">
-            QR Code diperbarui otomatis untuk keamanan.
-          </Text>
-        </View>
+      <GlassCard className="items-center">
+        <Text className="text-lg font-black text-gray-900">Pindai untuk Hadir</Text>
+        <View className="mt-5"><QrVisual size={232} label="TOKEN DINAMIS" /></View>
+        <View className="mt-5 w-full"><View className="flex-row justify-between"><Text className="text-xs text-gray-500">Token dinamis</Text><Text className="text-xs font-bold text-emerald-700">08:45</Text></View><ProgressBar value={85}/><Text className="mt-2 text-center text-[11px] text-gray-400">QR Code diperbarui otomatis untuk keamanan.</Text></View>
       </GlassCard>
-
-      <View className="flex-row gap-3">
-        <SecondaryButton className="flex-1">
-          <Text className="text-sm font-bold text-emerald-800">↗ Share QR</Text>
-        </SecondaryButton>
-        <SecondaryButton className="flex-1">
-          <Text className="text-sm font-bold text-emerald-800">↓ Download Image</Text>
-        </SecondaryButton>
-      </View>
-
-      <GlassCard className="rounded-xl border-gray-200 bg-gray-50 p-5">
-        <Text className="text-xs font-semibold uppercase tracking-[2px] text-gray-500">
-          Status Kehadiran
-        </Text>
-        <View className="mt-2 flex-row items-end">
-          <Text className="text-5xl font-bold text-emerald-800">42</Text>
-          <Text className="mb-1 ml-2 text-base text-gray-500">/ 50 Peserta</Text>
-        </View>
-        <PrimaryButton className="mt-4" onPress={() => router.push("/screens/history-session")}>
-          <View className="flex-row items-center gap-2">
-            <ButtonText>Lihat Riwayat Kehadiran</ButtonText>
-            <Text className="text-base text-white">→</Text>
-          </View>
-        </PrimaryButton>
+      <View className="flex-row gap-3"><SecondaryButton className="flex-1"><Text className="text-sm font-bold text-gray-800">↗ Bagikan QR</Text></SecondaryButton><SecondaryButton className="flex-1"><Text className="text-sm font-bold text-gray-800">↓ Download</Text></SecondaryButton></View>
+      <GlassCard>
+        <Text className="text-xs font-bold uppercase tracking-[2px] text-gray-500">Status Kehadiran</Text>
+        <View className="mt-2 flex-row items-end"><Text className="text-4xl font-black text-emerald-600">42</Text><Text className="mb-1 ml-2 text-sm text-gray-500">/ 50 peserta</Text></View>
+        <PrimaryButton className="mt-4" onPress={() => router.push("/screens/history-session")}><ButtonText>Lihat Riwayat Kehadiran →</ButtonText></PrimaryButton>
       </GlassCard>
-
-      <View className="h-32 overflow-hidden rounded-xl border border-gray-200 bg-gray-100">
-        <View className="flex-1 items-center justify-center">
-          <View className="h-28 w-28 rounded-full border-2 border-emerald-300/70 bg-emerald-200/25" />
-          <View className="absolute h-4 w-4 rounded-full bg-emerald-700" />
-          <View className="absolute inset-x-0 bottom-0 bg-white/85 px-4 py-3">
-            <Text className="text-xs font-semibold text-gray-700">Ruang Auditorium Utama</Text>
-          </View>
-        </View>
-      </View>
-
-      <GlassCard className="overflow-hidden rounded-xl border-gray-200 p-0">
+      <View className="h-32 items-center justify-center rounded-2xl bg-emerald-50"><Text className="text-3xl text-emerald-600">⌖</Text><Text className="mt-2 text-xs font-semibold text-gray-600">Ruang Auditorium Utama · GPS 150 m</Text></View>
+      <GlassCard>
         <RowButton icon="✎" title="Edit Detail Sesi" trailing="›" />
         <RowButton icon="⌖" title="Pengaturan Batasan Wilayah" trailing="›" />
       </GlassCard>
+      <DangerButton onPress={() => router.push("/screens/expired-qr")}><Text className="font-bold text-red-700">Hapus Sesi</Text></DangerButton>
+    </Screen>
+  );
+}
 
-      <DangerButton onPress={() => router.push("/screens/expired-qr")}>
-        <View className="flex-row items-center gap-2">
-          <Text className="text-lg text-red-700">⌫</Text>
-          <Text className="font-bold text-red-700">Hapus Sesi</Text>
-        </View>
-      </DangerButton>
+export function HistorySessionScreen() {
+  const router = useRouter();
+  const [filter, setFilter] = useState("Semua");
+  const rows = [
+    ["Budi Santoso", "09:02 WIB", "Hadir", "ABS-7K4P9X"],
+    ["Siti Rahma", "09:17 WIB", "Terlambat", "ABS-9Q2M1K"],
+    ["Andi Wijaya", "—", "Belum Absen", "—"],
+    ["Dewi Putri", "09:04 WIB", "Hadir", "ABS-4J8T3A"]
+  ];
+  return (
+    <Screen>
+      <BackHeader title="Detail Riwayat Sesi QR" />
+      <Text className="text-2xl font-black text-gray-950">Team Sync & Workshop</Text>
+      <Text className="mt-1 text-sm text-gray-500">15 Agustus 2024 · 24 target pengguna</Text>
+      <Segmented items={["Semua","Hadir","Terlambat"]} value={filter} onChange={setFilter} />
+      <GlassCard className="p-4">
+        {rows.filter((r) => filter === "Semua" || r[2] === filter).map((r) => <View key={r[0]} className="flex-row items-center border-b border-gray-100 py-3"><View className="h-9 w-9 items-center justify-center rounded-full bg-emerald-50"><Text className="text-sm font-black text-emerald-700">{r[0].charAt(0)}</Text></View><View className="ml-3 flex-1"><Text className="text-sm font-bold text-gray-900">{r[0]}</Text><Text className="mt-1 text-[11px] text-gray-500">{r[3]}</Text></View><View className="items-end"><Badge tone={r[2] === "Hadir" ? "green" : r[2] === "Terlambat" ? "yellow" : "gray"}>{r[2]}</Badge><Text className="mt-1 text-[10px] text-gray-400">{r[1]}</Text></View></View>)}
+      </GlassCard>
+      <SecondaryButton onPress={() => router.push("/history")}><Text className="text-sm font-bold text-gray-800">Kembali ke Riwayat</Text></SecondaryButton>
     </Screen>
   );
 }
 
 export function ExpiredQrScreen() {
   const router = useRouter();
-
   return (
-    <Screen>
+    <Screen bottomNav="history">
       <BackHeader title="Detail Sesi" />
-
       <View className="items-center pt-3">
-        <View className="h-20 w-20 items-center justify-center rounded-full bg-gray-100">
-          <Text className="text-3xl text-gray-500">×</Text>
-        </View>
-        <Text className="mt-5 text-2xl font-semibold text-gray-950">QR Kedaluwarsa</Text>
-        <View className="mt-2">
-          <Badge tone="gray">Kedaluwarsa</Badge>
-        </View>
+        <View className="h-20 w-20 items-center justify-center rounded-full bg-gray-100"><Text className="text-3xl text-gray-500">×</Text></View>
+        <Text className="mt-5 text-2xl font-black text-gray-950">QR Kedaluwarsa</Text>
+        <Badge tone="gray">Kedaluwarsa</Badge>
       </View>
-
-      <GlassCard className="rounded-xl border-gray-200">
-        <Text className="text-base font-semibold text-gray-900">Pelatihan Keberlanjutan Q3</Text>
-        <Text className="mt-2 text-sm text-gray-500">Berakhir 15 Agustus 2024 · 17:00 WIB</Text>
-
-        <View className="mt-5 items-center rounded-xl bg-gray-50 p-4">
-          <QrVisual size={190} label="ARSIP" />
-        </View>
-
-        <Text className="mt-5 text-sm leading-6 text-gray-600">
-          Sesi sudah tidak dapat digunakan untuk absensi. Riwayat tetap tersimpan sebagai arsip.
-        </Text>
+      <GlassCard>
+        <Text className="text-base font-black text-gray-900">Pelatihan Keberlanjutan Q3</Text>
+        <Text className="mt-1 text-sm text-gray-500">Berakhir 15 Agustus 2024 · 17:00 WIB</Text>
+        <Text className="mt-4 text-sm leading-6 text-gray-600">Sesi sudah tidak dapat digunakan untuk absensi. Riwayat tetap tersimpan sebagai arsip.</Text>
+        <View className="mt-4 items-center"><QrVisual size={190} label="ARSIP" /></View>
       </GlassCard>
-
-      <PrimaryButton onPress={() => router.push("/history")}>
-        <ButtonText>Lihat Riwayat</ButtonText>
-      </PrimaryButton>
-
-      <DangerButton>
-        <Text className="font-bold text-red-700">Hapus dari daftar saya</Text>
-      </DangerButton>
+      <PrimaryButton onPress={() => router.push("/history")}><ButtonText>Lihat Riwayat</ButtonText></PrimaryButton>
+      <DangerButton><Text className="font-bold text-red-700">Hapus dari daftar saya</Text></DangerButton>
     </Screen>
   );
 }
 
+export function ScanQrScreen() {
+  const router = useRouter();
+  const [permission, requestPermission] = useCameraPermissions();
+  const [torch, setTorch] = useState(false);
+  const [scanned, setScanned] = useState(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
 
+  const handleBarcode = ({ data }: { data: string }) => {
+    if (scanned) return;
+    setScanned(true);
+    router.push({
+      pathname: "/screens/attendance-success",
+      params: { qr: data }
+    });
+  };
+
+  if (!permission) {
+    return (
+      <View className="flex-1 items-center justify-center bg-[#091426]">
+        <StatusBar style="light" />
+        <ActivityIndicator color="#FFFFFF" size="large" />
+        <Text className="mt-4 text-sm text-white/70">Menyiapkan kamera…</Text>
+      </View>
+    );
+  }
+
+  if (!permission.granted) {
+    return (
+      <View className="flex-1 items-center justify-center bg-[#091426] px-6">
+        <StatusBar style="light" />
+        <View className="w-full rounded-3xl border border-white/10 bg-white/10 p-6">
+          <View className="items-center">
+            <View className="h-16 w-16 items-center justify-center rounded-full bg-emerald-300/15">
+              <AppIcon name="camera_alt" size={28} color="#A7F3D0" />
+            </View>
+            <Text className="mt-4 text-center text-2xl font-black text-white">Izin Kamera</Text>
+            <Text className="mt-2 text-center text-sm leading-6 text-white/70">
+              Izinkan kamera agar AyoHadir dapat membaca QR secara langsung.
+            </Text>
+          </View>
+
+          <PrimaryButton className="mt-5" onPress={requestPermission}>
+            <ButtonText>Izinkan Kamera</ButtonText>
+          </PrimaryButton>
+          <SecondaryButton className="mt-3 border-white/15 bg-white/5" onPress={() => router.back()}>
+            <Text className="text-sm font-bold text-white">Kembali</Text>
+          </SecondaryButton>
+        </View>
+      </View>
+    );
+  }
+
+  return (
+    <View className="flex-1 bg-black">
+      <StatusBar style="light" />
+      <CameraView
+        style={{ flex: 1 }}
+        facing="back"
+        enableTorch={torch}
+        barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
+        onBarcodeScanned={scanned ? undefined : handleBarcode}
+        onMountError={(event) => setCameraError(event.message)}
+      >
+        <View className="flex-1 bg-black/25">
+          <View className="flex-row items-center justify-between px-4 pt-3">
+            <Pressable
+              onPress={() => router.back()}
+              className="h-10 w-10 items-center justify-center rounded-full bg-[#091426]/65"
+            >
+              <AppIcon name="arrow_back" size={22} color="#FFFFFF" />
+            </Pressable>
+
+            <View className="rounded-full bg-[#091426]/65 px-4 py-2">
+              <Text className="text-base font-bold text-white">Pindai QR</Text>
+            </View>
+
+            <View className="flex-row items-center rounded-full bg-[#091426]/65 px-3 py-2">
+              <View className="mr-2 h-2 w-2 rounded-full bg-emerald-300" />
+              <Text className="text-xs font-bold text-white">Online</Text>
+            </View>
+          </View>
+
+          <View className="flex-1 items-center justify-center px-6">
+            <View className="relative h-[300px] w-[300px]">
+              <View className="absolute left-0 top-0 h-12 w-12 rounded-tl-3xl border-l-4 border-t-4 border-emerald-300" />
+              <View className="absolute right-0 top-0 h-12 w-12 rounded-tr-3xl border-r-4 border-t-4 border-emerald-300" />
+              <View className="absolute bottom-0 left-0 h-12 w-12 rounded-bl-3xl border-b-4 border-l-4 border-emerald-300" />
+              <View className="absolute bottom-0 right-0 h-12 w-12 rounded-br-3xl border-b-4 border-r-4 border-emerald-300" />
+              <View className="absolute left-3 right-3 top-1/2 h-0.5 bg-emerald-300/70" />
+            </View>
+
+            <Text className="mt-8 text-center text-base font-semibold text-white">
+              Posisikan kode QR di dalam bingkai
+            </Text>
+
+            {cameraError ? (
+              <View className="mt-4 rounded-2xl bg-red-500/20 px-4 py-3">
+                <Text className="text-center text-xs leading-5 text-red-100">
+                  Kamera gagal dimuat: {cameraError}
+                </Text>
+              </View>
+            ) : null}
+          </View>
+
+          <View className="mb-7 flex-row justify-center gap-5">
+            <Pressable
+              onPress={() => setTorch((value) => !value)}
+              className="h-14 w-14 items-center justify-center rounded-full border border-white/15 bg-black/50"
+            >
+              <AppIcon name="flash_on" size={21} color={torch ? "#A7F3D0" : "#FFFFFF"} />
+              <Text className="mt-0.5 text-[9px] font-semibold text-white">{torch ? "Nyala" : "Flash"}</Text>
+            </Pressable>
+
+            <Pressable
+              onPress={() => router.push("/screens/attendance-success")}
+              className="h-14 w-14 items-center justify-center rounded-full border border-white/15 bg-black/50"
+            >
+              <AppIcon name="keyboard" size={20} color="#FFFFFF" />
+              <Text className="mt-0.5 text-[9px] font-semibold text-white">Manual</Text>
+            </Pressable>
+          </View>
+        </View>
+      </CameraView>
+    </View>
+  );
+}
+
+export function AttendanceSuccessScreen() {
+  const router = useRouter();
+  return (
+    <Screen>
+      <View className="items-center pt-3">
+        <View className="h-24 w-24 items-center justify-center rounded-full bg-emerald-50"><Text className="text-5xl text-emerald-600">✓</Text></View>
+        <Text className="mt-5 text-2xl font-black text-gray-950">Absensi Berhasil!</Text>
+        <Text className="mt-2 text-center text-sm leading-5 text-gray-500">Kehadiran Anda sudah tercatat pada sesi Pelatihan Keberlanjutan Q3.</Text>
+      </View>
+      <GlassCard>
+        <Text className="text-xs font-bold uppercase tracking-[2px] text-gray-500">Kode Absensi</Text>
+        <View className="mt-2 flex-row items-center justify-between rounded-2xl bg-gray-50 px-4 py-4"><Text className="font-black tracking-[2px] text-gray-900">ABS-7K4P9X</Text><Text className="text-emerald-600">⧉</Text></View>
+        <View className="mt-4 flex-row justify-between"><Text className="text-xs text-gray-500">Status</Text><Badge>Hadir</Badge></View>
+        <View className="mt-3 flex-row justify-between"><Text className="text-xs text-gray-500">Waktu</Text><Text className="text-xs font-bold text-gray-900">09:02 WIB</Text></View>
+      </GlassCard>
+      <SecondaryButton><Text className="text-sm font-bold text-gray-800">↓ Download Receipt</Text></SecondaryButton>
+      <PrimaryButton onPress={() => router.push("/screens/attendance-proof")}><ButtonText>Lihat Bukti Absensi</ButtonText></PrimaryButton>
+      <TextButton onPress={() => router.replace("/")}>Tutup</TextButton>
+    </Screen>
+  );
+}
+
+export function AttendanceProofScreen() {
+  const router = useRouter();
+  return (
+    <Screen bottomNav="history">
+      <BackHeader title="Bukti Absensi" right={<Badge>Sync</Badge>} />
+      <GlassCard>
+        <View className="items-center"><Image source={logo} resizeMode="contain" className="h-12 w-12 rounded-2xl" /><Text className="mt-2 text-lg font-black text-emerald-700">AyoHadir!</Text><Text className="mt-1 text-xs text-gray-500">Bukti Absensi Digital</Text></View>
+        <View className="my-5 border-t border-dashed border-gray-200" />
+        {[
+          ["Nama", "Budi Santoso"],
+          ["Sesi", "Pelatihan Keberlanjutan Q3"],
+          ["Tanggal", "15 Agustus 2024"],
+          ["Waktu Scan", "09:02 WIB"],
+          ["Status", "Hadir"],
+          ["Kode", "ABS-7K4P9X"],
+          ["Perangkat", "Android · Redmi"],
+          ["GPS", "Terverifikasi · radius 150 m"]
+        ].map((x) => <View key={x[0]} className="mb-3 flex-row justify-between gap-4"><Text className="text-xs text-gray-500">{x[0]}</Text><Text className="flex-1 text-right text-xs font-bold text-gray-900">{x[1]}</Text></View>)}
+        <View className="mt-4 items-center"><QrVisual size={130} label="BUKTI" /></View>
+      </GlassCard>
+      <SecondaryButton onPress={() => router.push("/screens/cancellation-request")}><Text className="text-sm font-bold text-gray-800">Ajukan Pembatalan</Text></SecondaryButton>
+      <OfflineBanner text="Sinkronisasi tertunda akan tetap memakai waktu scan asli sebagai acuan absensi." />
+    </Screen>
+  );
+}
+
+export function HistoryScreen() {
+  const [mode, setMode] = useState("Absensi Saya");
+  const [filter, setFilter] = useState("Semua");
+  const rows = [
+    ["Meeting Ruang Utama","15 Agustus 2024 · 08:02","Hadir","ABS-7K4P9X"],
+    ["Pelatihan Keselamatan Kerja","14 Agustus 2024 · 09:16","Terlambat","ABS-5P8X2M"],
+    ["Briefing Proyek Alpha","12 Agustus 2024 · 08:00","Hadir","ABS-2K3L8Q"]
+  ];
+  return (
+    <Screen bottomNav="history">
+      <View className="flex-row items-center justify-between"><View><Text className="text-[28px] font-black text-gray-950">Riwayat Absensi</Text><Text className="mt-1 text-sm text-gray-500">Semua aktivitas absensi Anda.</Text></View><Pressable className="h-11 w-11 items-center justify-center rounded-full bg-gray-50"><Text>⌕</Text></Pressable></View>
+      <Segmented items={["Absensi Saya","Sesi Saya"]} value={mode} onChange={setMode} />
+      <View className="flex-row gap-2"><Segmented items={["Semua","Hadir","Terlambat"]} value={filter} onChange={setFilter} /></View>
+      <TextInput className="rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3.5 text-sm text-gray-900" placeholder="Cari riwayat..." placeholderTextColor="#94A3B8" />
+      {mode === "Absensi Saya" ? rows.filter((r) => filter === "Semua" || r[2] === filter).map((r) => (
+        <GlassCard key={r[3]} className="p-4"><View className="flex-row items-start justify-between"><View className="flex-1"><Text className="text-base font-black text-gray-900">{r[0]}</Text><Text className="mt-1 text-xs text-gray-500">{r[1]}</Text></View><Badge tone={r[2] === "Hadir" ? "green" : "yellow"}>{r[2]}</Badge></View><View className="mt-4 flex-row items-center justify-between border-t border-gray-100 pt-3"><Text className="text-[11px] font-semibold tracking-[1px] text-gray-400">{r[3]}</Text><TextButton>Detail</TextButton></View></GlassCard>
+      )) : (
+        <GlassCard><Text className="text-sm font-bold text-gray-900">Sesi QR Buatan Saya</Text><Text className="mt-2 text-sm text-gray-500">Pelatihan Keberlanjutan Q3 · 42/50 peserta</Text><Text className="mt-4 text-sm font-bold text-emerald-700">Lihat detail →</Text></GlassCard>
+      )}
+    </Screen>
+  );
+}
+
+export function CancellationRequestScreen() {
+  const router = useRouter();
+  const [reason, setReason] = useState("");
+  return (
+    <Screen>
+      <BackHeader title="Ajukan Pembatalan" />
+      <GlassCard>
+        <Text className="text-xl font-black text-gray-950">Request Cancellation</Text>
+        <Text className="mt-2 text-sm leading-5 text-gray-500">Pengajuan tidak menghapus catatan asli. Pembuat QR akan meninjau alasan Anda.</Text>
+        <View className="mt-5 rounded-2xl bg-gray-50 p-4"><Text className="text-xs font-bold text-gray-500">Attendance Summary</Text><Text className="mt-2 text-sm font-black text-gray-900">Pelatihan Keberlanjutan Q3</Text><Text className="mt-1 text-xs text-gray-500">15 Agustus 2024 · 09:02 WIB · ABS-7K4P9X</Text><View className="mt-3"><Badge>Hadir</Badge></View></View>
+        <Text className="mt-5 text-sm font-bold text-gray-800">Cancellation Details</Text>
+        <TextInput multiline value={reason} onChangeText={setReason} className="mt-3 min-h-32 rounded-2xl border border-gray-200 bg-white px-4 py-3.5 text-sm text-gray-900" placeholder="Tuliskan alasan pembatalan..." placeholderTextColor="#94A3B8" textAlignVertical="top" />
+        <PrimaryButton className="mt-5" onPress={() => router.push("/screens/cancellation-submitted")}><ButtonText>Send Request</ButtonText></PrimaryButton>
+        <SecondaryButton className="mt-3" onPress={() => router.back()}><Text className="text-sm font-bold text-gray-800">Cancel</Text></SecondaryButton>
+      </GlassCard>
+    </Screen>
+  );
+}
+
+export function CancellationSubmittedScreen() {
+  const router = useRouter();
+  return (
+    <Screen>
+      <View className="items-center pt-5"><View className="h-20 w-20 items-center justify-center rounded-full bg-emerald-50"><Text className="text-4xl text-emerald-600">✓</Text></View><Text className="mt-5 text-2xl font-black text-gray-950">Pengajuan Terkirim</Text><Text className="mt-2 text-center text-sm leading-5 text-gray-500">Permintaan pembatalan sudah dikirim kepada pembuat QR.</Text></View>
+      <GlassCard><Text className="text-xs font-bold uppercase tracking-[2px] text-gray-500">Detail Pengajuan</Text><Text className="mt-3 text-sm font-black text-gray-900">ABS-7K4P9X</Text><Badge tone="yellow">Menunggu keputusan</Badge><Text className="mt-3 text-xs leading-5 text-gray-500">Alasan tersimpan di audit trail dan tidak menghapus catatan absensi asli.</Text></GlassCard>
+      <PrimaryButton onPress={() => router.push("/history")}><ButtonText>Kembali ke Riwayat</ButtonText></PrimaryButton>
+    </Screen>
+  );
+}
+
+export function CancellationApprovedScreen() {
+  const router = useRouter();
+  return (
+    <Screen bottomNav="notifications">
+      <BackHeader title="Status Pembatalan" />
+      <GlassCard><Badge>Disetujui</Badge><Text className="mt-3 text-2xl font-black text-gray-950">Permintaan pembatalan disetujui</Text><Text className="mt-2 text-sm leading-5 text-gray-500">Status absensi berubah sesuai keputusan tanpa menghapus rekam audit.</Text></GlassCard>
+      <GlassCard><Text className="text-xs font-bold uppercase tracking-[2px] text-gray-500">Attendance Details</Text><RowButton icon="▣" title="event_note · Original Record" subtitle="ABS-7K4P9X · 15 Agustus 2024 · 09:02 WIB" trailing="" /><RowButton icon="↶" title="edit_note · Cancellation Request" subtitle="Disetujui oleh pembuat QR pada 15 Agustus 2024." trailing="" /></GlassCard>
+      <PrimaryButton onPress={() => router.push("/history")}><ButtonText>Back to History</ButtonText></PrimaryButton>
+    </Screen>
+  );
+}
+
+export function CancellationRejectedScreen() {
+  const router = useRouter();
+  return (
+    <Screen bottomNav="notifications">
+      <BackHeader title="Status Pembatalan" />
+      <GlassCard><Badge tone="red">Ditolak</Badge><Text className="mt-3 text-2xl font-black text-gray-950">Pengajuan pembatalan ditolak</Text><Text className="mt-2 text-sm leading-5 text-gray-500">Catatan absensi tetap tersimpan dengan jejak keputusan.</Text></GlassCard>
+      <GlassCard><Text className="text-xs font-bold uppercase tracking-[2px] text-gray-500">Detail Kehadiran</Text><Text className="mt-3 text-sm font-black text-gray-900">Pelatihan Keberlanjutan Q3</Text><Text className="mt-1 text-xs text-gray-500">ABS-7K4P9X · 15 Agustus 2024 · 09:02 WIB</Text><View className="my-4 border-t border-gray-100" /><Text className="text-xs font-bold text-gray-500">Alasan Penolakan</Text><Text className="mt-2 text-sm leading-5 text-gray-700">Data absensi masih dinilai valid dan sesuai dengan sesi.</Text></GlassCard>
+      <SecondaryButton onPress={() => router.push("/history")}><Text className="text-sm font-bold text-gray-800">Kembali ke Riwayat</Text></SecondaryButton>
+    </Screen>
+  );
+}
+
+export function NotificationsScreen() {
+  const router = useRouter();
+  const [allRead, setAllRead] = useState(false);
+  const items = [
+    ["Absensi berhasil","Bukti ABS-7K4P9X siap dilihat.","2 menit lalu","green","✓"],
+    ["QR Hampir Kedaluwarsa","Pelatihan Keberlanjutan Q3 berakhir dalam 30 menit.","25 menit lalu","yellow","◷"],
+    ["Sinkronisasi","3 data offline tersinkronisasi.","Hari ini","green","↻"],
+    ["Permintaan Pembatalan","Pengajuan Anda sedang ditinjau.","Kemarin","gray","↶"],
+    ["QR Kedaluwarsa","Sesi Briefing Proyek Alpha sudah berakhir.","Kemarin","gray","×"]
+  ] as const;
+  return (
+    <Screen bottomNav="notifications">
+      <View className="flex-row items-center justify-between"><View><Text className="text-[28px] font-black text-gray-950">Notifikasi</Text><Text className="mt-1 text-sm text-gray-500">Pembaruan absensi dan QR Anda.</Text></View><Pressable onPress={() => setAllRead(true)}><Text className="text-xs font-bold text-emerald-600">Tandai semua dibaca</Text></Pressable></View>
+      {items.map((i) => <Pressable key={i[0]} onPress={() => i[0] === "Absensi berhasil" && router.push("/screens/attendance-proof")} className={"rounded-[20px] border border-gray-100 bg-white p-4 shadow-sm " + (allRead ? "opacity-70" : "")}><View className="flex-row"><View className={"h-10 w-10 items-center justify-center rounded-full " + (i[3] === "green" ? "bg-emerald-50" : i[3] === "yellow" ? "bg-amber-50" : "bg-gray-100")}><Text className="font-black text-gray-700">{i[4]}</Text></View><View className="ml-3 flex-1"><View className="flex-row items-start justify-between"><Text className="flex-1 text-sm font-black text-gray-900">{i[0]}</Text><Text className="ml-3 text-[10px] text-gray-400">{i[2]}</Text></View><Text className="mt-1 text-xs leading-5 text-gray-500">{i[1]}</Text></View></View></Pressable>)}
+    </Screen>
+  );
+}
+
+export function ProfileScreen() {
+  const router = useRouter();
+  const { profile, user } = useAuth();
+  const name = profile?.display_name || "Budi Santoso";
+  const verified = Boolean(user?.email_confirmed_at);
+  const [logoutVisible, setLogoutVisible] = useState(false);
+
+  return (
+    <>
+      <Screen bottomNav="profile">
+        <View className="flex-row items-end justify-between">
+          <View className="flex-1">
+            <Text className="text-xs font-bold uppercase tracking-[2px] text-emerald-700">Akun Saya</Text>
+            <Text className="mt-1 text-[30px] font-black text-gray-950">Profil</Text>
+          </View>
+          <Pressable
+            onPress={() => router.push("/screens/profile-settings")}
+            className="h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white shadow-sm"
+          >
+            <AppIcon name="settings" size={21} color="#475569" />
+          </Pressable>
+        </View>
+
+        <GlassCard className="items-center rounded-[24px] border-gray-200 bg-gray-50/80 p-6">
+          <AvatarView uri={profile?.avatar_url} name={name} size={112} />
+          <Text className="mt-4 text-xl font-black text-gray-950">{name}</Text>
+          <Text className="mt-1 text-sm text-gray-500">{user?.email || "budi@example.com"}</Text>
+          <View className="mt-3">
+            <Badge tone={verified ? "green" : "yellow"}>
+              {verified ? "✓ Email Terverifikasi" : "Email Belum Terverifikasi"}
+            </Badge>
+          </View>
+        </GlassCard>
+
+        <GlassCard className="overflow-hidden rounded-[22px] p-2">
+          <RowButton icon="person" title="Edit Profil" subtitle="Ubah nama dan foto profil" onPress={() => router.push("/screens/profile-settings")} />
+          <RowButton icon="devices" title="Perangkat" subtitle="Kelola perangkat dan sesi aplikasi" trailing="›" />
+          <RowButton icon="logout" title="Keluar" subtitle="Keluar dari akun pada perangkat ini" onPress={() => setLogoutVisible(true)} trailing="›" />
+        </GlassCard>
+      </Screen>
+
+      <LogoutConfirmModal visible={logoutVisible} onClose={() => setLogoutVisible(false)} />
+    </>
+  );
+}
+
+function AvatarView({ uri, name, size }: { uri: string | null | undefined; name: string; size: number }) {
+  const initial = name.trim().charAt(0).toUpperCase() || "A";
+
+  return (
+    <View
+      style={{ width: size, height: size }}
+      className="overflow-hidden rounded-full border-4 border-white bg-emerald-50 shadow-sm"
+    >
+      {uri ? (
+        <Image source={{ uri }} className="h-full w-full" resizeMode="cover" />
+      ) : (
+        <View className="h-full w-full items-center justify-center">
+          <Text className="text-4xl font-black text-emerald-700">{initial}</Text>
+        </View>
+      )}
+    </View>
+  );
+}
+
+function LogoutConfirmModal({ visible, onClose }: { visible: boolean; onClose: () => void }) {
+  const confirmLogout = async () => {
+    onClose();
+    await supabase.auth.signOut();
+  };
+
+  return (
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+      <View className="flex-1 items-center justify-end bg-black/40 px-5 pb-7">
+        <View className="w-full rounded-[28px] bg-white p-6">
+          <View className="h-12 w-12 items-center justify-center rounded-full bg-red-50">
+            <AppIcon name="logout" size={22} color="#DC2626" />
+          </View>
+          <Text className="mt-4 text-xl font-black text-gray-950">Keluar dari akun?</Text>
+          <Text className="mt-2 text-sm leading-6 text-gray-500">
+            Anda akan keluar dari sesi AyoHadir pada perangkat ini.
+          </Text>
+
+          <View className="mt-5 flex-row gap-3">
+            <SecondaryButton className="flex-1" onPress={onClose}>
+              <Text className="text-sm font-bold text-gray-800">Batal</Text>
+            </SecondaryButton>
+            <DangerButton onPress={confirmLogout}>
+              <Text className="text-sm font-bold text-red-700">Keluar</Text>
+            </DangerButton>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
+export function ProfileSettingsScreen() {
+  const router = useRouter();
+  const { profile, user, updateDisplayName, updateAvatarUrl } = useAuth();
+  const [name, setName] = useState(profile?.display_name || "Budi Santoso");
+  const [avatar, setAvatar] = useState<string | null>(profile?.avatar_url ?? null);
+  const [saving, setSaving] = useState(false);
+  const [avatarBusy, setAvatarBusy] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
+
+  const pickAvatar = async () => {
+    if (avatarBusy || !user) return;
+
+    setNotice(null);
+    setAvatarBusy(true);
+
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"],
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.85
+      });
+
+      if (result.canceled || !result.assets[0]) return;
+
+      const asset = result.assets[0];
+      const response = await fetch(asset.uri);
+      const buffer = await response.arrayBuffer();
+      const extension = asset.mimeType?.split("/")[1]?.replace("jpeg", "jpg") || "jpg";
+      const path = user.id + "/avatar-" + Date.now() + "." + extension;
+
+      const { error: uploadError } = await supabase.storage
+        .from("profile-avatars")
+        .upload(path, buffer, {
+          contentType: asset.mimeType || "image/jpeg",
+          cacheControl: "3600",
+          upsert: false
+        });
+
+      if (uploadError) throw uploadError;
+
+      const { data } = supabase.storage.from("profile-avatars").getPublicUrl(path);
+      await updateAvatarUrl(data.publicUrl);
+      setAvatar(data.publicUrl);
+      setNotice("Foto profil berhasil diperbarui.");
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Foto profil gagal disimpan.");
+    } finally {
+      setAvatarBusy(false);
+    }
+  };
+
+  const saveProfile = async () => {
+    if (saving || avatarBusy) return;
+
+    setNotice(null);
+    setSaving(true);
+
+    try {
+      await updateDisplayName(name);
+      setNotice("Perubahan profil berhasil disimpan.");
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Profil tidak dapat disimpan.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <Screen>
+      <BackHeader title="Pengaturan Profil" />
+
+      <GlassCard className="items-center rounded-[24px] border-gray-200 bg-gray-50/80 p-6">
+        <Pressable onPress={pickAvatar} disabled={avatarBusy} className="relative">
+          <AvatarView uri={avatar} name={name} size={112} />
+          <View className="absolute bottom-0 right-0 h-9 w-9 items-center justify-center rounded-full border-2 border-white bg-emerald-500">
+            {avatarBusy ? (
+              <ActivityIndicator color="#FFFFFF" size="small" />
+            ) : (
+              <AppIcon name="photo_camera" size={17} color="#FFFFFF" />
+            )}
+          </View>
+        </Pressable>
+
+        <Text className="mt-4 text-xl font-black text-gray-950">{name || "Pengguna"}</Text>
+        <Text className="mt-1 text-sm text-gray-500">{user?.email || "budi@example.com"}</Text>
+        <Badge>{Boolean(user?.email_confirmed_at) ? "Terverifikasi" : "Belum Terverifikasi"}</Badge>
+        <Text className="mt-3 text-center text-xs leading-5 text-gray-400">
+          Ketuk foto untuk memilih foto profil baru.
+        </Text>
+      </GlassCard>
+
+      <GlassCard className="rounded-[22px]">
+        <Text className="text-base font-black text-gray-950">Data Profil</Text>
+        <Text className="mt-3 text-xs font-semibold text-gray-500">Nama tampilan</Text>
+        <TextInput
+          value={name}
+          onChangeText={(value) => {
+            setNotice(null);
+            setName(value);
+          }}
+          className="mt-2 rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3.5 text-base text-gray-900"
+          placeholder="Masukkan nama"
+          placeholderTextColor="#94A3B8"
+          autoCapitalize="words"
+          returnKeyType="done"
+        />
+
+        {notice ? (
+          <View className="mt-3 rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3">
+            <Text className="text-xs font-semibold leading-5 text-emerald-800">{notice}</Text>
+          </View>
+        ) : null}
+
+        <PrimaryButton className="mt-3" disabled={saving || avatarBusy} onPress={saveProfile}>
+          {saving ? <ActivityIndicator color="#FFFFFF" /> : <ButtonText>Simpan Perubahan</ButtonText>}
+        </PrimaryButton>
+      </GlassCard>
+
+      <GlassCard className="overflow-hidden rounded-[22px] p-2">
+        <Text className="px-1 pt-2 text-xs font-bold uppercase tracking-[2px] text-gray-500">Pengaturan Kehadiran</Text>
+        <RowButton icon="⌖" title="Pengaturan Lokasi" subtitle="Preferensi GPS dan validasi lokasi" trailing="›" />
+        <RowButton icon="☼" title="Preferensi Aplikasi" subtitle="Notifikasi, tampilan, dan pengalaman" trailing="›" />
+        <RowButton icon="🔒" title="Ubah Password" subtitle="Perbarui password akun Anda" onPress={() => router.push("/update-password")} trailing="›" />
+      </GlassCard>
+
+      <GlassCard className="overflow-hidden rounded-[22px] p-2">
+        <Text className="px-1 pt-2 text-xs font-bold uppercase tracking-[2px] text-gray-500">Dukungan & Legal</Text>
+        <RowButton icon="?" title="Pusat Bantuan" trailing="›" />
+        <RowButton icon="i" title="Kebijakan Privasi" trailing="›" />
+        <RowButton icon="§" title="Syarat & Ketentuan" trailing="›" />
+      </GlassCard>
+    </Screen>
+  );
+}
+
+export function PermissionsAccessScreen() {
+  const router = useRouter();
+  return (
+    <Screen scroll={false} contentClassName="justify-center px-6">
+      <GlassCard className="w-full max-w-md self-center">
+        <View className="h-16 w-16 items-center justify-center rounded-full bg-emerald-50"><Text className="text-3xl text-emerald-600">✓</Text></View>
+        <Text className="mt-4 text-2xl font-black text-gray-950">Enable Features</Text>
+        <Text className="mt-2 text-sm leading-5 text-gray-500">Berikan akses kamera dan lokasi agar scanner dan verifikasi GPS bekerja sesuai pengaturan sesi.</Text>
+        <View className="mt-5 gap-3"><RowButton icon="⌗" title="Camera Access" subtitle="Diperlukan untuk scan QR" /><RowButton icon="⌖" title="Precise Location" subtitle="Diperlukan saat GPS diaktifkan" /></View>
+        <PrimaryButton className="mt-5" onPress={() => Linking.openSettings()}><ButtonText>Allow Permissions</ButtonText></PrimaryButton>
+        <SecondaryButton className="mt-3" onPress={() => router.back()}><Text className="text-sm font-bold text-gray-800">Not Now</Text></SecondaryButton>
+      </GlassCard>
+    </Screen>
+  );
+}
+
+export function PermissionNeededScreen() {
+  const router = useRouter();
+  return (
+    <Screen scroll={false} contentClassName="justify-center px-6">
+      <GlassCard className="w-full max-w-md self-center items-center">
+        <View className="h-16 w-16 items-center justify-center rounded-full bg-amber-50"><Text className="text-3xl text-amber-600">!</Text></View>
+        <Text className="mt-4 text-center text-2xl font-black text-gray-950">Permissions Needed</Text>
+        <Text className="mt-2 text-center text-sm leading-5 text-gray-500">Akses perangkat yang diperlukan belum diberikan, sehingga fitur tertentu tidak dapat digunakan.</Text>
+        <PrimaryButton className="mt-5 w-full" onPress={() => Linking.openSettings()}><ButtonText>Open System Settings</ButtonText></PrimaryButton>
+        <SecondaryButton className="mt-3 w-full" onPress={() => router.back()}><Text className="text-sm font-bold text-gray-800">Go Back</Text></SecondaryButton>
+      </GlassCard>
+    </Screen>
+  );
+}
+
+export function NotificationsPermissionScreen() {
+  const router = useRouter();
+  return (
+    <Screen scroll={false} contentClassName="justify-center px-6">
+      <GlassCard className="w-full max-w-md self-center">
+        <View className="items-center"><View className="h-16 w-16 items-center justify-center rounded-full bg-emerald-50"><Text className="text-3xl text-emerald-600">◉</Text></View><Text className="mt-4 text-center text-2xl font-black text-gray-950">Stay Updated</Text><Text className="mt-2 text-center text-sm leading-5 text-gray-500">Aktifkan notifikasi untuk menerima pembaruan penting.</Text></View>
+        <View className="mt-5"><RowButton icon="✓" title="Attendance Confirmation" subtitle="Beri tahu saat absensi berhasil atau tersinkronisasi." /><RowButton icon="↻" title="Sync Status" subtitle="Beri tahu saat sinkronisasi selesai atau tertunda." /><RowButton icon="◷" title="Schedule Changes" subtitle="Peringatan sesi dan QR yang hampir kedaluwarsa." /></View>
+        <PrimaryButton className="mt-4" onPress={() => Linking.openSettings()}><ButtonText>Enable Notifications</ButtonText></PrimaryButton>
+        <SecondaryButton className="mt-3" onPress={() => router.back()}><Text className="text-sm font-bold text-gray-800">Not Now</Text></SecondaryButton>
+      </GlassCard>
+    </Screen>
+  );
+}
+
+export function SyncDataScreen() {
+  const [filter, setFilter] = useState("Semua");
+  const rows = [
+    ["Check-in Proyek Bendungan","15 Agustus · 08:03","Menunggu sinkronisasi","yellow"],
+    ["Laporan Inspeksi Harian","14 Agustus · 17:10","Tersinkronisasi","green"],
+    ["Unggah Foto Lokasi","14 Agustus · 15:20","Sinkronisasi tertunda","yellow"],
+    ["Check-out Kantor Pusat","13 Agustus · 17:05","Tersinkronisasi","green"]
+  ] as const;
+  return (
+    <Screen>
+      <BackHeader title="Sinkronisasi Data" />
+      <GlassCard><Text className="text-xs font-bold uppercase tracking-[2px] text-gray-500">Offline Queue</Text><Text className="mt-2 text-3xl font-black text-emerald-600">3</Text><Text className="mt-1 text-sm text-gray-500">data menunggu sinkronisasi</Text><ProgressBar value={72} /></GlassCard>
+      <OfflineBanner text="Sinkronisasi tertunda tidak mengubah waktu scan asli. Data akan divalidasi server saat koneksi tersedia." />
+      <Segmented items={["Semua","Tertunda","Selesai"]} value={filter} onChange={setFilter} />
+      {rows.filter((r) => filter === "Semua" || (filter === "Selesai" ? r[3] === "green" : r[3] === "yellow")).map((r) => <GlassCard key={r[0]} className="p-4"><View className="flex-row items-start justify-between"><View className="flex-1"><Text className="text-sm font-black text-gray-900">{r[0]}</Text><Text className="mt-1 text-xs text-gray-500">{r[1]}</Text></View><Badge tone={r[3] === "green" ? "green" : "yellow"}>{r[2]}</Badge></View></GlassCard>)}
+      <PrimaryButton><ButtonText>↻ Sinkronkan Sekarang</ButtonText></PrimaryButton>
+    </Screen>
+  );
+}
