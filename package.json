@@ -37,7 +37,8 @@
     "expo-image-picker": "~57.0.20",
     "expo-symbols": "~57.0.3",
     "react-native-qrcode-svg": "^6.3.26",
-    "react-native-svg": "15.12.1"
+    "react-native-svg": "15.15.4",
+    "expo-font": "~57.0.4"
   },
   "devDependencies": {
     "@types/react": "~19.2.2",
