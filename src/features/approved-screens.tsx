@@ -1,13 +1,14 @@
 
 import { useState } from "react";
-import { Image, Linking, Pressable, ScrollView, Switch, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Image, Linking, Pressable, ScrollView, Switch, Text, TextInput, View } from "react-native";
+import { StatusBar } from "expo-status-bar";
 import { useRouter } from "expo-router";
 
 import { useAuth } from "@/auth/auth-context";
 import {
   Badge,
   BackHeader,
-  BottomNav,
+
   ButtonText,
   DangerButton,
   GlassCard,
@@ -166,7 +167,6 @@ export function QrHubScreen() {
           <Text className="mr-3 text-2xl text-emerald-600">⌗</Text><View className="flex-1"><Text className="font-black text-gray-900">Scan QR</Text><Text className="mt-1 text-xs text-gray-500">Buka scanner kamera.</Text></View><Text className="text-xl text-gray-300">→</Text>
         </Pressable>
       </View>
-      <BottomNav active="qr" />
     </Screen>
   );
 }
@@ -177,64 +177,151 @@ export function CreateSessionScreen() {
   const [duration, setDuration] = useState(8);
   const [gps, setGps] = useState(true);
   const [radius, setRadius] = useState(150);
+
   return (
     <Screen scroll={false}>
-      <BackHeader title="Buat Sesi Absensi" right={<Pressable onPress={() => router.back()}><Text className="text-xl text-gray-400">×</Text></Pressable>} />
-      <ScrollishCreate target={target} setTarget={setTarget} duration={duration} setDuration={setDuration} gps={gps} setGps={setGps} radius={radius} setRadius={setRadius} router={router} />
+      <BackHeader
+        title="Buat Sesi Absensi"
+        right={
+          <Pressable onPress={() => router.back()} className="h-10 w-10 items-center justify-center rounded-full">
+            <Text className="text-2xl text-gray-500">×</Text>
+          </Pressable>
+        }
+      />
+
+      <View className="flex-1">
+        <ScrollView
+          className="flex-1"
+          keyboardShouldPersistTaps="handled"
+          contentContainerClassName="gap-7 px-5 pb-7 pt-5"
+        >
+          <View className="gap-2">
+            <Text className="text-sm font-bold text-gray-900">Judul Sesi</Text>
+            <TextInput
+              className="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-3.5 text-base text-gray-900"
+              placeholder="Contoh: Rapat Tim Pagi"
+              placeholderTextColor="#94A3B8"
+              defaultValue="Pelatihan Keberlanjutan Q3"
+            />
+          </View>
+
+          <View className="gap-2">
+            <Text className="text-sm font-bold text-gray-900">Target Peserta</Text>
+            <Segmented items={["Semua Pengguna", "Pengguna Tertentu"]} value={target} onChange={setTarget} />
+          </View>
+
+          <GlassCard className="gap-4 rounded-xl border-gray-200 p-5">
+            <View className="flex-row items-center justify-between">
+              <Text className="text-sm font-bold text-gray-900">Durasi Sesi</Text>
+              <Text className="text-sm font-semibold text-emerald-700">{duration} Jam</Text>
+            </View>
+            <RangeSlider value={duration} min={1} max={24} onChange={setDuration} />
+            <View className="flex-row justify-between">
+              <Text className="text-xs text-gray-400">1j</Text>
+              <Text className="text-xs text-gray-400">12j</Text>
+              <Text className="text-xs text-gray-400">24j</Text>
+            </View>
+          </GlassCard>
+
+          <View className="gap-2">
+            <Text className="text-sm font-bold text-gray-900">Batas Terlambat</Text>
+            <View className="rounded-lg border border-gray-300 bg-transparent px-4 py-3.5">
+              <Text className="text-base font-semibold text-gray-900">09:15</Text>
+            </View>
+            <Text className="text-xs leading-5 text-gray-500">
+              Peserta yang memindai setelah waktu ini akan dicatat sebagai terlambat.
+            </Text>
+          </View>
+
+          <GlassCard className="gap-5 rounded-xl border-gray-200 p-5">
+            <View className="flex-row items-center justify-between">
+              <View className="flex-1 pr-4">
+                <Text className="text-sm font-bold text-gray-900">GPS & Geofencing</Text>
+                <Text className="mt-1 text-xs leading-5 text-gray-500">Batasi absensi pada lokasi tertentu.</Text>
+              </View>
+              <Switch
+                value={gps}
+                onValueChange={setGps}
+                trackColor={{ false: "#E5E7EB", true: "#6EE7B7" }}
+                thumbColor="#FFFFFF"
+              />
+            </View>
+
+            {gps ? (
+              <View className="gap-3">
+                <View className="flex-row items-center justify-between">
+                  <Text className="text-xs font-semibold text-gray-600">Radius yang diizinkan</Text>
+                  <Text className="text-xs font-bold text-emerald-700">{radius} m</Text>
+                </View>
+                <RangeSlider value={radius} min={5} max={3000} onChange={setRadius} />
+                <View className="relative h-48 overflow-hidden rounded-xl border border-gray-200 bg-gray-100">
+                  <View className="absolute inset-0 items-center justify-center">
+                    <View className="h-40 w-40 rounded-full border-2 border-emerald-300/80 bg-emerald-200/30" />
+                    <View className="absolute h-4 w-4 rounded-full bg-emerald-600" />
+                  </View>
+                  <View className="absolute inset-x-0 bottom-0 bg-white/80 px-4 py-3">
+                    <Text className="text-xs font-semibold text-gray-700">Lokasi kantor saat ini</Text>
+                    <Text className="mt-1 text-[11px] text-gray-500">Preview visual · integrasi peta menyusul.</Text>
+                  </View>
+                </View>
+                <Text className="text-xs leading-5 text-gray-400">Menggunakan lokasi perangkat saat QR dibuat.</Text>
+              </View>
+            ) : (
+              <OfflineBanner text="GPS nonaktif. QR tetap dapat dibuat; lokasi tidak digunakan saat validasi." />
+            )}
+          </GlassCard>
+        </ScrollView>
+
+        <View className="border-t border-emerald-900/10 bg-white px-5 py-3">
+          <View className="flex-row gap-3">
+            <SecondaryButton className="flex-1" onPress={() => router.back()}>
+              <Text className="text-sm font-bold text-gray-800">Batal</Text>
+            </SecondaryButton>
+            <PrimaryButton className="flex-[1.4]" onPress={() => router.push("/screens/confirm-qr")}>
+              <View className="flex-row items-center gap-2">
+                <Text className="text-lg text-white">▦</Text>
+                <ButtonText>Generate QR</ButtonText>
+              </View>
+            </PrimaryButton>
+          </View>
+        </View>
+      </View>
     </Screen>
   );
 }
 
-function ScrollishCreate({
-  target,setTarget,duration,setDuration,gps,setGps,radius,setRadius,router
-}: any) {
+function RangeSlider({
+  value,
+  min,
+  max,
+  onChange
+}: {
+  value: number;
+  min: number;
+  max: number;
+  onChange: (value: number) => void;
+}) {
+  const [trackWidth, setTrackWidth] = useState(0);
+  const percentage = ((value - min) / (max - min)) * 100;
+
   return (
-    <ScrollViewFallback>
-      <View className="gap-5 px-5 pb-28 pt-5">
-        <View>
-          <Text className="text-xs font-bold uppercase tracking-[2px] text-emerald-700">01 · Info Dasar</Text>
-          <Text className="mt-1 text-lg font-black text-gray-900">Nama sesi</Text>
-          <TextInput className="mt-3 rounded-2xl border border-gray-200 bg-white px-4 py-3.5 text-base text-gray-900" placeholder="Contoh: Rapat Tim Pagi" placeholderTextColor="#94A3B8" defaultValue="Pelatihan Keberlanjutan Q3" />
-        </View>
-        <View>
-          <Text className="text-sm font-bold text-gray-800">Target Pengguna</Text>
-          <Segmented items={["Semua Pengguna","Pengguna Tertentu"]} value={target} onChange={setTarget} />
-        </View>
-
-        <GlassCard>
-          <Text className="text-xs font-bold uppercase tracking-[2px] text-emerald-700">02 · Waktu</Text>
-          <View className="mt-4 flex-row gap-3">
-            <View className="flex-1"><Text className="text-xs font-semibold text-gray-500">Mulai</Text><View className="mt-2 rounded-2xl bg-gray-50 px-4 py-3.5"><Text className="font-bold text-gray-900">09:00 WIB</Text></View></View>
-            <View className="flex-1"><Text className="text-xs font-semibold text-gray-500">Berakhir</Text><View className="mt-2 rounded-2xl bg-gray-50 px-4 py-3.5"><Text className="font-bold text-gray-900">{duration + 1}:00 WIB</Text></View></View>
-          </View>
-          <Text className="mt-4 text-xs font-semibold text-gray-500">Durasi · {duration} jam</Text>
-          <View className="mt-2 flex-row items-center gap-2"><Pressable onPress={() => setDuration(Math.max(1,duration-1))} className="h-10 w-10 items-center justify-center rounded-full bg-gray-100"><Text>−</Text></Pressable><View className="flex-1"><ProgressBar value={(duration/24)*100} /></View><Pressable onPress={() => setDuration(Math.min(24,duration+1))} className="h-10 w-10 items-center justify-center rounded-full bg-emerald-50"><Text className="text-emerald-700">+</Text></Pressable></View>
-          <Text className="mt-2 text-xs text-gray-400">Minimal 1 jam · maksimal 24 jam</Text>
-          <View className="mt-4"><Text className="text-xs font-semibold text-gray-500">Batas Terlambat</Text><View className="mt-2 rounded-2xl border border-gray-200 bg-white px-4 py-3.5"><Text className="font-bold text-gray-900">09:15</Text></View></View>
-        </GlassCard>
-
-        <GlassCard>
-          <View className="flex-row items-center justify-between">
-            <View className="flex-1"><Text className="text-xs font-bold uppercase tracking-[2px] text-emerald-700">03 · Lokasi</Text><Text className="mt-1 text-base font-black text-gray-900">GPS & Geofencing</Text><Text className="mt-1 text-xs leading-5 text-gray-500">Batasi absensi pada titik lokasi tertentu.</Text></View>
-            <Switch value={gps} onValueChange={setGps} trackColor={{false:"#E5E7EB",true:"#6EE7B7"}} thumbColor="#FFFFFF" />
-          </View>
-          {gps ? <View className="mt-4"><View className="flex-row justify-between"><Text className="text-xs font-semibold text-gray-500">Radius</Text><Text className="text-xs font-bold text-emerald-700">{radius} m</Text></View><View className="mt-2 flex-row items-center gap-2"><Pressable onPress={() => setRadius(Math.max(5,radius-25))} className="h-10 w-10 items-center justify-center rounded-full bg-gray-100"><Text>−</Text></Pressable><View className="flex-1"><ProgressBar value={((radius-5)/2995)*100} /></View><Pressable onPress={() => setRadius(Math.min(3000,radius+25))} className="h-10 w-10 items-center justify-center rounded-full bg-emerald-50"><Text className="text-emerald-700">+</Text></Pressable></View><View className="mt-4 h-40 items-center justify-center rounded-2xl bg-emerald-50"><Text className="text-4xl text-emerald-600">⌖</Text><Text className="mt-2 text-xs font-semibold text-gray-600">Lokasi saat ini · Radius {radius} m</Text></View></View> : <OfflineBanner text="GPS nonaktif. QR tetap dapat dibuat dan lokasi tidak digunakan saat validasi." />}
-        </GlassCard>
-
-        <GlassCard>
-          <Text className="text-xs font-bold uppercase tracking-[2px] text-emerald-700">04 · Review</Text>
-          <Text className="mt-2 text-lg font-black text-gray-900">Siap membuat QR?</Text>
-          <Text className="mt-2 text-sm leading-5 text-gray-500">QR dibuat secara online dan akan memakai token dinamis untuk mengurangi risiko penyalahgunaan.</Text>
-          <View className="mt-4 rounded-2xl bg-gray-50 p-4"><Text className="text-xs font-semibold text-gray-500">Ringkasan</Text><Text className="mt-2 text-sm font-bold text-gray-900">Pelatihan Keberlanjutan Q3</Text><Text className="mt-1 text-xs text-gray-500">{duration} jam · {target} · GPS {gps ? "aktif" : "nonaktif"}</Text></View>
-          <PrimaryButton className="mt-4" onPress={() => router.push("/screens/confirm-qr")}><ButtonText>Buat QR</ButtonText></PrimaryButton>
-        </GlassCard>
-      </View>
-    </ScrollViewFallback>
+    <Pressable
+      onLayout={(event) => setTrackWidth(event.nativeEvent.layout.width)}
+      onPress={(event) => {
+        const x = event.nativeEvent.locationX;
+        const next = min + (x / Math.max(trackWidth, 1)) * (max - min);
+        onChange(Math.max(min, Math.min(max, Math.round(next))));
+      }}
+      className="relative h-6 w-full justify-center"
+    >
+      <View className="absolute inset-x-0 h-1 rounded-full bg-gray-300" />
+      <View className="absolute left-0 h-1 rounded-full bg-emerald-700" style={{ width: `${percentage}%` }} />
+      <View
+        className="absolute h-5 w-5 rounded-full border-2 border-white bg-emerald-700 shadow-sm"
+        style={{ left: `${percentage}%`, marginLeft: -10 }}
+      />
+    </Pressable>
   );
-}
-
-function ScrollViewFallback({ children }: { children: React.ReactNode }) {
-  return <ScrollView className="flex-1">{children}</ScrollView>;
 }
 
 export function ConfirmQrScreen() {
@@ -365,6 +452,7 @@ export function ScanQrScreen() {
   const [online] = useState(true);
   return (
     <Screen scroll={false} contentClassName="bg-gray-950" bottomNav={null}>
+      <StatusBar style="light" />
       <View className="flex-1 bg-gray-950">
         <View className="flex-row items-center justify-between px-4 py-3"><Pressable onPress={() => router.back()} className="h-10 w-10 items-center justify-center rounded-full bg-white/10"><Text className="text-xl text-white">‹</Text></Pressable><Text className="text-base font-black text-white">Pindai QR</Text><Badge tone={online ? "green" : "yellow"}>{online ? "Online" : "Offline"}</Badge></View>
         <View className="flex-1 items-center justify-center">
@@ -557,18 +645,84 @@ export function ProfileSettingsScreen() {
   const { profile, user, updateDisplayName } = useAuth();
   const [name, setName] = useState(profile?.display_name || "Budi Santoso");
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  const handleSave = async () => {
+    if (saving) return;
+
+    setSaved(false);
+    setSaveError(null);
+    setSaving(true);
+
+    try {
+      await updateDisplayName(name);
+      setSaved(true);
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : "Profil tidak dapat disimpan.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <Screen>
-      <BackHeader title="Pengaturan Profil" right={<Text className="text-lg text-gray-500">⚙</Text>} />
+      <BackHeader title="Pengaturan Profil" />
       <GlassCard className="items-center">
-        <View className="h-20 w-20 items-center justify-center rounded-full bg-emerald-50"><Text className="text-3xl font-black text-emerald-700">{name.charAt(0)}</Text></View>
-        <Text className="mt-3 text-lg font-black text-gray-950">{name}</Text><Text className="mt-1 text-sm text-gray-500">{user?.email || "budi@example.com"}</Text>
+        <View className="h-20 w-20 items-center justify-center rounded-full bg-emerald-50">
+          <Text className="text-3xl font-black text-emerald-700">{name.trim().charAt(0).toUpperCase() || "A"}</Text>
+        </View>
+        <Text className="mt-3 text-lg font-black text-gray-950">{name || "Pengguna"}</Text>
+        <Text className="mt-1 text-sm text-gray-500">{user?.email || "budi@example.com"}</Text>
         <Badge>{Boolean(user?.email_confirmed_at) ? "Terverifikasi" : "Belum Terverifikasi"}</Badge>
       </GlassCard>
-      <GlassCard><Text className="text-base font-black text-gray-950">Edit Profil</Text><Text className="mt-3 text-xs font-semibold text-gray-500">Nama tampilan</Text><TextInput value={name} onChangeText={(v) => { setSaved(false); setName(v); }} className="mt-2 rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3.5 text-base text-gray-900" /><PrimaryButton className="mt-3" onPress={async () => { await updateDisplayName(name); setSaved(true); }}><ButtonText>{saved ? "Tersimpan ✓" : "Simpan Perubahan"}</ButtonText></PrimaryButton></GlassCard>
-      <GlassCard><Text className="text-xs font-bold uppercase tracking-[2px] text-gray-500">Pengaturan Kehadiran</Text><RowButton icon="⌖" title="Pengaturan Lokasi" subtitle="Preferensi GPS dan validasi lokasi" trailing="›" /><RowButton icon="☼" title="Preferensi Aplikasi" subtitle="Notifikasi, tampilan, dan pengalaman" trailing="›" /><RowButton icon="🔒" title="Ubah Password" subtitle="Perbarui password akun Anda" onPress={() => router.push("/update-password")} trailing="›" /></GlassCard>
-      <GlassCard><Text className="text-xs font-bold uppercase tracking-[2px] text-gray-500">Dukungan & Legal</Text><RowButton icon="?" title="Pusat Bantuan" trailing="›" /><RowButton icon="i" title="Kebijakan Privasi" trailing="›" /><RowButton icon="§" title="Syarat & Ketentuan" trailing="›" /></GlassCard>
-      <DangerButton onPress={() => supabaseSignOut()}><Text className="font-bold text-red-700">Keluar Akun</Text></DangerButton>
+
+      <GlassCard>
+        <Text className="text-base font-black text-gray-950">Edit Profil</Text>
+        <Text className="mt-3 text-xs font-semibold text-gray-500">Nama tampilan</Text>
+        <TextInput
+          value={name}
+          onChangeText={(v) => {
+            setSaved(false);
+            setSaveError(null);
+            setName(v);
+          }}
+          className="mt-2 rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3.5 text-base text-gray-900"
+          placeholder="Masukkan nama"
+          placeholderTextColor="#94A3B8"
+          autoCapitalize="words"
+          returnKeyType="done"
+        />
+
+        {saveError ? (
+          <View className="mt-3 rounded-2xl border border-red-100 bg-red-50 px-4 py-3">
+            <Text className="text-xs font-bold leading-5 text-red-700">Gagal menyimpan profil.</Text>
+            <Text className="mt-1 text-xs leading-5 text-red-600">{saveError}</Text>
+          </View>
+        ) : null}
+
+        <PrimaryButton className="mt-3" disabled={saving} onPress={handleSave}>
+          {saving ? <ActivityIndicator color="#FFFFFF" /> : <ButtonText>{saved ? "Tersimpan ✓" : "Simpan Perubahan"}</ButtonText>}
+        </PrimaryButton>
+      </GlassCard>
+
+      <GlassCard>
+        <Text className="text-xs font-bold uppercase tracking-[2px] text-gray-500">Pengaturan Kehadiran</Text>
+        <RowButton icon="⌖" title="Pengaturan Lokasi" subtitle="Preferensi GPS dan validasi lokasi" trailing="›" />
+        <RowButton icon="☼" title="Preferensi Aplikasi" subtitle="Notifikasi, tampilan, dan pengalaman" trailing="›" />
+        <RowButton icon="🔒" title="Ubah Password" subtitle="Perbarui password akun Anda" onPress={() => router.push("/update-password")} trailing="›" />
+      </GlassCard>
+
+      <GlassCard>
+        <Text className="text-xs font-bold uppercase tracking-[2px] text-gray-500">Dukungan & Legal</Text>
+        <RowButton icon="?" title="Pusat Bantuan" trailing="›" />
+        <RowButton icon="i" title="Kebijakan Privasi" trailing="›" />
+        <RowButton icon="§" title="Syarat & Ketentuan" trailing="›" />
+      </GlassCard>
+
+      <DangerButton onPress={() => supabaseSignOut()}>
+        <Text className="font-bold text-red-700">Keluar Akun</Text>
+      </DangerButton>
       <TextButton onPress={() => router.replace("/profile")}>Kembali ke Profil</TextButton>
     </Screen>
   );
