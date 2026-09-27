@@ -149,9 +149,9 @@ export function AppIcon({
   return (
     <SymbolView
       name={{
-        ios: APP_ICON_IOS[name],
-        android: APP_ICON_ANDROID[name],
-        web: APP_ICON_ANDROID[name]
+        ios: APP_ICON_IOS[name] as never,
+        android: APP_ICON_ANDROID[name] as never,
+        web: APP_ICON_ANDROID[name] as never
       }}
       size={size}
       tintColor={color}
@@ -172,7 +172,7 @@ export const UI = {
   border: "#C5C8B8",
   green: "#3E5219",
   greenDark: "#3E5219",
-  greenSoft: "#BF EFBE".replace(" ", ""),
+  greenSoft: "#BFEFBE",
   yellow: "#F59E0B",
   yellowSoft: "#FFFBEB",
   red: "#EF4444",
