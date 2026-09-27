@@ -341,16 +341,23 @@ export function PrimaryButton({
 export function SecondaryButton({
   children,
   onPress,
+  disabled = false,
   className = ""
 }: {
   children: ReactNode;
   onPress?: () => void;
+  disabled?: boolean;
   className?: string;
 }) {
   return (
     <Pressable
       onPress={onPress}
-      className={"min-h-12 items-center justify-center rounded-lg border border-[#75796B] bg-white px-5 py-3.5 " + className}
+      disabled={disabled}
+      className={
+        "min-h-12 items-center justify-center rounded-lg border border-[#75796B] bg-white px-5 py-3.5 " +
+        (disabled ? "opacity-50 " : "") +
+        className
+      }
     >
       {children}
     </Pressable>
