@@ -41,6 +41,15 @@ jobs:
         run: |
           ! grep -R -n -E 'onPress=\{\(\) => \{\}\}|onPress=\{\(\) => null\}|onPress=\{\(\) => undefined\}' app src
 
+      - name: Set up Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+          cache: true
+
+      - name: Type check Edge Functions
+        run: deno check --all supabase/functions/*/index.ts
+
       - name: Guard legacy green tokens
         run: |
           ! grep -R -n -E 'emerald-[0-9]+|#10B981|#059669' app src
