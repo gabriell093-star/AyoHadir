@@ -19,6 +19,7 @@ export default function AuthCallbackScreen() {
     error?: string | string[];
     error_description?: string | string[];
     type?: string | string[];
+    next?: string | string[];
   }>();
   const processed = useRef(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -31,7 +32,11 @@ export default function AuthCallbackScreen() {
     processed.current = true;
 
     const type = firstParam(params.type);
-    const safeNext = type === "recovery" ? "/update-password" : "/";
+    const next = firstParam(params.next);
+    const safeNext =
+      type === "recovery" || next === "/update-password"
+        ? "/update-password"
+        : "/";
 
     void handleAuthRedirectParams({
       code: firstParam(params.code),
@@ -54,7 +59,7 @@ export default function AuthCallbackScreen() {
 
   if (!errorMessage) {
     return (
-      <View className="flex-1 items-center justify-center bg-white px-6">
+      <View className="flex-1 items-center justify-center bg-[#FAF9F6] px-6">
         <ActivityIndicator color="#10B981" size="large" />
         <Text className="mt-4 text-center text-sm text-gray-500">
           Memproses autentikasi...
@@ -71,7 +76,7 @@ export default function AuthCallbackScreen() {
         </Text>
         <Text className="text-sm leading-5 text-red-700">{errorMessage}</Text>
         <Pressable
-          className="items-center rounded-2xl bg-emerald-500 px-4 py-4"
+          className="items-center rounded-2xl bg-[#3E5219] px-4 py-4"
           onPress={() => router.replace("/sign-in")}
         >
           <Text className="font-bold text-white">Kembali ke masuk</Text>
