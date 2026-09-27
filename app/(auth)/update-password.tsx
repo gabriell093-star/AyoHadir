@@ -29,8 +29,13 @@ export default function UpdatePasswordScreen() {
       return;
     }
 
-    if (password.length < 6) {
-      setNotice("Password minimal 6 karakter.");
+    const hasLetter = /[A-Za-z]/.test(password);
+    const hasNumber = /\d/.test(password);
+
+    if (password.length < 8 || !hasLetter || !hasNumber) {
+      setNotice(
+        "Password minimal 8 karakter dan harus mengandung huruf serta angka."
+      );
       return;
     }
 
@@ -79,7 +84,7 @@ export default function UpdatePasswordScreen() {
               className="rounded-2xl border border-gray-200 bg-gray-50 px-4 py-4 text-base text-gray-950"
               value={password}
               onChangeText={setPassword}
-              placeholder="Minimal 6 karakter"
+              placeholder="Minimal 8 karakter, huruf + angka"
               placeholderTextColor="#9CA3AF"
               autoCapitalize="none"
               secureTextEntry

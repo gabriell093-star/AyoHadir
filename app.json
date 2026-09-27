@@ -2,14 +2,16 @@
   "expo": {
     "name": "AyoHadir",
     "slug": "ayohadir",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "scheme": "ayohadir",
+    "icon": "./assets/images/ayo-hadir-icon.png",
     "android": {
       "package": "com.ayohadir.app",
       "adaptiveIcon": {
-        "backgroundColor": "#FFFFFF"
+        "backgroundColor": "#FFFFFF",
+        "foregroundImage": "./assets/images/ayo-hadir-icon.png"
       }
     },
     "plugins": ["expo-router", "expo-secure-store"],
