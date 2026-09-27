@@ -1,2 +1,2 @@
-import { NotificationsScreen } from "@/features/approved-screens";
-export default NotificationsScreen;
+import { NotificationsWiredScreen } from "@/features/prd-wired-screens";
+export default NotificationsWiredScreen;
