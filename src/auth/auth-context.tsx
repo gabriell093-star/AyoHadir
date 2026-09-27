@@ -22,6 +22,7 @@ type AuthContextValue = {
   profile: AuthProfile | null;
   refreshProfile: () => Promise<void>;
   updateDisplayName: (displayName: string) => Promise<void>;
+  updateAvatarUrl: (avatarUrl: string | null) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -148,6 +149,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .from("profiles")
           .update({
             display_name: cleanedName,
+            updated_at: new Date().toISOString()
+          })
+          .eq("id", session.user.id)
+          .select("display_name, avatar_url")
+          .maybeSingle();
+
+        if (error) {
+          throw error;
+        }
+
+        if (!data) {
+          throw new Error("Profil pengguna tidak ditemukan atau tidak dapat diperbarui.");
+        }
+
+        setProfile({
+          display_name: data.display_name,
+          avatar_url: data.avatar_url
+        });
+      },
+      updateAvatarUrl: async (avatarUrl) => {
+        if (!session?.user.id) {
+          throw new Error("Sesi pengguna tidak tersedia.");
+        }
+
+        const { data, error } = await supabase
+          .from("profiles")
+          .update({
+            avatar_url: avatarUrl,
             updated_at: new Date().toISOString()
           })
           .eq("id", session.user.id)
