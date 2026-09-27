@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { ActivityIndicator, AppState, Image, Linking, Modal, PanResponder, Platform, Pressable, ScrollView, Switch, Text, TextInput, View, type DimensionValue } from "react-native";
+import { ActivityIndicator, AppState, Image, Linking, Modal, PanResponder, Pressable, ScrollView, Switch, Text, TextInput, View, type DimensionValue } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useRouter } from "expo-router";
 import { Camera, CameraView, useCameraPermissions } from "expo-camera";
@@ -105,7 +105,7 @@ export function DashboardScreen() {
           fetch("https://sqrvntrxoytjnbgticpd.supabase.co/auth/v1/health"),
           timeout
         ]);
-        if (mounted) setOnline(response instanceof Response ? response.ok || response.status < 500 : false);
+        if (mounted) setOnline(Boolean((response as { ok?: boolean; status?: number }).ok) || Number((response as { status?: number }).status ?? 0) < 500);
       } catch {
         if (mounted) setOnline(false);
       }
