@@ -4,7 +4,7 @@ import { useRouter } from "expo-router";
 import * as Linking from "expo-linking";
 
 import { supabase } from "@/lib/supabase";
-import { PrimaryButton, SecondaryButton, ButtonText } from "@/components/ui";
+import { AyoHadirLogo, PrimaryButton, SecondaryButton, ButtonText } from "@/components/ui";
 
 const logo = require("../../assets/images/ayo-hadir-icon.png");
 
@@ -25,7 +25,7 @@ export default function ForgotPasswordScreen() {
       return;
     }
 
-    const redirectTo = Linking.createURL("auth/callback") + "?next=%2Fupdate-password";
+    const redirectTo = Linking.createURL("auth/callback");
     const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, { redirectTo });
 
     if (error) {
@@ -37,12 +37,12 @@ export default function ForgotPasswordScreen() {
   };
 
   return (
-    <KeyboardAvoidingView className="flex-1 bg-emerald-50/30" behavior={Platform.OS === "ios" ? "padding" : undefined}>
+    <KeyboardAvoidingView className="flex-1 bg-[#FAF9F6]" behavior={Platform.OS === "ios" ? "padding" : undefined}>
       <View className="flex-1 justify-center px-6">
-        <View className="mx-auto w-full max-w-md rounded-[28px] border border-emerald-100 bg-white p-6 shadow-sm">
+        <View className="mx-auto w-full max-w-md rounded-[28px] border border-[#DDE8C9] bg-white p-6 shadow-sm">
           <View className="items-center">
-            <Image source={logo} resizeMode="contain" className="h-16 w-16 rounded-[20px]" />
-            <Text className="mt-3 text-2xl font-black text-emerald-700">Lupa Kata Sandi</Text>
+            <AyoHadirLogo size={72} />
+            <Text className="mt-3 text-2xl font-black text-[#3E5219]">Lupa Kata Sandi</Text>
             <Text className="mt-2 text-center text-sm leading-5 text-gray-500">Masukkan email akun AyoHadir! untuk menerima instruksi pemulihan.</Text>
           </View>
 
@@ -53,7 +53,7 @@ export default function ForgotPasswordScreen() {
             </View>
           </View>
 
-          {notice ? <View className="mt-4 rounded-2xl bg-emerald-50 px-4 py-3"><Text className="text-sm leading-5 text-emerald-800">{notice}</Text></View> : null}
+          {notice ? <View className="mt-4 rounded-2xl bg-[#F2F5E8] px-4 py-3"><Text className="text-sm leading-5 text-[#2F4014]">{notice}</Text></View> : null}
 
           <PrimaryButton className="mt-5" onPress={submit} disabled={busy}>
             {busy ? <ActivityIndicator color="#FFFFFF" /> : <ButtonText>Kirim Instruksi</ButtonText>}
