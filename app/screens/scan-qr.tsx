@@ -1,2 +1,2 @@
-import { ScanQrScreen } from "@/features/approved-screens";
-export default ScanQrScreen;
+import { ScanQrWiredScreen } from "@/features/prd-wired-screens";
+export default ScanQrWiredScreen;
