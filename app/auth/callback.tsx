@@ -60,7 +60,7 @@ export default function AuthCallbackScreen() {
   if (!errorMessage) {
     return (
       <View className="flex-1 items-center justify-center bg-[#FAF9F6] px-6">
-        <ActivityIndicator color="#10B981" size="large" />
+        <ActivityIndicator color="#3E5219" size="large" />
         <Text className="mt-4 text-center text-sm text-gray-500">
           Memproses autentikasi...
         </Text>
@@ -69,7 +69,7 @@ export default function AuthCallbackScreen() {
   }
 
   return (
-    <View className="flex-1 items-center justify-center bg-white px-6">
+    <View className="flex-1 items-center justify-center bg-[#FAF9F6] px-6">
       <View className="w-full gap-4 rounded-[28px] border border-red-100 bg-white p-6 shadow-sm">
         <Text className="text-xl font-extrabold text-gray-950">
           Autentikasi gagal
