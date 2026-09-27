@@ -1,2 +1,2 @@
-import { ConfirmQrScreen } from "@/features/approved-screens";
-export default ConfirmQrScreen;
+import { ConfirmQrWiredScreen } from "@/features/prd-wired-screens";
+export default ConfirmQrWiredScreen;
