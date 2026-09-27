@@ -1,2 +1,2 @@
-import { AttendanceProofScreen } from "@/features/approved-screens";
-export default AttendanceProofScreen;
+import { AttendanceProofWiredScreen } from "@/features/prd-wired-screens";
+export default AttendanceProofWiredScreen;
