@@ -19,6 +19,9 @@ function RootNavigator() {
     }
 
     const first = segments[0];
+    const second = segments[1];
+    const isPasswordRecoveryRoute =
+      first === "(auth)" && second === "update-password";
     const isPublicRoute =
       first === "(auth)" ||
       first === "auth" ||
@@ -33,7 +36,7 @@ function RootNavigator() {
       return;
     }
 
-    if (session && isPublicRoute && first !== "auth") {
+    if (session && isPublicRoute && first !== "auth" && !isPasswordRecoveryRoute) {
       router.replace("/");
     }
   }, [loading, router, segments, session]);
