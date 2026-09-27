@@ -1,2 +1,2 @@
-import { QrSuccessScreen } from "@/features/approved-screens";
-export default QrSuccessScreen;
+import { QrSuccessWiredScreen } from "@/features/prd-wired-screens";
+export default QrSuccessWiredScreen;
