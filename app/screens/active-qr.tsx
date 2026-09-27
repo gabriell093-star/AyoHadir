@@ -1,2 +1,2 @@
-import { ActiveQrScreen } from "@/features/approved-screens";
-export default ActiveQrScreen;
+import { ActiveQrWiredScreen } from "@/features/prd-wired-screens";
+export default ActiveQrWiredScreen;
