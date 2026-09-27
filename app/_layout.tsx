@@ -7,9 +7,20 @@ import { ActivityIndicator, View } from "react-native";
 import { useEffect } from "react";
 
 import { AuthProvider, useAuth } from "@/auth/auth-context";
+import { supabase } from "@/lib/supabase";
 
 function RootNavigator() {
   const router = useRouter();
+
+  useEffect(() => {
+    const { data } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") {
+        router.replace("/update-password?mode=recovery");
+      }
+    });
+
+    return () => data.subscription.unsubscribe();
+  }, [router]);
   const segments = useSegments();
   const { session, loading } = useAuth();
 
