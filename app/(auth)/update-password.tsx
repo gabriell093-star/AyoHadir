@@ -73,7 +73,12 @@ export default function UpdatePasswordScreen() {
       }
     }
 
-    const { error } = await supabase.auth.updateUser({ password });
+    const { error } = isRecovery
+      ? await supabase.auth.updateUser({ password })
+      : await supabase.auth.updateUser({
+          password,
+          currentPassword
+        });
 
     if (error) {
       setNotice(error.message);
