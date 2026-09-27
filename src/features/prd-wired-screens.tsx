@@ -91,12 +91,66 @@ export function AttendanceProofWiredScreen(){
  const p=useLocalSearchParams<Record<string,string>>(); const router=useRouter();
  return <Screen><BackHeader title="Bukti Absensi"/><SoftCard><Text className="text-xs font-bold uppercase tracking-[2px] text-[#3E5219]">{p.queued==="true"?"Menunggu sinkronisasi":"Absensi tervalidasi server"}</Text><Text className="mt-2 text-2xl font-black text-gray-950">{p.queued==="true"?"Absensi tersimpan di perangkat":"Absensi tercatat"}</Text><Text className="mt-2 text-sm leading-5 text-gray-600">{p.queued==="true"?"Data akan divalidasi server saat koneksi tersedia.":"Bukti ini menggunakan hasil validasi server AyoHadir."}</Text></SoftCard><GlassCard>{[["Sesi",p.session_name],["Kode unik",p.unique_code],["Status",p.attendance_status],["Waktu scan",p.scanned_at],["Tercatat server",p.server_recorded_at],["Lokasi terverifikasi",p.location_verified]].map(([k,v])=>v?<View key={k} className="flex-row justify-between border-b border-gray-100 py-3"><Text className="text-xs text-gray-500">{k}</Text><Text className="max-w-[62%] text-right text-sm font-bold text-gray-900">{v}</Text></View>:null)}{p.queued==="true"?<Badge tone="yellow">Menunggu sinkronisasi</Badge>:null}</GlassCard>{p.queued!=="true"&&p.attendance_id?<SecondaryButton onPress={()=>router.push({pathname:"/screens/cancellation-request",params:{attendance_id:p.attendance_id}})}><Text className="text-sm font-bold text-red-700">Ajukan Pembatalan</Text></SecondaryButton>:null}</Screen>;
 }export function HistoryWiredScreen(){
- const {user}=useAuth(); const router=useRouter(); const [mode,setMode]=useState("Absensi Saya"); const [query,setQuery]=useState(""); const [rows,setRows]=useState<any[]>([]); const [sessions,setSessions]=useState<any[]>([]); const [loading,setLoading]=useState(false);
- const load=async()=>{if(!user?.id)return;setLoading(true);const a=await supabase.from("attendance").select("id,qr_id,status,unique_code,location_verified,location_accuracy_meters,server_recorded_at,scanned_at,sync_status,qr_sessions(name)").eq("user_id",user.id).order("server_recorded_at",{ascending:false}).limit(100);const s=await supabase.from("qr_sessions").select("id,name,starts_at,ends_at,status,gps_enabled").eq("owner_id",user.id).order("starts_at",{ascending:false}).limit(100);setRows(a.data??[]);setSessions(s.data??[]);setLoading(false);};
+ const {user}=useAuth(); const router=useRouter();
+ const [mode,setMode]=useState("Absensi Saya"); const [query,setQuery]=useState("");
+ const [statusFilter,setStatusFilter]=useState("Semua");
+ const [rows,setRows]=useState<any[]>([]); const [sessions,setSessions]=useState<any[]>([]);
+ const [loading,setLoading]=useState(false);
+
+ const load=async()=>{
+  if(!user?.id)return;
+  setLoading(true);
+  try{
+   const [a,s]=await Promise.all([
+    supabase.from("attendance").select("id,qr_id,status,unique_code,location_verified,location_accuracy_meters,server_recorded_at,scanned_at,sync_status,qr_sessions(name)").eq("user_id",user.id).order("server_recorded_at",{ascending:false}).limit(100),
+    supabase.from("qr_sessions").select("id,name,starts_at,ends_at,status,gps_enabled").eq("owner_id",user.id).order("starts_at",{ascending:false}).limit(100)
+   ]);
+   setRows(a.data??[]);
+   setSessions(s.data??[]);
+  }finally{setLoading(false);}
+ };
+
  useEffect(()=>{void load();},[user?.id]);
- const q=query.trim().toLowerCase(); const filteredRows=rows.filter(r=>[r.qr_sessions?.name,r.unique_code,r.status,r.server_recorded_at].join(" ").toLowerCase().includes(q)); const filteredSessions=sessions.filter(s=>[s.name,s.status,s.starts_at,s.ends_at].join(" ").toLowerCase().includes(q));
- return <Screen bottomNav="history"><View><Text className="text-[28px] font-black text-gray-950">Riwayat Absensi</Text><Text className="mt-1 text-sm leading-5 text-gray-500">Cari absensi Anda atau sesi QR yang Anda buat.</Text></View><Segmented items={["Absensi Saya","Sesi Saya"]} value={mode} onChange={setMode}/><View className="flex-row items-center rounded-2xl border border-[#C5C8B8] bg-white px-4" style={{minHeight:54}}><AppIcon name="history" size={22} color="#75796B"/><TextInput value={query} onChangeText={setQuery} className="ml-3 flex-1 py-3.5 text-base text-gray-900" placeholder="Cari riwayat, sesi, atau kode…" placeholderTextColor="#8A8D82" autoCapitalize="none" autoCorrect={false}/>{query?<Pressable onPress={()=>setQuery("")} className="h-8 w-8 items-center justify-center rounded-full bg-[#F4F3F1]"><AppIcon name="close" size={17} color="#75796B"/></Pressable>:null}</View><SecondaryButton onPress={()=>void load()} disabled={loading}>{loading?<ActivityIndicator/>:<Text className="font-bold text-gray-800">Refresh</Text>}</SecondaryButton>{mode==="Absensi Saya"?(filteredRows.length?filteredRows.map(row=><GlassCard key={row.id}><View className="flex-row items-start justify-between"><View className="flex-1 pr-3"><Text className="text-base font-black text-gray-900">{row.qr_sessions?.name||"Sesi QR"}</Text><Text className="mt-1 text-xs text-gray-500">{row.server_recorded_at||row.scanned_at||"-"}</Text></View><Badge tone={row.status==="cancelled"?"red":row.status==="late"?"yellow":"green"}>{row.status==="cancelled"?"Dibatalkan":row.status==="late"?"Terlambat":"Hadir"}</Badge></View><View className="mt-4 flex-row items-center justify-between border-t border-gray-100 pt-3"><Text className="text-[11px] font-black tracking-[1px] text-gray-400">{row.unique_code||"-"}</Text><Pressable onPress={()=>router.push({pathname:"/screens/attendance-proof",params:{attendance_id:row.id,session_name:row.qr_sessions?.name||"Sesi QR",unique_code:row.unique_code||"",attendance_status:row.status||"",scanned_at:row.scanned_at||"",server_recorded_at:row.server_recorded_at||"",location_verified:row.location_verified===true?"Terverifikasi":row.location_verified===false?"Tidak terverifikasi":""}})}><Text className="font-bold text-[#3E5219]">Detail</Text></Pressable></View></GlassCard>):<GlassCard><Text className="font-bold text-gray-900">Tidak ada hasil.</Text></GlassCard>):(filteredSessions.length?filteredSessions.map(session=><GlassCard key={session.id}><View className="flex-row items-start justify-between"><Text className="flex-1 pr-3 text-base font-black text-gray-900">{session.name}</Text><Badge tone={session.status==="active"?"green":session.status==="expired"?"gray":"red"}>{session.status||""}</Badge></View><Text className="mt-2 text-xs text-gray-500">{session.starts_at} → {session.ends_at}</Text><PrimaryButton className="mt-4" onPress={()=>router.push({pathname:"/screens/active-qr",params:{qr_id:session.id,title:session.name,starts_at:session.starts_at,ends_at:session.ends_at,gps:String(Boolean(session.gps_enabled))}})}><ButtonText>Lihat Sesi</ButtonText></PrimaryButton></GlassCard>):<GlassCard><Text className="font-bold text-gray-900">Belum ada sesi QR yang dibuat.</Text></GlassCard>)}</Screen>;
-}export function HistorySessionWiredScreen(){
+
+ const q=query.trim().toLowerCase();
+ const filteredRows=rows.filter(r=>{
+  const matchesSearch=[r.qr_sessions?.name,r.unique_code,r.status,r.server_recorded_at].join(" ").toLowerCase().includes(q);
+  const matchesStatus=statusFilter==="Semua"||(statusFilter==="Hadir"&&r.status==="present")||(statusFilter==="Terlambat"&&r.status==="late");
+  return matchesSearch&&matchesStatus;
+ });
+ const filteredSessions=sessions.filter(s=>[s.name,s.status,s.starts_at,s.ends_at].join(" ").toLowerCase().includes(q));
+
+ return <Screen bottomNav="history">
+  <View><Text className="text-[28px] font-black text-gray-950">Riwayat Absensi</Text><Text className="mt-1 text-sm leading-5 text-gray-500">Cari absensi Anda atau sesi QR yang Anda buat.</Text></View>
+  <Segmented items={["Absensi Saya","Sesi Saya"]} value={mode} onChange={setMode}/>
+  <View className="flex-row items-center rounded-2xl border border-[#C5C8B8] bg-white px-4" style={{minHeight:54}}>
+   <AppIcon name="history" size={22} color="#75796B"/>
+   <TextInput value={query} onChangeText={setQuery} className="ml-3 flex-1 py-3.5 text-base text-gray-900" placeholder="Cari riwayat, sesi, atau kode…" placeholderTextColor="#8A8D82" autoCapitalize="none" autoCorrect={false}/>
+   {query?<Pressable onPress={()=>setQuery("")} className="h-8 w-8 items-center justify-center rounded-full bg-[#F4F3F1]"><AppIcon name="close" size={17} color="#75796B"/></Pressable>:null}
+  </View>
+  {mode==="Absensi Saya"?<Segmented items={["Semua","Hadir","Terlambat"]} value={statusFilter} onChange={setStatusFilter}/>:null}
+  <SecondaryButton onPress={()=>void load()} disabled={loading}>{loading?<ActivityIndicator/>:<Text className="font-bold text-gray-800">Refresh</Text>}</SecondaryButton>
+
+  {mode==="Absensi Saya"
+   ?(filteredRows.length?filteredRows.map(row=><GlassCard key={row.id}>
+      <View className="flex-row items-start justify-between">
+       <View className="flex-1 pr-3"><Text className="text-base font-black text-gray-900">{row.qr_sessions?.name||"Sesi QR"}</Text><Text className="mt-1 text-xs text-gray-500">{row.server_recorded_at||row.scanned_at||"-"}</Text></View>
+       <Badge tone={row.status==="cancelled"?"red":row.status==="late"?"yellow":"green"}>{row.status==="cancelled"?"Dibatalkan":row.status==="late"?"Terlambat":"Hadir"}</Badge>
+      </View>
+      <View className="mt-4 flex-row items-center justify-between border-t border-gray-100 pt-3">
+       <Text className="text-[11px] font-black tracking-[1px] text-gray-400">{row.unique_code||"-"}</Text>
+       <Pressable onPress={()=>router.push({pathname:"/screens/attendance-proof",params:{attendance_id:row.id,session_name:row.qr_sessions?.name||"Sesi QR",unique_code:row.unique_code||"",attendance_status:row.status||"",scanned_at:row.scanned_at||"",server_recorded_at:row.server_recorded_at||"",location_verified:row.location_verified===true?"Terverifikasi":row.location_verified===false?"Tidak terverifikasi":"",sync_status:row.sync_status||""}})}><Text className="font-bold text-[#3E5219]">Detail</Text></Pressable>
+      </View>
+     </GlassCard>):<GlassCard><Text className="font-bold text-gray-900">Tidak ada hasil untuk filter ini.</Text></GlassCard>)
+   :(filteredSessions.length?filteredSessions.map(session=><GlassCard key={session.id}>
+      <View className="flex-row items-start justify-between"><Text className="flex-1 pr-3 text-base font-black text-gray-900">{session.name}</Text><Badge tone={session.status==="active"?"green":session.status==="expired"?"gray":"red"}>{session.status||""}</Badge></View>
+      <Text className="mt-2 text-xs text-gray-500">{session.starts_at} → {session.ends_at}</Text>
+      <PrimaryButton className="mt-4" onPress={()=>router.push({pathname:"/screens/active-qr",params:{qr_id:session.id,title:session.name,starts_at:session.starts_at,ends_at:session.ends_at,gps:String(Boolean(session.gps_enabled))}})}><ButtonText>Lihat Sesi</ButtonText></PrimaryButton>
+     </GlassCard>):<GlassCard><Text className="font-bold text-gray-900">Belum ada sesi QR yang dibuat.</Text></GlassCard>)}
+ </Screen>;
+}
+
+export function HistorySessionWiredScreen(){
  const p=useLocalSearchParams<Record<string,string>>(); const router=useRouter(); const [rows,setRows]=useState<any[]>([]);
  useEffect(()=>{if(p.qr_id)void supabase.from("attendance").select("id,user_id,status,unique_code,server_recorded_at,scanned_at,location_verified,location_accuracy_meters,profiles(display_name)").eq("qr_id",p.qr_id).order("server_recorded_at",{ascending:false}).then(({data})=>setRows(data??[]));},[p.qr_id]);
  return <Screen><BackHeader title="Riwayat Kehadiran"/>{rows.length?rows.map(row=><GlassCard key={row.id}><View className="flex-row items-start justify-between"><View className="flex-1"><Text className="font-black text-gray-900">{row.profiles?.display_name||"Pengguna"}</Text><Text className="mt-1 text-xs text-gray-500">{row.unique_code||"-"}</Text><Text className="mt-1 text-[11px] text-gray-400">{row.server_recorded_at||row.scanned_at||"-"}</Text></View><Badge tone={row.status==="late"?"yellow":row.status==="cancelled"?"red":"green"}>{row.status==="late"?"Terlambat":row.status==="cancelled"?"Dibatalkan":"Hadir"}</Badge></View>{row.status!=="cancelled"?<SecondaryButton className="mt-4" onPress={()=>router.push({pathname:"/screens/owner-cancel-attendance",params:{attendance_id:row.id,user_name:row.profiles?.display_name||"Pengguna",qr_id:p.qr_id||""}})}><Text className="text-sm font-bold text-red-700">Batalkan Absensi</Text></SecondaryButton>:null}</GlassCard>):<GlassCard><Text className="font-bold text-gray-900">Belum ada absensi untuk sesi ini.</Text></GlassCard>}</Screen>;
