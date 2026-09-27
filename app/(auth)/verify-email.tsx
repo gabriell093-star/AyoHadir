@@ -47,9 +47,9 @@ export default function VerifyEmailScreen() {
   };
 
   return (
-    <View className="flex-1 justify-center bg-white px-6">
-      <View className="items-center gap-5 rounded-[28px] border border-gray-100 bg-white p-6 shadow-sm">
-        <View className="h-16 w-16 items-center justify-center rounded-full bg-emerald-50">
+    <View className="flex-1 justify-center bg-[#FAF9F6] px-6">
+      <View className="items-center gap-5 rounded-[28px] border border-[#C5C8B8]/50 bg-white p-6 shadow-sm">
+        <View className="h-16 w-16 items-center justify-center rounded-full bg-[#F2F5E8]">
           <Text className="text-3xl">✉️</Text>
         </View>
 
@@ -68,7 +68,7 @@ export default function VerifyEmailScreen() {
 
         <Pressable
           className={[
-            "w-full items-center rounded-2xl bg-emerald-500 px-4 py-4",
+            "w-full items-center rounded-2xl bg-[#3E5219] px-4 py-4",
             busy ? "opacity-60" : ""
           ].join(" ")}
           onPress={resend}
