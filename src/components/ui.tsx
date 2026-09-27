@@ -188,10 +188,16 @@ export function BottomNav({ active }: { active: NavKey }) {
         return (
           <Pressable
             key={item.key}
-            onPress={() => router.push(item.route)}
+            onPress={() => router.push(item.route as any)}
             className={"min-w-[58px] items-center rounded-2xl px-2 py-1.5 " + (selected ? "bg-emerald-50" : "")}
           >
-            <Text className={"text-lg " + (selected ? "text-emerald-600" : "text-gray-400")}>{item.icon}</Text>
+            {item.key === "qr" ? (
+              <View className="-mt-6 h-14 w-14 items-center justify-center rounded-full bg-emerald-500 shadow-sm">
+                <Text className="text-2xl font-black text-white">▦</Text>
+              </View>
+            ) : (
+              <Text className={"text-lg " + (selected ? "text-emerald-600" : "text-gray-400")}>{item.icon}</Text>
+            )}
             <Text className={"mt-0.5 text-[10px] font-semibold " + (selected ? "text-emerald-700" : "text-gray-500")}>{item.label}</Text>
           </Pressable>
         );
