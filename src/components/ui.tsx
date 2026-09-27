@@ -1,6 +1,7 @@
 
 import type { PropsWithChildren, ReactNode } from "react";
-import { Pressable, SafeAreaView, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 
 export const UI = {
@@ -28,21 +29,33 @@ type ScreenProps = PropsWithChildren<{
 }>;
 
 export function Screen({ children, scroll = true, contentClassName = "", bottomNav = null }: ScreenProps) {
+  const insets = useSafeAreaInsets();
   const body = scroll ? (
     <ScrollView
       className="flex-1 bg-white"
-      contentInsetAdjustmentBehavior="automatic"
+      contentInsetAdjustmentBehavior="never"
       keyboardShouldPersistTaps="handled"
-      contentContainerClassName={"gap-5 px-5 pb-8 pt-5 " + contentClassName}
+      contentContainerClassName={"gap-5 px-5 pt-5 " + contentClassName}
+      contentContainerStyle={{
+        paddingBottom: bottomNav ? insets.bottom + 96 : insets.bottom + 32
+      }}
     >
       {children}
     </ScrollView>
   ) : (
-    <View className={"flex-1 bg-white " + contentClassName}>{children}</View>
+    <View
+      className={"flex-1 bg-white " + contentClassName}
+      style={{ paddingBottom: bottomNav ? 0 : insets.bottom }}
+    >
+      {children}
+    </View>
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView
+      className="flex-1 bg-white"
+      edges={bottomNav ? ["top"] : ["top", "bottom"]}
+    >
       {body}
       {bottomNav ? <BottomNav active={bottomNav} /> : null}
     </SafeAreaView>
@@ -173,6 +186,7 @@ type NavKey = "home" | "history" | "qr" | "notifications" | "profile";
 
 export function BottomNav({ active }: { active: NavKey }) {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const items: Array<{ key: NavKey; label: string; icon: string; route: string }> = [
     { key: "home", label: "Beranda", icon: "⌂", route: "/" },
     { key: "history", label: "Riwayat", icon: "◷", route: "/history" },
@@ -182,7 +196,10 @@ export function BottomNav({ active }: { active: NavKey }) {
   ];
 
   return (
-    <View className="flex-row items-center justify-around border-t border-gray-100 bg-white px-2 pb-2 pt-2">
+    <View
+      className="flex-row items-center justify-around border-t border-gray-100 bg-white px-2 pt-2"
+      style={{ paddingBottom: Math.max(insets.bottom, 10) }}
+    >
       {items.map((item) => {
         const selected = active === item.key;
         return (
@@ -281,21 +298,36 @@ export function Segmented({
 
 export function QrVisual({ size = 236, label = "QR" }: { size?: number; label?: string }) {
   const cells: ReactNode[] = [];
-  const n = 21;
-  const isFinder = (x: number, y: number, ox: number, oy: number) =>
-    x >= ox && x < ox + 7 && y >= oy && y < oy + 7 &&
-    (x === ox || x === ox + 6 || y === oy || y === oy + 6 || (x >= ox + 2 && x <= ox + 4 && y >= oy + 2 && y <= oy + 4));
+  const n = 29;
+  const cell = size / n;
+  const isFinder = (x: number, y: number, ox: number, oy: number) => {
+    if (x < ox || x >= ox + 7 || y < oy || y >= oy + 7) return false;
+    const dx = x - ox;
+    const dy = y - oy;
+    return (
+      dx === 0 || dx === 6 || dy === 0 || dy === 6 ||
+      (dx >= 2 && dx <= 4 && dy >= 2 && dy <= 4)
+    );
+  };
 
-  for (let y = 0; y < n; y++) {
-    for (let x = 0; x < n; x++) {
-      const dark = isFinder(x, y, 0, 0) || isFinder(x, y, 14, 0) || isFinder(x, y, 0, 14) ||
-        (x > 7 && y > 7 && ((x * 17 + y * 11 + x * y) % 7 < 3));
-      cells.push(<View key={String(x) + "-" + String(y)} className={"h-[9.5px] w-[9.5px] " + (dark ? "bg-gray-900" : "bg-white")} />);
+  for (let y = 0; y < n; y += 1) {
+    for (let x = 0; x < n; x += 1) {
+      const inFinder = isFinder(x, y, 0, 0) || isFinder(x, y, n - 7, 0) || isFinder(x, y, 0, n - 7);
+      const reserved = x < 8 || y < 8 || x >= n - 8 || y >= n - 8;
+      const dataBit = ((x * 73 + y * 37 + x * y * 11 + 17) % 13) < 6;
+      const dark = inFinder || (!reserved && dataBit);
+      cells.push(
+        <View
+          key={String(x) + "-" + String(y)}
+          style={{ width: cell, height: cell }}
+          className={dark ? "bg-gray-900" : "bg-white"}
+        />
+      );
     }
   }
 
   return (
-    <View className="items-center justify-center rounded-2xl border-2 border-emerald-100 bg-white p-3">
+    <View className="items-center justify-center rounded-xl border-2 border-emerald-100 bg-white p-3">
       <View style={{ width: size, height: size }} className="flex-row flex-wrap overflow-hidden bg-white">
         {cells}
       </View>
