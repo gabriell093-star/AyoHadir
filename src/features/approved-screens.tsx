@@ -860,6 +860,7 @@ export function AttendanceProofScreen() {
 }
 
 export function HistoryScreen() {
+  const router = useRouter();
   const [mode, setMode] = useState("Absensi Saya");
   const [query, setQuery] = useState("");
   const rows = [
