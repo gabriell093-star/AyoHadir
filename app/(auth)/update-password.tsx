@@ -77,7 +77,7 @@ export default function UpdatePasswordScreen() {
       ? await supabase.auth.updateUser({ password })
       : await supabase.auth.updateUser({
           password,
-          currentPassword
+          current_password: currentPassword
         });
 
     if (error) {
