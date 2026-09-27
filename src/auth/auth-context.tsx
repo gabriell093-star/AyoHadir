@@ -144,22 +144,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           throw new Error("Nama tidak boleh kosong.");
         }
 
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from("profiles")
           .update({
             display_name: cleanedName,
             updated_at: new Date().toISOString()
           })
-          .eq("id", session.user.id);
+          .eq("id", session.user.id)
+          .select("display_name, avatar_url")
+          .maybeSingle();
 
         if (error) {
           throw error;
         }
 
-        setProfile((current) => ({
-          display_name: cleanedName,
-          avatar_url: current?.avatar_url ?? null
-        }));
+        if (!data) {
+          throw new Error("Profil pengguna tidak ditemukan atau tidak dapat diperbarui.");
+        }
+
+        setProfile({
+          display_name: data.display_name,
+          avatar_url: data.avatar_url
+        });
       }
     }),
     [loading, profile, session]
