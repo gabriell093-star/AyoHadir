@@ -1,9 +1,12 @@
 import { useState } from "react";
-import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, Pressable, Text, TextInput, View } from "react-native";
 import { useRouter } from "expo-router";
 import * as Linking from "expo-linking";
 
 import { supabase } from "@/lib/supabase";
+import { PrimaryButton, SecondaryButton, ButtonText } from "@/components/ui";
+
+const logo = require("../../assets/images/ayo-hadir-icon.png");
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
@@ -14,7 +17,6 @@ export default function ForgotPasswordScreen() {
   const submit = async () => {
     setBusy(true);
     setNotice(null);
-
     const normalizedEmail = email.trim().toLowerCase();
 
     if (!normalizedEmail || !normalizedEmail.includes("@")) {
@@ -23,85 +25,41 @@ export default function ForgotPasswordScreen() {
       return;
     }
 
-    const redirectTo =
-      Linking.createURL("auth/callback") + "?next=%2Fupdate-password";
-
-    const { error } = await supabase.auth.resetPasswordForEmail(
-      normalizedEmail,
-      { redirectTo }
-    );
+    const redirectTo = Linking.createURL("auth/callback") + "?next=%2Fupdate-password";
+    const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, { redirectTo });
 
     if (error) {
       setNotice(error.message);
     } else {
-      setNotice(
-        "Jika akun dengan email tersebut tersedia, tautan reset password telah dikirim. Cek inbox dan folder spam."
-      );
+      setNotice("Jika akun dengan email tersebut tersedia, tautan reset password telah dikirim. Cek inbox dan folder spam.");
     }
-
     setBusy(false);
   };
 
   return (
-    <KeyboardAvoidingView
-      className="flex-1 bg-white"
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
+    <KeyboardAvoidingView className="flex-1 bg-emerald-50/30" behavior={Platform.OS === "ios" ? "padding" : undefined}>
       <View className="flex-1 justify-center px-6">
-        <View className="gap-5 rounded-[28px] border border-gray-100 bg-white p-6 shadow-sm">
-          <View className="gap-2">
-            <Text className="text-2xl font-extrabold text-gray-950">
-              Reset password
-            </Text>
-            <Text className="text-sm leading-5 text-gray-500">
-              Masukkan email akun AyoHadir!. Tautan reset akan membuka aplikasi
-              kembali.
-            </Text>
+        <View className="mx-auto w-full max-w-md rounded-[28px] border border-emerald-100 bg-white p-6 shadow-sm">
+          <View className="items-center">
+            <Image source={logo} resizeMode="contain" className="h-16 w-16 rounded-[20px]" />
+            <Text className="mt-3 text-2xl font-black text-emerald-700">Lupa Kata Sandi</Text>
+            <Text className="mt-2 text-center text-sm leading-5 text-gray-500">Masukkan email akun AyoHadir! untuk menerima instruksi pemulihan.</Text>
           </View>
 
-          <View className="gap-2">
-            <Text className="text-sm font-semibold text-gray-700">Email</Text>
-            <TextInput
-              className="rounded-2xl border border-gray-200 bg-gray-50 px-4 py-4 text-base text-gray-950"
-              value={email}
-              onChangeText={setEmail}
-              placeholder="nama@email.com"
-              placeholderTextColor="#9CA3AF"
-              autoCapitalize="none"
-              autoCorrect={false}
-              keyboardType="email-address"
-              editable={!busy}
-            />
-          </View>
-
-          {notice ? (
-            <View className="rounded-2xl bg-emerald-50 px-4 py-3">
-              <Text className="text-sm leading-5 text-emerald-800">{notice}</Text>
+          <View className="mt-6">
+            <Text className="text-sm font-bold text-gray-800">Email</Text>
+            <View className="mt-2 rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3.5">
+              <TextInput value={email} onChangeText={setEmail} placeholder="nama@email.com" placeholderTextColor="#94A3B8" autoCapitalize="none" autoCorrect={false} keyboardType="email-address" editable={!busy} className="text-base text-gray-900" />
             </View>
-          ) : null}
+          </View>
 
-          <Pressable
-            className={[
-              "items-center rounded-2xl bg-emerald-500 px-4 py-4",
-              busy ? "opacity-60" : ""
-            ].join(" ")}
-            onPress={submit}
-            disabled={busy}
-          >
-            {busy ? (
-              <ActivityIndicator color="#FFFFFF" />
-            ) : (
-              <Text className="font-bold text-white">Kirim tautan reset</Text>
-            )}
-          </Pressable>
+          {notice ? <View className="mt-4 rounded-2xl bg-emerald-50 px-4 py-3"><Text className="text-sm leading-5 text-emerald-800">{notice}</Text></View> : null}
 
-          <Pressable
-            className="items-center rounded-2xl border border-gray-200 bg-white px-4 py-4"
-            onPress={() => router.replace("/sign-in")}
-            disabled={busy}
-          >
-            <Text className="font-bold text-gray-800">Kembali ke masuk</Text>
-          </Pressable>
+          <PrimaryButton className="mt-5" onPress={submit} disabled={busy}>
+            {busy ? <ActivityIndicator color="#FFFFFF" /> : <ButtonText>Kirim Instruksi</ButtonText>}
+          </PrimaryButton>
+          <SecondaryButton className="mt-3" onPress={() => router.replace("/sign-in")}><Text className="text-sm font-bold text-gray-800">Kembali ke Login</Text></SecondaryButton>
+          <Text className="mt-5 text-center text-xs leading-5 text-gray-400">Tidak menerima email? Periksa folder spam atau hubungi dukungan.</Text>
         </View>
       </View>
     </KeyboardAvoidingView>
