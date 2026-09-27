@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Linking, Platform, Pressable, Switch, Text, View } from "react-native";
+import { Linking, Platform, Switch, Text, View } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 
 import { AppIcon, BackHeader, Badge, ButtonText, GlassCard, PrimaryButton, Screen, SecondaryButton } from "@/components/ui";
