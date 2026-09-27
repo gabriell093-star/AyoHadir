@@ -4,6 +4,6 @@ const { defineConfig } = require("eslint/config");
 module.exports = defineConfig([
   expoConfig,
   {
-    ignores: ["dist/**", "android/**", "ios/**", ".expo/**"]
+    ignores: ["dist/**", "android/**", "ios/**", ".expo/**", "supabase/functions/**"]
   }
 ]);
