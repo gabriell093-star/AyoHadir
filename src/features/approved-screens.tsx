@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { ActivityIndicator, Image, Modal, PanResponder, Pressable, ScrollView, Switch, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Image, Linking, Modal, PanResponder, Pressable, ScrollView, Switch, Text, TextInput, View, type DimensionValue } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useRouter } from "expo-router";
 import { CameraView, useCameraPermissions } from "expo-camera";
@@ -332,11 +332,11 @@ function RangeSlider({
       <View className="absolute inset-x-0 h-1.5 rounded-full bg-[#D7D8CF]" />
       <View
         className="absolute left-0 h-1.5 rounded-full bg-[#3E5219]"
-        style={{ width: percentage + "%" }}
+        style={{ width: (percentage + "%") as DimensionValue }}
       />
       <View
         className="absolute h-6 w-6 rounded-full border-2 border-white bg-[#3E5219] shadow-sm"
-        style={{ left: percentage + "%", marginLeft: -12 }}
+        style={{ left: (percentage + "%") as DimensionValue, marginLeft: -12 }}
       />
     </View>
   );
