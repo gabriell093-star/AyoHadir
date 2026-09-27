@@ -1,2 +1,2 @@
-import { HistorySessionScreen } from "@/features/approved-screens";
-export default HistorySessionScreen;
+import { HistorySessionWiredScreen } from "@/features/prd-wired-screens";
+export default HistorySessionWiredScreen;
