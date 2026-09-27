@@ -23,7 +23,7 @@ export default function ForgotPasswordScreen() {
       return;
     }
 
-    const redirectTo = Linking.createURL("auth/callback") + "?next=%2Fupdate-password";
+    const redirectTo = Linking.createURL("auth/callback");
     const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, { redirectTo });
 
     if (error) {
