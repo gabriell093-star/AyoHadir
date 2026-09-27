@@ -161,7 +161,7 @@ export function HistorySessionWiredScreen(){
    setError("");
    const [infoResult,attendanceResult,allowedResult,profileCountResult]=await Promise.all([
     supabase.rpc("get_qr_owner_details",{p_qr_id:p.qr_id}),
-    supabase.from("attendance").select("id,user_id,status,unique_code,server_recorded_at,scanned_at,sync_status,location_verified,location_accuracy_meters").eq("qr_id",p.qr_id).order("server_recorded_at",{ascending:false}),
+    supabase.from("attendance").select("id,user_id,status,unique_code,server_recorded_at,scanned_at,sync_status,location_verified,location_accuracy_meters,profiles(display_name)").eq("qr_id",p.qr_id).order("server_recorded_at",{ascending:false}),
     supabase.from("qr_allowed_users").select("user_id").eq("qr_id",p.qr_id),
     supabase.from("profiles").select("id",{count:"exact",head:true})
    ]);
@@ -223,7 +223,7 @@ export function HistorySessionWiredScreen(){
   {rows.length?rows.map(row=><GlassCard key={row.id}>
    <View className="flex-row items-start justify-between">
     <View className="flex-1">
-     <Text className="font-black text-gray-900">Pengguna</Text>
+     <Text className="font-black text-gray-900">{row.profiles?.display_name||"Pengguna"}</Text>
      <Text className="mt-1 text-xs text-gray-500">{row.unique_code||"-"}</Text>
      <Text className="mt-1 text-[11px] text-gray-400">{row.server_recorded_at||row.scanned_at||"-"}</Text>
     </View>
@@ -234,7 +234,7 @@ export function HistorySessionWiredScreen(){
     <Badge tone={row.sync_status==="synced"?"green":row.sync_status==="delayed"?"red":"yellow"}>{syncLabel(row.sync_status)}</Badge>
     {row.location_accuracy_meters!=null?<Badge tone="gray">Akurasi {Math.round(Number(row.location_accuracy_meters))} m</Badge>:null}
    </View>
-   {row.status!=="cancelled"?<SecondaryButton className="mt-4" onPress={()=>router.push({pathname:"/screens/owner-cancel-attendance",params:{attendance_id:row.id,user_name:"Pengguna",qr_id:p.qr_id||""}})}><Text className="text-sm font-bold text-red-700">Batalkan Absensi</Text></SecondaryButton>:null}
+   {row.status!=="cancelled"?<SecondaryButton className="mt-4" onPress={()=>router.push({pathname:"/screens/owner-cancel-attendance",params:{attendance_id:row.id,user_name:row.profiles?.display_name||"Pengguna",qr_id:p.qr_id||""}})}><Text className="text-sm font-bold text-red-700">Batalkan Absensi</Text></SecondaryButton>:null}
   </GlassCard>):<GlassCard><Text className="font-bold text-gray-900">Belum ada absensi untuk sesi ini.</Text></GlassCard>}
  </Screen>;
 }
