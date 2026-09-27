@@ -459,41 +459,6 @@ function RangeSlider({
       {...panResponder.panHandlers}
     >
       <View className="absolute inset-x-0 h-1.5 rounded-full bg-[#D7D8CF]" />
-      <View className="absolute left-0 h-1.5 rounded-full bg-[#3E5219]" style={{ width: (percentage + "%") as DimensionValue }} />
-      <View className="absolute h-6 w-6 rounded-full border-2 border-white bg-[#3E5219] shadow-sm" style={{ left: (percentage + "%") as DimensionValue, marginLeft: -12 }} />
-    </Pressable>
-  );
-}: {
-  value: number;
-  min: number;
-  max: number;
-  onChange: (value: number) => void;
-}) {
-  const [trackWidth, setTrackWidth] = useState(1);
-
-  const updateFromX = (x: number) => {
-    const clamped = Math.max(0, Math.min(trackWidth, x));
-    const ratio = clamped / Math.max(trackWidth, 1);
-    const next = min + ratio * (max - min);
-    onChange(Math.max(min, Math.min(max, Math.round(next))));
-  };
-
-  const panResponder = PanResponder.create({
-    onStartShouldSetPanResponder: () => true,
-    onMoveShouldSetPanResponder: () => true,
-    onPanResponderGrant: (event) => updateFromX(event.nativeEvent.locationX),
-    onPanResponderMove: (event) => updateFromX(event.nativeEvent.locationX)
-  });
-
-  const percentage = ((value - min) / (max - min)) * 100;
-
-  return (
-    <View
-      onLayout={(event) => setTrackWidth(event.nativeEvent.layout.width)}
-      className="h-8 w-full justify-center"
-      {...panResponder.panHandlers}
-    >
-      <View className="absolute inset-x-0 h-1.5 rounded-full bg-[#D7D8CF]" />
       <View
         className="absolute left-0 h-1.5 rounded-full bg-[#3E5219]"
         style={{ width: (percentage + "%") as DimensionValue }}
@@ -502,7 +467,7 @@ function RangeSlider({
         className="absolute h-6 w-6 rounded-full border-2 border-white bg-[#3E5219] shadow-sm"
         style={{ left: (percentage + "%") as DimensionValue, marginLeft: -12 }}
       />
-    </View>
+    </Pressable>
   );
 }
 
