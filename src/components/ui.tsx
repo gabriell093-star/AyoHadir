@@ -571,7 +571,7 @@ export function QrVisual({
 export function ProgressBar({ value }: { value: number }) {
   return (
     <View className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
-      <View className="h-full rounded-full bg-[#F2F5E8]0" style={{ width: `${Math.max(0, Math.min(100, value))}%` }} />
+      <View className="h-full rounded-full bg-[#3E5219]" style={{ width: `${Math.max(0, Math.min(100, value))}%` }} />
     </View>
   );
 }
