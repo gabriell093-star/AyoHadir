@@ -1,2 +1,2 @@
-import { CreateSessionScreen } from "@/features/approved-screens";
-export default CreateSessionScreen;
+import { CreateSessionWiredScreen } from "@/features/prd-wired-screens";
+export default CreateSessionWiredScreen;
