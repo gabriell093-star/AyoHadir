@@ -19,9 +19,8 @@ function RootNavigator() {
     }
 
     const first = segments[0];
-    const second = segments[1];
     const isPasswordRecoveryRoute =
-      first === "(auth)" && second === "update-password";
+      segments.join("/") === "(auth)/update-password";
     const isPublicRoute =
       first === "(auth)" ||
       first === "auth" ||
