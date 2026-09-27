@@ -44,7 +44,7 @@ function RootNavigator() {
   return (
     <SafeAreaProvider>
       <StatusBar style="dark" />
-      <View className="flex-1 bg-white">
+      <View className="flex-1 bg-[#FAF9F6]">
         <Stack
         screenOptions={{
           headerShown: false,
@@ -53,7 +53,7 @@ function RootNavigator() {
       />
         {loading ? (
           <View className="absolute inset-0 items-center justify-center bg-white">
-            <ActivityIndicator color="#10B981" size="large" />
+            <ActivityIndicator color="#3E5219" size="large" />
           </View>
         ) : null}
       </View>
