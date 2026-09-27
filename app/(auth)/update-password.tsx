@@ -11,10 +11,12 @@ import {
 import { useLocalSearchParams, useRouter } from "expo-router";
 
 import { AyoHadirLogo } from "@/components/ui";
+import { useAuth } from "@/auth/auth-context";
 import { supabase } from "@/lib/supabase";
 
 export default function UpdatePasswordScreen() {
   const router = useRouter();
+  const { user } = useAuth();
   const params = useLocalSearchParams<{ mode?: string | string[] }>();
   const mode = Array.isArray(params.mode) ? params.mode[0] : params.mode;
   const isRecovery = mode === "recovery";
@@ -53,11 +55,19 @@ export default function UpdatePasswordScreen() {
 
     setBusy(true);
 
-    const { error } = await supabase.auth.updateUser(
-      isRecovery
-        ? { password }
-        : { password, currentPassword }
-    );
+    if (!isRecovery) {
+      const { error: verifyError } = await supabase.auth.signInWithPassword({
+        email: user?.email ?? "",
+        password: currentPassword
+      });
+      if (verifyError) {
+        setNotice("Password saat ini tidak benar.");
+        setBusy(false);
+        return;
+      }
+    }
+
+    const { error } = await supabase.auth.updateUser({ password });
 
     if (error) {
       setNotice(error.message);
