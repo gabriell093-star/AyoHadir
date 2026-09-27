@@ -23,10 +23,11 @@ function RootNavigator() {
       first === "sign-in" ||
       first === "verify-email" ||
       first === "forgot-password" ||
-      first === "update-password";
+      first === "update-password" ||
+      first === "welcome";
 
     if (!session && !isPublicRoute) {
-      router.replace("/sign-in");
+      router.replace("/welcome");
       return;
     }
 
