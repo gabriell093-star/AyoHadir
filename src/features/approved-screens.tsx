@@ -488,7 +488,6 @@ export function ConfirmQrScreen() {
   const lateMinutes = Number(params.lateMinutes || 15);
   const gps = params.gps === "true";
   const radius = Number(params.radius || 150);
-  const [qrValue] = useState(() => "ayohadir:" + title + ":" + Date.now());
 
   return (
     <Screen>
