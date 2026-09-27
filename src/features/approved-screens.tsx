@@ -488,6 +488,7 @@ export function ConfirmQrScreen() {
   const lateMinutes = Number(params.lateMinutes || 15);
   const gps = params.gps === "true";
   const radius = Number(params.radius || 150);
+  const [qrValue] = useState(() => "ayohadir:" + title + ":" + Date.now());
 
   return (
     <Screen>
@@ -557,7 +558,7 @@ export function QrSuccessScreen() {
           </View>
           <Badge>Aktif</Badge>
         </View>
-        <View className="mt-5"><QrVisual size={210} label="QR AKTIF" value={"ayohadir:" + title + ":" + Date.now()} /></View>
+        <View className="mt-5"><QrVisual size={210} label="QR AKTIF" value={qrValue} /></View>
         <Text className="mt-4 text-center text-xs leading-5 text-gray-500">Bagikan atau unduh QR. QR di atas adalah representasi visual untuk tahap ini; validasi token server menjadi langkah berikutnya.</Text>
       </GlassCard>
 
