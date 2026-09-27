@@ -210,7 +210,7 @@ export function Screen({ children, scroll = true, contentClassName = "", bottomN
 
   return (
     <SafeAreaView
-      className="flex-1 bg-white"
+      className="flex-1 bg-[#FAF9F6]"
       edges={bottomNav ? ["top"] : ["top", "bottom"]}
     >
       {body}
@@ -221,7 +221,7 @@ export function Screen({ children, scroll = true, contentClassName = "", bottomN
 
 export function GlassCard({ children, className = "" }: PropsWithChildren<{ className?: string }>) {
   return (
-    <View className={"rounded-[20px] border border-gray-100 bg-white p-5 shadow-sm " + className}>
+    <View className={"rounded-xl border border-[#C5C8B8]/35 bg-white p-5 " + className}>
       {children}
     </View>
   );
@@ -229,7 +229,7 @@ export function GlassCard({ children, className = "" }: PropsWithChildren<{ clas
 
 export function SoftCard({ children, className = "" }: PropsWithChildren<{ className?: string }>) {
   return (
-    <View className={"rounded-[20px] border border-emerald-100 bg-emerald-50/70 p-5 " + className}>
+    <View className={"rounded-xl border border-[#3E5219]/10 bg-[#F5F5DC] p-5 " + className}>
       {children}
     </View>
   );
@@ -240,17 +240,17 @@ export function Badge({
   tone = "green"
 }: PropsWithChildren<{ tone?: "green" | "yellow" | "red" | "gray" | "dark" }>) {
   const box = {
-    green: "bg-emerald-50",
-    yellow: "bg-amber-50",
-    red: "bg-red-50",
+    green: "bg-[#E4F1D2]",
+    yellow: "bg-[#FFF4D6]",
+    red: "bg-[#FDECEC]",
     gray: "bg-gray-100",
-    dark: "bg-gray-900"
+    dark: "bg-[#3E5219]"
   }[tone];
   const text = {
-    green: "text-emerald-700",
-    yellow: "text-amber-700",
-    red: "text-red-700",
-    gray: "text-gray-600",
+    green: "text-[#3E5219]",
+    yellow: "text-[#8A5A00]",
+    red: "text-[#BA1A1A]",
+    gray: "text-[#45483C]",
     dark: "text-white"
   }[tone];
   return (
@@ -276,7 +276,7 @@ export function PrimaryButton({
       onPress={onPress}
       disabled={disabled}
       className={
-        "min-h-12 items-center justify-center rounded-2xl bg-[#3E5219] px-5 py-3.5 " +
+        "min-h-12 items-center justify-center rounded-lg bg-[#3E5219] px-5 py-3.5 " +
         (disabled ? "opacity-50 " : "") +
         className
       }
@@ -298,7 +298,7 @@ export function SecondaryButton({
   return (
     <Pressable
       onPress={onPress}
-      className={"min-h-12 items-center justify-center rounded-2xl border border-gray-300 bg-white px-5 py-3.5 " + className}
+      className={"min-h-12 items-center justify-center rounded-lg border border-[#75796B] bg-white px-5 py-3.5 " + className}
     >
       {children}
     </Pressable>
@@ -333,7 +333,7 @@ export function BackHeader({
       <Pressable onPress={() => router.back()} className="h-10 w-10 items-center justify-center rounded-full bg-gray-50">
         <AppIcon name="arrow_back" size={22} color={UI.text} />
       </Pressable>
-      <Text className="flex-1 px-3 text-base font-extrabold text-emerald-700">{title}</Text>
+      <Text className="flex-1 px-3 text-base font-extrabold text-[#3E5219]">{title}</Text>
       <View className="min-w-10 items-end">{right}</View>
     </View>
   );
@@ -354,10 +354,10 @@ export function BottomNav({ active }: { active: NavKey }) {
 
   return (
     <View
-      className="border-t border-gray-200 bg-white"
+      className="border-t border-[#C5C8B8]/30 bg-[#FAF9F6]"
       style={{ paddingBottom: Math.max(insets.bottom, 8) }}
     >
-      <View className="flex-row items-center justify-around px-2 pt-2">
+      <View className="flex-row items-center justify-around px-3 pt-2">
         {items.map((item) => {
           const selected = active === item.key;
           return (
@@ -367,11 +367,11 @@ export function BottomNav({ active }: { active: NavKey }) {
               className="min-w-[60px] items-center px-2 pb-1"
             >
               {item.key === "qr" ? (
-                <View className="-mt-7 h-14 w-14 items-center justify-center rounded-full bg-emerald-500 shadow-lg">
+                <View className="-mt-7 h-14 w-14 items-center justify-center rounded-full bg-[#3E5219] shadow-md">
                   <AppIcon name="qr" size={26} color="#FFFFFF" />
                 </View>
               ) : (
-                <View className={selected ? "h-9 w-14 items-center justify-center rounded-full bg-emerald-50" : "h-9 w-14 items-center justify-center"}>
+                <View className={selected ? "h-9 w-14 items-center justify-center rounded-full bg-[#E4F1D2]" : "h-9 w-14 items-center justify-center"}>
                   <AppIcon
                     name={item.icon}
                     size={23}
@@ -379,7 +379,7 @@ export function BottomNav({ active }: { active: NavKey }) {
                   />
                 </View>
               )}
-              <Text className={"mt-1 text-[10px] font-semibold " + (selected ? "text-emerald-700" : "text-gray-500")}>
+              <Text className={"mt-1 text-[10px] font-semibold " + (selected ? "text-[#3E5219]" : "text-gray-500")}>
                 {item.label}
               </Text>
             </Pressable>
@@ -459,7 +459,7 @@ export function StatCard({ label, value, delta, tone = "green" }: { label: strin
   return (
     <GlassCard className="flex-1 p-4">
       <Text className="text-xs font-semibold text-gray-500">{label}</Text>
-      <Text className={"mt-2 text-3xl font-black " + (tone === "green" ? "text-emerald-600" : "text-amber-600")}>{value}</Text>
+      <Text className={"mt-2 text-3xl font-black " + (tone === "green" ? "text-[#3E5219]" : "text-amber-600")}>{value}</Text>
       {delta ? <Text className="mt-1 text-[11px] font-semibold text-gray-500">{delta}</Text> : null}
     </GlassCard>
   );
@@ -475,14 +475,14 @@ export function Segmented({
   onChange?: (value: string) => void;
 }) {
   return (
-    <View className="flex-row rounded-2xl border border-gray-100 bg-gray-50 p-1">
+    <View className="flex-row rounded-lg border border-[#C5C8B8]/30 bg-[#F4F3F1] p-1">
       {items.map((item) => {
         const selected = item === value;
         return (
           <Pressable
             key={item}
             onPress={() => onChange?.(item)}
-            className={"flex-1 items-center rounded-xl px-3 py-3 " + (selected ? "bg-white shadow-sm" : "")}
+            className={"flex-1 items-center rounded-md px-3 py-3 " + (selected ? "bg-white shadow-sm" : "")}
           >
             <Text className={"text-xs font-bold " + (selected ? "text-gray-900" : "text-gray-500")}>{item}</Text>
           </Pressable>
