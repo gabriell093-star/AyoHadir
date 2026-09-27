@@ -41,7 +41,7 @@ export default function AuthCallbackScreen() {
       error_description: firstParam(params.error_description)
     })
       .then(() => {
-        router.replace(safeNext);
+        router.replace(safeNext === "/update-password" ? "/update-password?mode=recovery" : "/");
       })
       .catch((error: unknown) => {
         setErrorMessage(
