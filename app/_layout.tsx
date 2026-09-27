@@ -8,6 +8,7 @@ import { useEffect } from "react";
 
 import { AuthProvider, useAuth } from "@/auth/auth-context";
 import { supabase } from "@/lib/supabase";
+import { startForegroundSync } from "@/lib/sync-service";
 
 function RootNavigator() {
   const router = useRouter();
@@ -21,6 +22,12 @@ function RootNavigator() {
 
     return () => data.subscription.unsubscribe();
   }, [router]);
+
+  useEffect(() => {
+    const stop = startForegroundSync(session?.user?.id);
+    return stop;
+  }, [session?.user?.id]);
+
   const segments = useSegments();
   const { session, loading } = useAuth();
 
