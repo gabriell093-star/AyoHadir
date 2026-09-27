@@ -6,8 +6,6 @@ import * as Linking from "expo-linking";
 import { supabase } from "@/lib/supabase";
 import { AyoHadirLogo, PrimaryButton, SecondaryButton, ButtonText } from "@/components/ui";
 
-const logo = require("../../assets/images/ayo-hadir-icon.png");
-
 export default function ForgotPasswordScreen() {
   const router = useRouter();
   const [email, setEmail] = useState("");
