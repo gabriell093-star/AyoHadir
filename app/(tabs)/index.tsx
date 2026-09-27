@@ -1,2 +1,2 @@
-import { DashboardScreen } from "@/features/approved-screens";
-export default DashboardScreen;
+import { DashboardWiredScreen } from "@/features/dashboard-wired";
+export default DashboardWiredScreen;
