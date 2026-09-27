@@ -51,12 +51,16 @@ export async function syncPendingAttendance(userId?: string) {
         "Sinkronisasi tertunda",
         reason
       );
-      await supabase.rpc("notify_sync_delayed", {
-        p_user_id: userId,
-        p_client_event_id: item.client_event_id,
-        p_qr_id: item.qr_id,
-        p_reason: reason
-      });
+      try {
+        await supabase.rpc("notify_sync_delayed", {
+          p_user_id: userId,
+          p_client_event_id: item.client_event_id,
+          p_qr_id: item.qr_id,
+          p_reason: reason
+        });
+      } catch {
+        // Notification failure must not block the retry state of the queue item.
+      }
       delayed += 1;
     }
   }
@@ -75,6 +79,9 @@ export function startForegroundSync(userId?: string) {
     running = true;
     try {
       await syncPendingAttendance(userId);
+    } catch {
+      // Keep the foreground retry loop alive if local storage or another unexpected
+      // synchronization error occurs.
     } finally {
       running = false;
     }
