@@ -10,7 +10,10 @@ export type AppIconName =
   | "home"
   | "history"
   | "qr"
+  | "qr_code_scanner"
+  | "qr_code_2"
   | "notifications"
+  | "notifications_active"
   | "person"
   | "settings"
   | "arrow_back"
@@ -33,6 +36,14 @@ export type AppIconName =
   | "tune"
   | "devices"
   | "schedule"
+  | "timer"
+  | "analytics"
+  | "trending_up"
+  | "cloud_done"
+  | "assignment_late"
+  | "lock_clock"
+  | "verified"
+  | "account_circle"
   | "more_vert"
   | "chevron_right"
   | "person_add"
@@ -68,7 +79,62 @@ const APP_ICON_IOS: Record<AppIconName, string> = {
   more_vert: "ellipsis",
   chevron_right: "chevron.right",
   person_add: "person.badge.plus",
-  photo_camera: "camera.circle"
+  photo_camera: "camera.circle",
+  qr_code_scanner: "qrcode.viewfinder",
+  qr_code_2: "qrcode",
+  notifications_active: "bell.badge",
+  timer: "timer",
+  analytics: "chart.bar",
+  trending_up: "chart.line.uptrend.xyaxis",
+  cloud_done: "checkmark.icloud",
+  assignment_late: "doc.badge.ellipsis",
+  lock_clock: "lock",
+  verified: "checkmark.seal",
+  account_circle: "person.crop.circle"
+};
+
+const APP_ICON_ANDROID: Record<AppIconName, string> = {
+  home: "home",
+  history: "history",
+  qr: "qr_code_2",
+  qr_code_scanner: "qr_code_scanner",
+  qr_code_2: "qr_code_2",
+  notifications: "notifications",
+  notifications_active: "notifications_active",
+  person: "person",
+  settings: "settings",
+  arrow_back: "arrow_back",
+  close: "close",
+  share: "share",
+  download: "download",
+  edit: "edit",
+  delete: "delete",
+  location_on: "location_on",
+  camera_alt: "camera_alt",
+  flash_on: "flash_on",
+  keyboard: "keyboard",
+  check_circle: "check_circle",
+  error: "error",
+  sync: "sync",
+  logout: "logout",
+  help: "help",
+  info: "info",
+  description: "description",
+  tune: "tune",
+  devices: "devices",
+  schedule: "schedule",
+  timer: "timer",
+  analytics: "analytics",
+  trending_up: "trending_up",
+  cloud_done: "cloud_done",
+  assignment_late: "assignment_late",
+  lock_clock: "lock_clock",
+  verified: "verified",
+  account_circle: "account_circle",
+  more_vert: "more_vert",
+  chevron_right: "chevron_right",
+  person_add: "person_add",
+  photo_camera: "photo_camera"
 };
 
 export function AppIcon({
@@ -84,8 +150,8 @@ export function AppIcon({
     <SymbolView
       name={{
         ios: APP_ICON_IOS[name],
-        android: name,
-        web: name
+        android: APP_ICON_ANDROID[name],
+        web: APP_ICON_ANDROID[name]
       }}
       size={size}
       tintColor={color}
@@ -96,17 +162,17 @@ export function AppIcon({
 }
 
 export const UI = {
-  bg: "#FFFFFF",
-  soft: "#F8FAFC",
+  bg: "#FAF9F6",
+  soft: "#F4F3F1",
   surface: "#FFFFFF",
   tint: "#F5F5DC",
-  text: "#111827",
-  muted: "#6B7280",
-  faint: "#94A3B8",
-  border: "#E5E7EB",
-  green: "#10B981",
-  greenDark: "#059669",
-  greenSoft: "#ECFDF5",
+  text: "#1A1C1A",
+  muted: "#45483C",
+  faint: "#75796B",
+  border: "#C5C8B8",
+  green: "#3E5219",
+  greenDark: "#3E5219",
+  greenSoft: "#BF EFBE".replace(" ", ""),
   yellow: "#F59E0B",
   yellowSoft: "#FFFBEB",
   red: "#EF4444",
@@ -123,7 +189,7 @@ export function Screen({ children, scroll = true, contentClassName = "", bottomN
   const insets = useSafeAreaInsets();
   const body = scroll ? (
     <ScrollView
-      className="flex-1 bg-white"
+      className="flex-1 bg-[#FAF9F6]"
       contentInsetAdjustmentBehavior="never"
       keyboardShouldPersistTaps="handled"
       contentContainerClassName={"gap-5 px-5 pt-5 " + contentClassName}
@@ -135,7 +201,7 @@ export function Screen({ children, scroll = true, contentClassName = "", bottomN
     </ScrollView>
   ) : (
     <View
-      className={"flex-1 bg-white " + contentClassName}
+      className={"flex-1 bg-[#FAF9F6] " + contentClassName}
       style={{ paddingBottom: bottomNav ? 0 : insets.bottom }}
     >
       {children}
@@ -210,7 +276,7 @@ export function PrimaryButton({
       onPress={onPress}
       disabled={disabled}
       className={
-        "min-h-12 items-center justify-center rounded-2xl bg-emerald-500 px-5 py-3.5 " +
+        "min-h-12 items-center justify-center rounded-2xl bg-[#3E5219] px-5 py-3.5 " +
         (disabled ? "opacity-50 " : "") +
         className
       }
@@ -232,7 +298,7 @@ export function SecondaryButton({
   return (
     <Pressable
       onPress={onPress}
-      className={"min-h-12 items-center justify-center rounded-2xl border border-gray-200 bg-white px-5 py-3.5 " + className}
+      className={"min-h-12 items-center justify-center rounded-2xl border border-gray-300 bg-white px-5 py-3.5 " + className}
     >
       {children}
     </Pressable>
@@ -243,7 +309,7 @@ export function DangerButton({ children, onPress }: { children: ReactNode; onPre
   return (
     <Pressable
       onPress={onPress}
-      className="min-h-12 items-center justify-center rounded-2xl border border-red-100 bg-red-50 px-5 py-3.5"
+      className="min-h-12 items-center justify-center rounded-2xl border border-red-200 bg-red-50 px-5 py-3.5"
     >
       {children}
     </Pressable>
@@ -281,7 +347,7 @@ export function BottomNav({ active }: { active: NavKey }) {
   const items: Array<{ key: NavKey; label: string; icon: AppIconName; route: string }> = [
     { key: "home", label: "Beranda", icon: "home", route: "/" },
     { key: "history", label: "Riwayat", icon: "history", route: "/history" },
-    { key: "qr", label: "QR", icon: "qr", route: "/qr" },
+    { key: "qr", label: "QR", icon: "qr_code_scanner", route: "/qr" },
     { key: "notifications", label: "Notifikasi", icon: "notifications", route: "/notifications" },
     { key: "profile", label: "Profil", icon: "person", route: "/profile" }
   ];
