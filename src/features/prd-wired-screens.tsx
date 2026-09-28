@@ -336,3 +336,17 @@ export function SyncWiredScreen(){
 }
 
 export function GuideWiredScreen(){return <Screen><BackHeader title="Panduan"/><SoftCard><Text className="text-2xl font-black">Panduan AyoHadir</Text><Text className="mt-2 text-sm text-gray-600">Buat QR, gunakan token server, scan online/offline, sinkronkan, dan cek riwayat.</Text></SoftCard>{[["Pembuatan QR","Isi nama, target, waktu mulai dan selesai. GPS mengambil koordinat aktual."],["Masa berlaku","QR memakai token server dan diperbarui berkala."],["Target pengguna","Target tertentu membutuhkan 1–100 user unik."],["Berbagi QR online","Berbagi online berisiko disalahgunakan; aktifkan GPS bila memungkinkan."],["Scan online/offline","Online divalidasi server. Offline hanya diantrikan bila token masih memiliki expiry."],["Sinkronisasi","Status: Menunggu sinkronisasi, Tersinkronisasi, Sinkronisasi tertunda."],["Riwayat & pembatalan","Bukti memakai data server; pembatalan diproses dengan attendance_id dan alasan."]].map(([a,b])=><GlassCard key={a}><Text className="font-black">{a}</Text><Text className="mt-2 text-sm leading-5 text-gray-600">{b}</Text></GlassCard>)}<View className="rounded-2xl border border-amber-200 bg-amber-50 p-4"><Text className="font-black text-amber-900">Peringatan keamanan</Text><Text className="mt-1 text-sm text-amber-800">{GPS_SHARE_WARNING}</Text></View></Screen>}
+
+export function QrHubWiredScreen(){
+ const router=useRouter();
+ return <Screen scroll={false} contentClassName="justify-end">
+  <View className="flex-1"/>
+  <View className="rounded-t-[28px] border border-gray-100 bg-white p-6 shadow-sm">
+   <View className="mx-auto h-1.5 w-12 rounded-full bg-gray-200"/>
+   <Text className="mt-5 text-xl font-black text-gray-950">Aksi QR</Text>
+   <Text className="mt-1 text-sm text-gray-500">Pilih aksi yang ingin dilakukan.</Text>
+   <PrimaryButton className="mt-5" onPress={()=>router.push("/screens/create-session")}><ButtonText>Buat QR</ButtonText></PrimaryButton>
+   <SecondaryButton className="mt-3" onPress={()=>router.push("/screens/scan-qr")}><Text className="text-sm font-bold text-gray-800">Scan QR</Text></SecondaryButton>
+  </View>
+ </Screen>;
+}
