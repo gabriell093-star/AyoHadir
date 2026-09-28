@@ -15,7 +15,7 @@ Deno.serve(withSupabase({ auth: 'user' }, async (req, ctx) => {
       return Response.json({ error: 'Rejection reason is required' }, { status: 400 })
     }
     const { error } = await ctx.supabase.rpc('server_review_cancellation', {
-      p_reviewer_id: ctx.userClaims!.sub,
+      p_reviewer_id: ctx.userClaims!.id,
       p_request_id: body.request_id,
       p_decision: body.decision,
       p_reviewer_reason: body.reviewer_reason ?? null,
