@@ -448,10 +448,26 @@ export function NotificationsPermissionScreen() {
   return (
     <Screen scroll={false} contentClassName="justify-center px-6">
       <GlassCard className="w-full max-w-md self-center">
-        <View className="items-center"><View className="h-16 w-16 items-center justify-center rounded-full bg-[#F2F5E8]"><Text className="text-3xl text-[#3E5219]">◉</Text></View><Text className="mt-4 text-center text-2xl font-black text-gray-950">Stay Updated</Text><Text className="mt-2 text-center text-sm leading-5 text-gray-500">Aktifkan notifikasi untuk menerima pembaruan penting.</Text></View>
-        <View className="mt-5"><RowButton icon="✓" title="Attendance Confirmation" subtitle="Beri tahu saat absensi berhasil atau tersinkronisasi." /><RowButton icon="↻" title="Sync Status" subtitle="Beri tahu saat sinkronisasi selesai atau tertunda." /><RowButton icon="◷" title="Schedule Changes" subtitle="Peringatan sesi dan QR yang hampir kedaluwarsa." /></View>
-        <PrimaryButton className="mt-4" onPress={() => Linking.openSettings()}><ButtonText>Enable Notifications</ButtonText></PrimaryButton>
-        <SecondaryButton className="mt-3" onPress={() => router.back()}><Text className="text-sm font-bold text-gray-800">Not Now</Text></SecondaryButton>
+        <View className="items-center">
+          <View className="h-16 w-16 items-center justify-center rounded-full bg-[#F2F5E8]">
+            <Text className="text-3xl text-[#3E5219]">◉</Text>
+          </View>
+          <Text className="mt-4 text-center text-2xl font-black text-gray-950">Notifikasi AyoHadir</Text>
+          <Text className="mt-2 text-center text-sm leading-5 text-gray-500">
+            Notifikasi absensi, QR, dan sinkronisasi tersedia langsung di pusat notifikasi aplikasi.
+          </Text>
+        </View>
+        <View className="mt-5">
+          <RowButton icon="✓" title="Absensi" subtitle="Pembaruan saat absensi berhasil atau selesai disinkronkan." />
+          <RowButton icon="↻" title="Sinkronisasi" subtitle="Pembaruan saat data offline berhasil atau tertunda." />
+          <RowButton icon="◷" title="QR" subtitle="Peringatan QR yang hampir kedaluwarsa atau sudah berakhir." />
+        </View>
+        <PrimaryButton className="mt-4" onPress={() => router.push("/notifications")}>
+          <ButtonText>Lihat Notifikasi</ButtonText>
+        </PrimaryButton>
+        <SecondaryButton className="mt-3" onPress={() => router.back()}>
+          <Text className="text-sm font-bold text-gray-800">Nanti</Text>
+        </SecondaryButton>
       </GlassCard>
     </Screen>
   );
