@@ -43,7 +43,7 @@ export async function syncPendingAttendance(userId?: string) {
         device_name: item.device_name,
         latitude: item.latitude,
         longitude: item.longitude,
-        accuracy: item.accuracy,
+        accuracy_meters: item.accuracy,
         sync_status: "pending",
         client_event_id: item.client_event_id
       });
