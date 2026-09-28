@@ -19,6 +19,12 @@ function publicError(error: unknown, fallback: string) {
   return { message: fallback, status: 400 };
 }
 
+
+function safeErrorMessage(error: unknown) {
+  const raw = error instanceof z.ZodError ? "Invalid request data" : error instanceof Error ? error.message : "";
+  const safe = ["Authentication required","Only the QR owner can cancel this attendance","Attendance record not found","Attendance already cancelled","Cancellation reason must be 3 to 1000 characters","Invalid request data","Method not allowed","Rate limit exceeded, try again later"];
+  return safe.includes(raw) ? raw : "Request failed";
+}
 Deno.serve(withSupabase({ auth: 'user' }, async (req, ctx) => {
   if (req.method !== 'POST') return Response.json({ error: 'Method not allowed' }, { status: 405 })
   try {
