@@ -1,2 +1,2 @@
-import { CancellationSubmittedScreen } from "@/features/approved-screens";
+import { CancellationSubmittedScreen } from "@/features/runtime-screens";
 export default CancellationSubmittedScreen;
