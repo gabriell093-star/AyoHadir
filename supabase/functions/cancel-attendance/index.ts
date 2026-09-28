@@ -11,7 +11,7 @@ Deno.serve(withSupabase({ auth: 'user' }, async (req, ctx) => {
   try {
     const body = bodySchema.parse(await req.json())
     const { error } = await ctx.supabase.rpc('server_cancel_attendance_by_owner', {
-      p_owner_id: ctx.userClaims!.sub,
+      p_owner_id: ctx.userClaims!.id,
       p_attendance_id: body.attendance_id,
       p_reason: body.reason
     })
