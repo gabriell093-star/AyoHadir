@@ -24,6 +24,10 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "supabaseUrl": "https://sqrvntrxoytjnbgticpd.supabase.co",
+      "supabasePublishableKey": "sb_publishable_Hv-REn65hH6zMXccfBB6mg_U_kSDW95"
     }
   }
 }
