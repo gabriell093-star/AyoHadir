@@ -1,2 +1,2 @@
-import { WelcomeScreen } from "@/features/approved-screens";
+import { WelcomeScreen } from "@/features/runtime-screens";
 export default WelcomeScreen;
