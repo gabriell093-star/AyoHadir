@@ -44,7 +44,7 @@ export default function SignInScreen() {
       await action();
     } catch (error) {
       setMessage(
-        error instanceof Error ? error.message : "Terjadi kesalahan. Coba lagi."
+        "Email atau kata sandi tidak valid, atau layanan sedang tidak tersedia. Coba lagi."
       );
     } finally {
       setBusy(false);
