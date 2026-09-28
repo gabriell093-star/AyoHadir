@@ -8,7 +8,7 @@ Deno.serve(withSupabase({ auth: 'user' }, async (req, ctx) => {
   try {
     const body = bodySchema.parse(await req.json())
     const { data, error } = await ctx.supabase.rpc('server_rotate_qr_token', {
-      p_owner_id: ctx.userClaims!.sub,
+      p_owner_id: ctx.userClaims!.id,
       p_qr_id: body.qr_id,
       p_ttl: `${body.ttl_minutes} minutes`,
     })
