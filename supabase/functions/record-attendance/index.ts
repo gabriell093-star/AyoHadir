@@ -19,7 +19,7 @@ Deno.serve(withSupabase({ auth: 'user' }, async (req, ctx) => {
   try {
     const body = bodySchema.parse(await req.json())
     const { data, error } = await ctx.supabase.rpc('server_record_attendance', {
-      p_user_id: ctx.userClaims!.sub,
+      p_user_id: ctx.userClaims!.id,
       p_qr_id: body.qr_id,
       p_token: body.token,
       p_client_event_id: body.client_event_id ?? null,
