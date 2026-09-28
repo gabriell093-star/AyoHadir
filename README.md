@@ -1,49 +1,67 @@
-# AyoHadir
+# AyoHadir!
 
-Aplikasi absensi QR Android-first menggunakan **Expo React Native + TypeScript**.
+Aplikasi absensi QR **Android-first** menggunakan Expo React Native + TypeScript.
 
-## Status
+## Sumber kebenaran
 
-Repository ini sekarang mengikuti arah pengembangan Expo. Foundation Flutter lama tidak lagi menjadi source project aktif.
+- Produk & fitur: `docs/PRD_Aplikasi_Absensi_QR.md`
+- UX: `docs/UIUX_Absensi_QR.md`
+- Baseline visual: `docs/UI_SOURCE_OF_TRUTH.md`
+- Referensi layar: `docs/ui/screens/`
+- Asset brand: `assets/images/ayo-hadir-logo.svg`
 
-### Source of truth produk
+Folder `docs/ui/legacy/` dan artefak arsip lama sudah dikeluarkan dari repository karena tidak dipakai runtime.
 
-- `docs/PRD_Aplikasi_Absensi_QR.md`
-- `docs/UIUX_Absensi_QR.md`
-- `docs/stitch/dashboard_utama_ayo_hadir.html`
-- `assets/images/ayo-hadir-logo.svg`
-
-### Stack foundation
+## Stack
 
 - Expo SDK 57
 - React Native 0.86
 - TypeScript
 - Expo Router
 - NativeWind 4
-- Zustand
-- Supabase
-- expo-sqlite
-- expo-secure-store
+- Supabase Auth + Postgres + Realtime + Edge Functions
+- expo-sqlite untuk antrean offline
+- expo-secure-store untuk sesi dan identifier instalasi
+- expo-device untuk metadata perangkat
+- react-native-qrcode-svg + react-native-svg
 
-Expo SDK 57 saat ini menargetkan React Native 0.86 dan Android API level 36. NativeWind 4.2.7 adalah jalur stabil untuk Expo SDK 57; NativeWind 5 masih pre-release.
+Android application ID: `com.ayohadir.app`
 
-## Foundation
+## Struktur backend
 
-Repository saat ini menyediakan:
-- routing Expo Router dengan lima tab dasar
-- styling NativeWind
-- struktur `src/` untuk komponen, state, theme, dan integrasi
-- Supabase client berbasis SecureStore tanpa service-role key
-- konfigurasi CNG untuk Android
-- GitHub Actions untuk doctor, typecheck, lint, prebuild Android, dan release APK build
+Source Edge Functions yang sedang dipakai tersedia di:
 
-Fitur produk seperti Auth, QR dinamis, GPS, attendance, offline sync, riwayat, pembatalan, dan notifikasi **belum dianggap selesai** pada tahap foundation.
+`supabase/functions/`
+
+Function utama:
+- create-qr
+- record-attendance
+- rotate-qr-token
+- update-qr
+- delete-qr
+- cancel-attendance
+- review-cancellation
+
+Semua function produksi diharuskan memakai autentikasi JWT.
+
+## Status fitur
+
+Alur utama PRD sudah dihubungkan ke backend nyata: akun, verifikasi email, pembuatan QR, target pengguna, GPS, token dinamis, scan online/offline, sinkronisasi, riwayat, pembatalan, notifikasi, dan audit.
+
+Data transaksi pada Supabase saat audit terakhir kosong; repository juga tidak menyimpan screen test dengan data absensi contoh.
+
+## Gate sebelum publikasi
+
+1. Organisasi Supabase harus menggunakan paket Pro sesuai kebutuhan deployment.
+2. Aktifkan Leaked Password Protection pada Supabase Auth.
+3. Pastikan GitHub Actions terbaru berhasil untuk install dependency, Expo Doctor, TypeScript, lint, guard source, dan Deno type-check Edge Functions.
+4. Setelah source gate lulus, lakukan satu build APK final dan uji perangkat nyata untuk kamera, GPS, QR dinamis, share/download, offline-sync, deep link auth, system UI, dan pembatalan.
 
 ## Validasi
 
-Jangan menganggap build berhasil hanya karena workflow tersedia. Status harus dibuktikan dari GitHub Actions.
+Jangan menganggap build berhasil hanya karena workflow atau source tersedia. Status build dan test harus dibuktikan oleh output GitHub Actions atau hasil pengujian perangkat yang nyata.
 
-Perintah lokal:
+Perintah lokal yang relevan:
 
 ```text
 npm install
