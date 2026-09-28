@@ -1,15 +1,10 @@
 import "react-native-url-polyfill/auto";
 import * as SecureStore from "expo-secure-store";
-import Constants from "expo-constants";
 import { createClient } from "@supabase/supabase-js";
 import type { SupportedStorage } from "@supabase/supabase-js";
 
-const extra = Constants.expoConfig?.extra as
-  | { supabaseUrl?: string; supabasePublishableKey?: string }
-  | undefined;
-
-const supabaseUrl = extra?.supabaseUrl;
-const supabasePublishableKey = extra?.supabasePublishableKey;
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+const supabasePublishableKey = process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
 if (!supabaseUrl || !supabasePublishableKey) {
   throw new Error("Konfigurasi Supabase aplikasi belum tersedia.");
