@@ -40,7 +40,7 @@ export async function syncPendingAttendance(userId?: string) {
     for (const item of await getPendingAttendanceQueue()) {
       try {
         await invokeEdgeFunction("record-attendance", {
-        qr_id: item.qr_id,
+          qr_id: item.qr_id,
         token: item.token,
         scanned_at: item.scanned_at,
         device_id_hash: item.device_id_hash,
@@ -49,8 +49,8 @@ export async function syncPendingAttendance(userId?: string) {
         longitude: item.longitude,
         accuracy_meters: item.accuracy,
         sync_status: "pending",
-        client_event_id: item.client_event_id
-      });
+                  client_event_id: item.client_event_id
+        });
       await markAttendanceQueueStatus(
         item.client_event_id,
         "Tersinkronisasi"
@@ -73,7 +73,7 @@ export async function syncPendingAttendance(userId?: string) {
       } catch {
         // Notification failure must not block the retry state of the queue item.
       }
-        delayed += 1;
+      delayed += 1;
       }
     }
 
@@ -85,10 +85,6 @@ export async function syncPendingAttendance(userId?: string) {
   } finally {
     activeSync = null;
   }
-}
-
-async function isAutoSyncEnabled() {
-  return (await SecureStore.getItemAsync("ayohadir_auto_sync_enabled_v1")) !== "false";
 }
 
 export function startForegroundSync(userId?: string) {
