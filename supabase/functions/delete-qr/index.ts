@@ -8,7 +8,7 @@ Deno.serve(withSupabase({ auth: 'user' }, async (req, ctx) => {
   try {
     const body = bodySchema.parse(await req.json())
     const { error } = await ctx.supabase.rpc('server_delete_qr', {
-      p_owner_id: ctx.userClaims!.sub,
+      p_owner_id: ctx.userClaims!.id,
       p_qr_id: body.qr_id,
     })
     if (error) throw error
