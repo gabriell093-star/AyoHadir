@@ -40,6 +40,7 @@ export async function syncPendingAttendance(userId?: string) {
         token: item.token,
         scanned_at: item.scanned_at,
         device_id_hash: item.device_id_hash,
+        device_name: item.device_name,
         latitude: item.latitude,
         longitude: item.longitude,
         accuracy: item.accuracy,
