@@ -1,0 +1,7 @@
+# Files not needed by the EAS build context
+.git
+.github
+docs
+*.md
+*.html
+*.xml
