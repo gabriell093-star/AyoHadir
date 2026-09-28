@@ -81,7 +81,7 @@ export default function UpdatePasswordScreen() {
         });
 
     if (error) {
-      setNotice(error.message);
+      setNotice("Password tidak dapat diperbarui. Pastikan password saat ini benar dan coba lagi.");
     } else {
       setNotice("Password berhasil diperbarui.");
       setCurrentPassword("");
