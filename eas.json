@@ -7,7 +7,8 @@
       "distribution": "internal",
       "autoIncrement": "versionCode",
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "image": "latest"
       }
     }
   }
