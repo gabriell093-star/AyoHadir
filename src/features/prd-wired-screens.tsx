@@ -247,7 +247,7 @@ export function HistorySessionWiredScreen(){
   setError(""); setMissingOffset(0);
   const [infoResult,attendanceResult,missingResult]=await Promise.all([
    supabase.rpc("get_qr_owner_details",{p_qr_id:p.qr_id}),
-   supabase.from("attendance").select("id,user_id,status,unique_code,device_name,server_recorded_at,scanned_at,sync_status,location_verified,location_accuracy_meters,profiles(display_name)").eq("qr_id",p.qr_id).order("server_recorded_at",{ascending:false}),
+   supabase.from("attendance").select("id,user_id,status,unique_code,device_id_hash,server_recorded_at,scanned_at,sync_status,location_verified,location_accuracy_meters,profiles(display_name)").eq("qr_id",p.qr_id).order("server_recorded_at",{ascending:false}),
    supabase.rpc("get_qr_owner_missing_users",{p_qr_id:p.qr_id,p_limit:50,p_offset:0})
   ]);
   const detail=Array.isArray(infoResult.data)?infoResult.data[0]:infoResult.data;
