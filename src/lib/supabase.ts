@@ -3,15 +3,13 @@ import * as SecureStore from "expo-secure-store";
 import { createClient } from "@supabase/supabase-js";
 import type { SupportedStorage } from "@supabase/supabase-js";
 
-const fallbackSupabaseUrl = "https://sqrvntrxoytjnbgticpd.supabase.co";
-const fallbackSupabasePublishableKey =
-  "sb_publishable_Hv-REn65hH6zMXccfBB6mg_U_kSDW95";
-
-const supabaseUrl =
-  process.env.EXPO_PUBLIC_SUPABASE_URL ?? fallbackSupabaseUrl;
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const supabasePublishableKey =
-  process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
-  fallbackSupabasePublishableKey;
+  process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+
+if (!supabaseUrl || !supabasePublishableKey) {
+  throw new Error("Konfigurasi Supabase aplikasi belum tersedia.");
+}
 
 const SECURE_STORE_CHUNK_SIZE = 1500;
 const CHUNK_COUNT_SUFFIX = "__chunk_count";
