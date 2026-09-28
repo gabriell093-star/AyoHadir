@@ -99,6 +99,15 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
+      - name: Check Expo token
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          test -n "$EXPO_TOKEN" || {
+            echo "EXPO_TOKEN GitHub Actions secret belum diatur."
+            exit 1
+          }
+
       - name: Link EAS project
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
