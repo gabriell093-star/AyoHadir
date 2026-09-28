@@ -1,59 +1,26 @@
 
 import type { PropsWithChildren, ReactNode } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Image, Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { SymbolView } from "expo-symbols";
 import { Circle, Ellipse, G, Path, Rect, Svg } from "react-native-svg";
 import { useRouter } from "expo-router";
 
 export function AyoHadirLogo({ size = 80 }: { size?: number }) {
+  const imageSize = Math.max(24, Math.round(size * 0.88));
   return (
-    <Svg width={size} height={size} viewBox="0 0 500 500" accessibilityLabel="Logo AyoHadir!">
-      <Circle cx="250" cy="250" r="240" fill="#FA6003" />
-      <Circle cx="250" cy="250" r="180" fill="none" stroke="#FFFFFF" strokeWidth="7" strokeDasharray="105 45" strokeDashoffset="25" />
-      <Circle cx="123" cy="123" r="14" fill="#FFFFFF" />
-      <Circle cx="377" cy="123" r="14" fill="#FFFFFF" />
-      <Circle cx="123" cy="377" r="14" fill="#FFFFFF" />
-      <Circle cx="377" cy="377" r="14" fill="#FFFFFF" />
-      <Circle cx="250" cy="245" r="95" fill="none" stroke="#FFFFFF" strokeWidth="16" />
-      <Circle cx="250" cy="195" r="32" fill="#FFFFFF" />
-      <Path d="M190 285 C190 230 310 230 310 285 Z" fill="#FFFFFF" />
-      <Path d="M205 300 L245 340 L320 255" fill="none" stroke="#FFFFFF" strokeWidth="22" strokeLinecap="round" strokeLinejoin="round" />
-      <Path d="M205 300 L245 340 L320 255" fill="none" stroke="#FA6003" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" />
-      <G transform="translate(250,95)">
-        <Circle cx="0" cy="0" r="42" fill="#FA6003" stroke="#FFFFFF" strokeWidth="12" />
-        <Path d="M0 -22 V0 L16 16" fill="none" stroke="#FFFFFF" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
-      </G>
-      <G transform="translate(100,255)">
-        <Path d="M-16 -48 H16 V-34 H-16 Z" fill="#FFFFFF" />
-        <Path d="M-8 -56 H8 V-46 H-8 Z" fill="#FA6003" />
-        <Rect x="-46" y="-34" width="92" height="72" rx="12" fill="#FFFFFF" />
-        <Circle cx="-22" cy="-6" r="10" fill="#FA6003" />
-        <Path d="M-34 18 C-34 6 -10 6 -10 18 Z" fill="#FA6003" />
-        <Rect x="4" y="-12" width="26" height="6" rx="3" fill="#FA6003" />
-        <Rect x="4" y="2" width="26" height="6" rx="3" fill="#FA6003" />
-      </G>
-      <G transform="translate(400,255)">
-        <Rect x="-40" y="-68" width="80" height="136" rx="16" fill="#FFFFFF" />
-        <Rect x="-12" y="-60" width="24" height="4" rx="2" fill="#FA6003" />
-        <Rect x="-26" y="-36" width="20" height="20" fill="none" stroke="#FA6003" strokeWidth="4" />
-        <Rect x="-22" y="-32" width="12" height="12" fill="#FA6003" />
-        <Rect x="6" y="-36" width="20" height="20" fill="none" stroke="#FA6003" strokeWidth="4" />
-        <Rect x="10" y="-32" width="12" height="12" fill="#FA6003" />
-        <Rect x="-26" y="-4" width="20" height="20" fill="none" stroke="#FA6003" strokeWidth="4" />
-        <Rect x="-22" y="0" width="12" height="12" fill="#FA6003" />
-        <Rect x="6" y="-4" width="6" height="6" fill="#FA6003" />
-        <Rect x="18" y="-4" width="8" height="6" fill="#FA6003" />
-        <Rect x="6" y="8" width="10" height="8" fill="#FA6003" />
-        <Rect x="20" y="10" width="6" height="6" fill="#FA6003" />
-        <Path d="M-32 -42 H-36 V-38 M32 -42 H36 V-38 M-32 26 H-36 V22 M32 26 H36 V22" fill="none" stroke="#FA6003" strokeWidth="3" strokeLinecap="round" />
-      </G>
-      <G transform="translate(250,410)">
-        <Ellipse cx="0" cy="30" rx="36" ry="12" fill="none" stroke="#FFFFFF" strokeWidth="7" />
-        <Path d="M0 24 C-26 0 -30 -20 -30 -34 C-30 -52 -16 -66 0 -66 C16 -66 30 -52 30 -34 C30 -20 26 0 0 24 Z" fill="#FFFFFF" />
-        <Circle cx="0" cy="-34" r="13" fill="#FA6003" />
-      </G>
-    </Svg>
+    <View
+      accessible
+      accessibilityLabel="Logo AyoHadir!"
+      className="items-center justify-center"
+      style={{ width: size, height: size }}
+    >
+      <Image
+        source={require("../../assets/images/ayo-hadir-icon.png")}
+        resizeMode="contain"
+        style={{ width: imageSize, height: imageSize }}
+      />
+    </View>
   );
 }
 
