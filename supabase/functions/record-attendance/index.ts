@@ -32,7 +32,8 @@ Deno.serve(withSupabase({ auth: 'user' }, async (req, ctx) => {
       p_accuracy_meters: body.accuracy_meters ?? null,
     })
     if (error) throw error
-    return Response.json({ attendance: data?.[0] ?? null })
+    const attendance = data?.[0] ?? null
+    return Response.json({ attendance, ...(attendance ?? {}) })
   } catch (error) {
     const message = error instanceof z.ZodError ? 'Invalid request data' : (error instanceof Error ? error.message : 'Attendance failed')
     const status = message === 'Rate limit exceeded, try again later' ? 429 : 400
