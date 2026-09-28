@@ -1,5 +1,6 @@
 import { AppState } from "react-native";
 import * as SecureStore from "expo-secure-store";
+import * as SecureStore from "expo-secure-store";
 import { getPendingAttendanceQueue, markAttendanceQueueStatus } from "@/lib/attendance-queue";
 import { invokeEdgeFunction } from "@/lib/backend";
 import { supabase } from "@/lib/supabase";
@@ -74,6 +75,10 @@ export async function syncPendingAttendance(userId?: string) {
   }
 
   return { synced, delayed };
+}
+
+async function isAutoSyncEnabled() {
+  return (await SecureStore.getItemAsync("ayohadir_auto_sync_enabled_v1")) !== "false";
 }
 
 export function startForegroundSync(userId?: string) {
