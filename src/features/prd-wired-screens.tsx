@@ -234,40 +234,37 @@ export function AttendanceProofWiredScreen(){
 export function HistorySessionWiredScreen(){
  const p=useLocalSearchParams<Record<string,string>>(); const router=useRouter();
  const [rows,setRows]=useState<any[]>([]); const [info,setInfo]=useState<any|null>(null);
- const [eligibleCount,setEligibleCount]=useState(0); const [missingNames,setMissingNames]=useState<string[]>([]); const [error,setError]=useState("");
+ const [missingUsers,setMissingUsers]=useState<{user_id:string;display_name:string|null}[]>([]);
+ const [missingTotal,setMissingTotal]=useState(0); const [missingOffset,setMissingOffset]=useState(0); const [error,setError]=useState("");
 
- useEffect(()=>{
-  const load=async()=>{
-   if(!p.qr_id)return;
-   setError("");
-   const [infoResult,attendanceResult,allowedResult,profileCountResult]=await Promise.all([
-    supabase.rpc("get_qr_owner_details",{p_qr_id:p.qr_id}),
-    supabase.from("attendance").select("id,user_id,status,unique_code,device_name,server_recorded_at,scanned_at,sync_status,location_verified,location_accuracy_meters,profiles(display_name)").eq("qr_id",p.qr_id).order("server_recorded_at",{ascending:false}),
-    supabase.from("qr_allowed_users").select("user_id").eq("qr_id",p.qr_id),
-    supabase.from("profiles").select("id",{count:"exact",head:true})
-   ]);
-   const detail=Array.isArray(infoResult.data)?infoResult.data[0]:infoResult.data;
-   if(infoResult.error||!detail){setError(infoResult.error?.message||"Detail sesi tidak tersedia.");return;}
-   if(attendanceResult.error){setError(attendanceResult.error.message);return;}
-   setInfo(detail);
-   const attendanceRows=attendanceResult.data??[];
-   setRows(attendanceRows);
-   const attendedIds=new Set(attendanceRows.map((row:any)=>row.user_id));
-   if(detail.target_mode==="specific_users"){
-    const eligibleIds=(allowedResult.data??[]).map((x:any)=>String(x.user_id));
-    setEligibleCount(eligibleIds.length);
-    const missing=eligibleIds.filter((id:string)=>!attendedIds.has(id));
-    if(missing.length){
-      const {data:profiles}=await supabase.from("profiles").select("id,display_name").in("id",missing).order("display_name",{ascending:true}).limit(100);
-      setMissingNames((profiles??[]).map((x:any)=>x.display_name||"Tanpa nama"));
-    }else setMissingNames([]);
-   }else{
-    setEligibleCount(profileCountResult.count??0);
-    setMissingNames([]);
-   }
-  };
-  void load();
- },[p.qr_id]);
+ const load=async()=>{
+  if(!p.qr_id)return;
+  setError(""); setMissingOffset(0);
+  const [infoResult,attendanceResult,missingResult]=await Promise.all([
+   supabase.rpc("get_qr_owner_details",{p_qr_id:p.qr_id}),
+   supabase.from("attendance").select("id,user_id,status,unique_code,device_name,server_recorded_at,scanned_at,sync_status,location_verified,location_accuracy_meters,profiles(display_name)").eq("qr_id",p.qr_id).order("server_recorded_at",{ascending:false}),
+   supabase.rpc("get_qr_owner_missing_users",{p_qr_id:p.qr_id,p_limit:50,p_offset:0})
+  ]);
+  const detail=Array.isArray(infoResult.data)?infoResult.data[0]:infoResult.data;
+  if(infoResult.error||!detail){setError(infoResult.error?.message||"Detail sesi tidak tersedia.");return;}
+  if(attendanceResult.error){setError(attendanceResult.error.message);return;}
+  if(missingResult.error){setError(missingResult.error.message);return;}
+  const missing=(missingResult.data??[]).map((row:any)=>({user_id:String(row.user_id),display_name:row.display_name??null}));
+  setInfo(detail); setRows(attendanceResult.data??[]); setMissingUsers(missing);
+  setMissingTotal(Number(missingResult.data?.[0]?.total_count??0));
+ };
+
+ const loadMoreMissing=async()=>{
+  if(!p.qr_id||missingUsers.length>=missingTotal)return;
+  const nextOffset=missingOffset+missingUsers.length;
+  const {data,error:e}=await supabase.rpc("get_qr_owner_missing_users",{p_qr_id:p.qr_id,p_limit:50,p_offset:nextOffset});
+  if(e){setError(e.message);return;}
+  const next=(data??[]).map((row:any)=>({user_id:String(row.user_id),display_name:row.display_name??null}));
+  setMissingOffset(nextOffset);
+  setMissingUsers(current=>[...current,...next]);
+ };
+
+ useEffect(()=>{void load();},[p.qr_id]);
 
  const syncLabel=(status:string|null|undefined)=>{
   if(status==="synced")return "Tersinkronisasi";
@@ -280,7 +277,7 @@ export function HistorySessionWiredScreen(){
   void Linking.openURL("https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(info.latitude+","+info.longitude));
  };
  const attendedCount=new Set(rows.map((row:any)=>row.user_id)).size;
- const missingCount=Math.max(0,eligibleCount-attendedCount);
+ const missingCount=missingTotal;
 
  return <Screen>
   <BackHeader title="Riwayat Kehadiran"/>
@@ -293,28 +290,13 @@ export function HistorySessionWiredScreen(){
     <View className="flex-1 rounded-2xl bg-[#F4F3F1] p-3"><Text className="text-xs text-gray-500">Belum absen</Text><Text className="mt-1 text-2xl font-black text-gray-900">{missingCount}</Text></View>
    </View>
    {info.gps_enabled
-    ?<View className="mt-4 rounded-2xl border border-[#DDE8C9] bg-[#F2F5E8] p-4">
-      <Text className="text-sm font-black text-[#3E5219]">Verifikasi lokasi aktif</Text>
-      <Text className="mt-1 text-xs leading-5 text-gray-600">Radius {info.radius_m} m · Pusat {Number(info.latitude).toFixed(6)}, {Number(info.longitude).toFixed(6)}</Text>
-      {info.latitude!=null&&info.longitude!=null?<SecondaryButton className="mt-3" onPress={openMap}><Text className="text-sm font-bold text-[#3E5219]">Buka Peta</Text></SecondaryButton>:null}
-     </View>
+    ?<View className="mt-4 rounded-2xl border border-[#DDE8C9] bg-[#F2F5E8] p-4"><Text className="text-sm font-black text-[#3E5219]">Verifikasi lokasi aktif</Text><Text className="mt-1 text-xs leading-5 text-gray-600">Radius {info.radius_m} m · Pusat {Number(info.latitude).toFixed(6)}, {Number(info.longitude).toFixed(6)}</Text>{info.latitude!=null&&info.longitude!=null?<SecondaryButton className="mt-3" onPress={openMap}><Text className="text-sm font-bold text-[#3E5219]">Buka Peta</Text></SecondaryButton>:null}</View>
     :<Text className="mt-4 text-xs text-gray-500">GPS tidak digunakan pada sesi ini.</Text>}
-   {info.target_mode==="specific_users"&&missingNames.length?<View className="mt-4"><Text className="text-sm font-black text-gray-900">Belum absen</Text>{missingNames.map((name,index)=><Text key={name+"-"+index} className="mt-1 text-xs text-gray-600">• {name}</Text>)}</View>:null}
+   {missingUsers.length?<View className="mt-4"><Text className="text-sm font-black text-gray-900">Belum absen</Text>{missingUsers.map(user=><Text key={user.user_id} className="mt-1 text-xs text-gray-600">• {user.display_name||"Tanpa nama"}</Text>)}{missingUsers.length<missingTotal?<SecondaryButton className="mt-3" onPress={()=>void loadMoreMissing()}><Text className="text-sm font-bold text-[#3E5219]">Muat berikutnya</Text></SecondaryButton>:null}</View>:<Text className="mt-4 text-xs text-gray-500">Semua pengguna dalam target sesi sudah absen.</Text>}
   </GlassCard>:null}
   {rows.length?rows.map(row=><GlassCard key={row.id}>
-   <View className="flex-row items-start justify-between">
-    <View className="flex-1">
-     <Text className="font-black text-gray-900">{row.profiles?.display_name||"Pengguna"}</Text>
-     <Text className="mt-1 text-xs text-gray-500">{row.unique_code||"-"}</Text>
-     <Text className="mt-1 text-[11px] text-gray-400">{row.server_recorded_at||row.scanned_at||"-"}</Text>
-    </View>
-    <Badge tone={row.status==="late"?"yellow":row.status==="cancelled"?"red":"green"}>{row.status==="late"?"Terlambat":row.status==="cancelled"?"Dibatalkan":"Hadir"}</Badge>
-   </View>
-   <View className="mt-3 flex-row flex-wrap gap-2">
-    <Badge tone={row.location_verified===true?"green":row.location_verified===false?"red":"gray"}>{row.location_verified===true?"GPS valid":row.location_verified===false?"GPS tidak valid":"GPS tidak digunakan"}</Badge>
-    <Badge tone={row.sync_status==="synced"?"green":row.sync_status==="delayed"?"red":"yellow"}>{syncLabel(row.sync_status)}</Badge>
-    {row.location_accuracy_meters!=null?<Badge tone="gray">Akurasi {Math.round(Number(row.location_accuracy_meters))} m</Badge>:null}
-   </View>
+   <View className="flex-row items-start justify-between"><View className="flex-1"><Text className="font-black text-gray-900">{row.profiles?.display_name||"Pengguna"}</Text><Text className="mt-1 text-xs text-gray-500">{row.unique_code||"-"}</Text><Text className="mt-1 text-[11px] text-gray-400">{row.server_recorded_at||row.scanned_at||"-"}</Text></View><Badge tone={row.status==="late"?"yellow":row.status==="cancelled"?"red":"green"}>{row.status==="late"?"Terlambat":row.status==="cancelled"?"Dibatalkan":"Hadir"}</Badge></View>
+   <View className="mt-3 flex-row flex-wrap gap-2"><Badge tone={row.location_verified===true?"green":row.location_verified===false?"red":"gray"}>{row.location_verified===true?"GPS valid":row.location_verified===false?"GPS tidak valid":"GPS tidak digunakan"}</Badge><Badge tone={row.sync_status==="synced"?"green":row.sync_status==="delayed"?"red":"yellow"}>{syncLabel(row.sync_status)}</Badge>{row.location_accuracy_meters!=null?<Badge tone="gray">Akurasi {Math.round(Number(row.location_accuracy_meters))} m</Badge>:null}{row.device_name?<Badge tone="gray">{row.device_name}</Badge>:null}</View>
    {row.status!=="cancelled"?<SecondaryButton className="mt-4" onPress={()=>router.push({pathname:"/screens/owner-cancel-attendance",params:{attendance_id:row.id,user_name:row.profiles?.display_name||"Pengguna",qr_id:p.qr_id||""}})}><Text className="text-sm font-bold text-red-700">Batalkan Absensi</Text></SecondaryButton>:null}
   </GlassCard>):<GlassCard><Text className="font-bold text-gray-900">Belum ada absensi untuk sesi ini.</Text></GlassCard>}
  </Screen>;
