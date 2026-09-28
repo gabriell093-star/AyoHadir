@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Linking, Platform, Switch, Text, View } from "react-native";
 import * as SecureStore from "expo-secure-store";
+import * as Device from "expo-device";
 import { useLocalSearchParams } from "expo-router";
 
 import { AppIcon, BackHeader, Badge, ButtonText, GlassCard, PrimaryButton, Screen, SecondaryButton } from "@/components/ui";
@@ -64,7 +65,7 @@ function DevicesSettings() {
           </View>
           <View className="ml-3 flex-1">
             <Text className="text-base font-black text-gray-950">Perangkat ini</Text>
-            <Text className="mt-1 text-xs text-gray-500">{Platform.OS === "android" ? "Android" : Platform.OS}</Text>
+            <Text className="mt-1 text-xs text-gray-500">{[Device.manufacturer, Device.modelName].filter(Boolean).join(" ") || (Platform.OS === "android" ? "Android" : Platform.OS)}</Text>
           </View>
           <Badge>Aktif</Badge>
         </View>
@@ -86,30 +87,31 @@ function DevicesSettings() {
 }
 
 function LocationSettings() {
-  const [locationEnabled, setLocationEnabled] = useState(true);
-  const [precise, setPrecise] = useState(true);
-
   return (
     <Screen>
       <BackHeader title="Pengaturan Lokasi" />
-      <SectionTitle eyebrow="Kehadiran" title="Lokasi" subtitle="Atur bagaimana GPS digunakan saat membuat dan memvalidasi absensi." />
+      <SectionTitle eyebrow="Kehadiran" title="Lokasi" subtitle="GPS digunakan mengikuti pengaturan masing-masing sesi absensi." />
 
       <GlassCard className="mt-1">
         <View className="flex-row items-center justify-between">
           <View className="flex-1 pr-4">
-            <Text className="text-base font-black text-gray-950">Izinkan lokasi</Text>
-            <Text className="mt-1 text-xs leading-5 text-gray-500">Gunakan lokasi perangkat saat sesi mengaktifkan geofencing.</Text>
+            <Text className="text-base font-black text-gray-950">Izin lokasi</Text>
+            <Text className="mt-1 text-xs leading-5 text-gray-500">
+              Aplikasi akan meminta izin lokasi saat sesi mengaktifkan verifikasi GPS.
+            </Text>
           </View>
-          <Switch value={locationEnabled} onValueChange={setLocationEnabled} trackColor={{ false: "#D9DCD1", true: "#879B5A" }} thumbColor="#FFFFFF" />
+          <Badge>Per sesi</Badge>
         </View>
 
         <View className="mt-5 border-t border-gray-100 pt-4">
           <View className="flex-row items-center justify-between">
             <View className="flex-1 pr-4">
               <Text className="text-base font-black text-gray-950">Lokasi presisi</Text>
-              <Text className="mt-1 text-xs leading-5 text-gray-500">Gunakan data lokasi yang lebih presisi saat validasi radius.</Text>
+              <Text className="mt-1 text-xs leading-5 text-gray-500">
+                Verifikasi radius menggunakan koordinat perangkat ketika GPS sesi aktif.
+              </Text>
             </View>
-            <Switch value={precise} onValueChange={setPrecise} disabled={!locationEnabled} trackColor={{ false: "#D9DCD1", true: "#879B5A" }} thumbColor="#FFFFFF" />
+            <Badge>Presisi</Badge>
           </View>
         </View>
       </GlassCard>
@@ -118,13 +120,17 @@ function LocationSettings() {
         <View className="flex-row items-start gap-3">
           <AppIcon name="info" size={20} color="#3E5219" />
           <Text className="flex-1 text-xs leading-5 text-[#2F4014]">
-            GPS tetap mengikuti pengaturan setiap sesi. Mematikan lokasi di sini tidak mengubah QR yang sudah dibuat.
+            Untuk memberi atau mencabut izin lokasi Android, gunakan pengaturan izin aplikasi. Pengaturan tersebut berlaku pada perangkat, bukan mengganti konfigurasi QR yang sudah dibuat.
           </Text>
         </View>
+        <SecondaryButton className="mt-4" onPress={() => Linking.openSettings()}>
+          <Text className="text-sm font-bold text-[#45483C]">Buka Pengaturan Android</Text>
+        </SecondaryButton>
       </GlassCard>
     </Screen>
   );
 }
+
 
 function PreferenceSettings() {
   const [autoSync, setAutoSync] = useState(true);
