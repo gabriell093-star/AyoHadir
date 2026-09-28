@@ -1,2 +1,2 @@
-import { PermissionsAccessScreen } from "@/features/approved-screens";
+import { PermissionsAccessScreen } from "@/features/runtime-screens";
 export default PermissionsAccessScreen;
