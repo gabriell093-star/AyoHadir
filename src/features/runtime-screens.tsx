@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ActivityIndicator, AppState, Image, Linking, Modal, Pressable, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Image, Linking, Modal, Pressable, Text, TextInput, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import { useAuth } from "@/auth/auth-context";
