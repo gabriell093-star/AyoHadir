@@ -1,9 +1,11 @@
 import { AppState } from "react-native";
+import * as SecureStore from "expo-secure-store";
 import { getPendingAttendanceQueue, markAttendanceQueueStatus } from "@/lib/attendance-queue";
 import { invokeEdgeFunction } from "@/lib/backend";
 import { supabase } from "@/lib/supabase";
 
 const HEALTH_URL = "https://sqrvntrxoytjnbgticpd.supabase.co/auth/v1/health";
+const AUTO_SYNC_KEY = "ayohadir_auto_sync_enabled_v1";
 
 function errorMessage(error: unknown) {
   return error instanceof Error ? error.message : "Sinkronisasi gagal.";
@@ -16,6 +18,11 @@ export async function isBackendOnline() {
   } catch {
     return false;
   }
+}
+
+async function isAutoSyncEnabled() {
+  const value = await SecureStore.getItemAsync(AUTO_SYNC_KEY);
+  return value !== "false";
 }
 
 export async function syncPendingAttendance(userId?: string) {
@@ -76,6 +83,7 @@ export function startForegroundSync(userId?: string) {
 
   const attempt = async () => {
     if (!active || running) return;
+    if (!(await isAutoSyncEnabled())) return;
     running = true;
     try {
       await syncPendingAttendance(userId);
