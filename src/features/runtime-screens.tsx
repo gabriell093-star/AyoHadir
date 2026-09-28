@@ -369,11 +369,13 @@ export function ExpiredQrScreen() {
   );
 }
 
-async function loadCancellation(id: string) {
+async function loadCancellationByAttendance(attendanceId: string) {
   const { data, error } = await supabase
     .from("cancellation_requests")
     .select("id,attendance_id,requester_id,reason,status,reviewer_reason,created_at,reviewed_at")
-    .eq("id", id)
+    .eq("attendance_id", attendanceId)
+    .order("created_at", { ascending: false })
+    .limit(1)
     .maybeSingle();
   if (error) throw error;
   return data;
@@ -416,7 +418,7 @@ export function CancellationRejectedScreen() {
 function CancellationStatusScreen({status,id}:{status:"approved"|"rejected";id?:string}) {
   const router=useRouter();
   const [item,setItem]=useState<any|null>(null);
-  useEffect(()=>{if(id) void loadCancellation(id).then(setItem).catch(()=>{});},[id]);
+  useEffect(()=>{if(id) void loadCancellationByAttendance(id).then(setItem).catch(()=>{});},[id]);
   const approved=status==="approved";
   return <Screen bottomNav="notifications">
     <BackHeader title="Status Pembatalan"/>
