@@ -8,12 +8,14 @@ permissions:
 
 jobs:
   build-apk:
-    name: Build signed release APK
+    name: Validate and build signed release APK
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
       - name: Set up Node
         uses: actions/setup-node@v6
@@ -22,6 +24,37 @@ jobs:
 
       - name: Install dependencies
         run: npm install --no-audit --no-fund
+
+      - name: Scan Git history for secrets
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Check source safety
+        shell: bash
+        run: |
+          set -euo pipefail
+          ! grep -RIn -E 'BEGIN (RSA|EC|OPENSSH|PRIVATE) KEY|SUPABASE_SERVICE_ROLE_KEY|SUPABASE_SECRET_KEY|service_role|sb_secret_|ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{20,}' app src supabase
+          ! grep -RIn -E 'dangerouslySetInnerHTML|<WebView|eval\(|new Function\(' app src
+          ! grep -RIn -E 'console\.(log|debug|info|warn|error)\(|debugger[;[:space:]]' app src supabase/functions
+
+      - name: Expo doctor
+        run: npx expo-doctor
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Set up Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+          cache: true
+
+      - name: Type check Edge Functions
+        run: deno check --all --config supabase/deno.json supabase/functions/*/index.ts
 
       - name: Check Expo token
         env:
