@@ -159,6 +159,9 @@ export function ActiveQrWiredScreen(){
    <SecondaryButton className="flex-1" onPress={()=>router.push({pathname:"/screens/edit-qr",params:{qr_id:p.qr_id||""}})} disabled={sessionEnded}><Text className="font-bold text-[#3E5219]">Edit Sesi</Text></SecondaryButton>
    <SecondaryButton className="flex-1" onPress={openArchive}><Text className="font-bold">Riwayat Kehadiran</Text></SecondaryButton>
   </View>
+  <SecondaryButton onPress={()=>router.push("/screens/cancellation-review")}>
+   <Text className="font-bold text-[#3E5219]">Review Pembatalan</Text>
+  </SecondaryButton>
   <DangerButton onPress={()=>void remove()}><Text className="font-bold text-red-700">Hapus Sesi</Text></DangerButton>
  </Screen>;
 }
