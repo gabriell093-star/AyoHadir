@@ -1,2 +1,2 @@
-import { LoginFailedScreen } from "@/features/approved-screens";
+import { LoginFailedScreen } from "@/features/runtime-screens";
 export default LoginFailedScreen;
