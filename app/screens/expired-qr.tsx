@@ -1,2 +1,2 @@
-import { ExpiredQrScreen } from "@/features/approved-screens";
+import { ExpiredQrScreen } from "@/features/runtime-screens";
 export default ExpiredQrScreen;
