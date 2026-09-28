@@ -6,7 +6,7 @@ Status: FROZEN VISUAL BASELINE
 - Product behavior and requirements: `docs/PRD_Aplikasi_Absensi_QR.md`
 - UX interaction guidance: `docs/UIUX_Absensi_QR.md`
 - Visual source of truth for implemented screens: `docs/ui/screens/`
-- Brand asset: `assets/images/ayo-hadir-logo.svg`
+- Brand asset: `assets/images/ayo-hadir-icon.png` (runtime UI logo is rendered as native SVG in `src/components/ui.tsx`)
 
 ## Rules
 1. The screens in `docs/ui/screens/` are the fixed visual reference for the Expo Android app.
