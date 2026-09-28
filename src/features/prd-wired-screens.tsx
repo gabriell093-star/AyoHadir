@@ -184,7 +184,7 @@ export function AttendanceProofWiredScreen(){
   setLoading(true);
   try{
    const [a,s]=await Promise.all([
-    supabase.from("attendance").select("id,qr_id,status,unique_code,device_name,location_verified,location_accuracy_meters,server_recorded_at,scanned_at,sync_status,qr_sessions(name)").eq("user_id",user.id).order("server_recorded_at",{ascending:false}).limit(100),
+    supabase.from("attendance").select("id,qr_id,status,unique_code,device_id_hash,location_verified,location_accuracy_meters,server_recorded_at,scanned_at,sync_status,qr_sessions(name)").eq("user_id",user.id).order("server_recorded_at",{ascending:false}).limit(100),
     supabase.from("qr_sessions").select("id,name,starts_at,ends_at,status,gps_enabled").eq("owner_id",user.id).order("starts_at",{ascending:false}).limit(100)
    ]);
    setRows(a.data??[]);
@@ -221,7 +221,7 @@ export function AttendanceProofWiredScreen(){
       </View>
       <View className="mt-4 flex-row items-center justify-between border-t border-gray-100 pt-3">
        <Text className="text-[11px] font-black tracking-[1px] text-gray-400">{row.unique_code||"-"}</Text>
-       <Pressable onPress={()=>router.push({pathname:"/screens/attendance-proof",params:{attendance_id:row.id,session_name:row.qr_sessions?.name||"Sesi QR",unique_code:row.unique_code||"",attendance_status:row.status||"",scanned_at:row.scanned_at||"",server_recorded_at:row.server_recorded_at||"",device_name:row.device_name||"",location_verified:row.location_verified===true?"Terverifikasi":row.location_verified===false?"Tidak terverifikasi":"",sync_status:row.sync_status||""}})}><Text className="font-bold text-[#3E5219]">Detail</Text></Pressable>
+       <Pressable onPress={()=>router.push({pathname:"/screens/attendance-proof",params:{attendance_id:row.id,session_name:row.qr_sessions?.name||"Sesi QR",unique_code:row.unique_code||"",attendance_status:row.status||"",scanned_at:row.scanned_at||"",server_recorded_at:row.server_recorded_at||"",device_name:row.device_id_hash?"Perangkat terdaftar":"",location_verified:row.location_verified===true?"Terverifikasi":row.location_verified===false?"Tidak terverifikasi":"",sync_status:row.sync_status||""}})}><Text className="font-bold text-[#3E5219]">Detail</Text></Pressable>
       </View>
      </GlassCard>):<GlassCard><Text className="font-bold text-gray-900">Tidak ada hasil untuk filter ini.</Text></GlassCard>)
    :(filteredSessions.length?filteredSessions.map(session=><GlassCard key={session.id}>
