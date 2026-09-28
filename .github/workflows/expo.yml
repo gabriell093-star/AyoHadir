@@ -81,7 +81,7 @@ jobs:
 
 
   build-apk:
-    name: Build Android Release APK
+    name: Build signed Android APK
     if: github.event_name == 'workflow_dispatch'
     needs: validate-source
     runs-on: ubuntu-latest
@@ -96,36 +96,21 @@ jobs:
         with:
           node-version: 24
 
-      - name: Set up Java
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: "17"
-
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Generate Android project
-        run: npx expo prebuild --platform android --non-interactive
+      - name: Link EAS project
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: npx eas-cli@latest init --force --non-interactive
 
-      - name: Build release APK
-        working-directory: android
-        run: ./gradlew assembleRelease --no-daemon --stacktrace
+      - name: Build signed APK
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: npx eas-cli@latest build --platform android --profile final-apk --non-interactive --wait
 
-      - name: Verify release APK
-        shell: bash
-        run: |
-          set -euo pipefail
-          apk="$(find android/app/build/outputs/apk/release -maxdepth 1 -type f -name '*.apk' | head -n 1)"
-          test -n "$apk"
-          test ! -d android/app/build/outputs/apk/debug
-          echo "Release APK: $apk"
-          ls -lh "$apk"
-
-      - name: Upload release APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: ayo-hadir-release-apk
-          path: android/app/build/outputs/apk/release/*.apk
-          if-no-files-found: error
-          retention-days: 7
+      - name: Show latest EAS build
+        if: always()
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: npx eas-cli@latest build:list --platform android --limit 1 --json --non-interactive
