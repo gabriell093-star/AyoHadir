@@ -5,7 +5,7 @@ export type AttendanceQueueItem = { client_event_id: string; qr_id: string; toke
 let databasePromise: Promise<SQLite.SQLiteDatabase> | null = null;
 async function getDatabase() {
   if (!databasePromise) {
-    databasePromise = SQLite.openDatabaseAsync("ayohadir-production-v1.db").then(async db => {
+    databasePromise = SQLite.openDatabaseAsync("ayohadir-production-v2.db").then(async db => {
       await db.execAsync(
         `PRAGMA journal_mode = WAL;
          CREATE TABLE IF NOT EXISTS attendance_queue (
