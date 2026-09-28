@@ -12,7 +12,8 @@
       "adaptiveIcon": {
         "backgroundColor": "#FFFFFF",
         "foregroundImage": "./assets/images/ayo-hadir-icon.png"
-      }
+      },
+      "usesCleartextTraffic": false
     },
     "plugins": [
       "expo-router",
