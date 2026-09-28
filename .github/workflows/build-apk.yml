@@ -27,7 +27,7 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install --no-audit --no-fund
 
       - name: Build final APK
         run: eas build --platform android --profile final-apk --non-interactive --wait
