@@ -167,7 +167,7 @@ export function ScanQrWiredScreen(){const router=useRouter();const[permission,re
 
 export function AttendanceProofWiredScreen(){
  const p=useLocalSearchParams<Record<string,string>>(); const router=useRouter();
- return <Screen><BackHeader title="Bukti Absensi"/><SoftCard><Text className="text-xs font-bold uppercase tracking-[2px] text-[#3E5219]">{p.queued==="true"?"Menunggu sinkronisasi":"Absensi tervalidasi server"}</Text><Text className="mt-2 text-2xl font-black text-gray-950">{p.queued==="true"?"Absensi tersimpan di perangkat":"Absensi tercatat"}</Text><Text className="mt-2 text-sm leading-5 text-gray-600">{p.queued==="true"?"Data akan divalidasi server saat koneksi tersedia.":"Bukti ini menggunakan hasil validasi server AyoHadir."}</Text></SoftCard><GlassCard>{[["Sesi",p.session_name],["Kode unik",p.unique_code],["Status",p.attendance_status],["Waktu scan",p.scanned_at],["Tercatat server",p.server_recorded_at],["Lokasi terverifikasi",p.location_verified]].map(([k,v])=>v?<View key={k} className="flex-row justify-between border-b border-gray-100 py-3"><Text className="text-xs text-gray-500">{k}</Text><Text className="max-w-[62%] text-right text-sm font-bold text-gray-900">{v}</Text></View>:null)}{p.queued==="true"?<><Badge tone="yellow">Menunggu sinkronisasi</Badge><SecondaryButton className="mt-4" onPress={()=>router.push("/screens/sync-data")}><Text className="text-sm font-bold text-[#3E5219]">Lihat Sinkronisasi</Text></SecondaryButton></>:null}</GlassCard>{p.queued!=="true"&&p.attendance_id?<SecondaryButton onPress={()=>router.push({pathname:"/screens/cancellation-request",params:{attendance_id:p.attendance_id}})}><Text className="text-sm font-bold text-red-700">Ajukan Pembatalan</Text></SecondaryButton>:null}</Screen>;
+ return <Screen><BackHeader title="Bukti Absensi"/><SoftCard><Text className="text-xs font-bold uppercase tracking-[2px] text-[#3E5219]">{p.queued==="true"?"Menunggu sinkronisasi":"Absensi tervalidasi server"}</Text><Text className="mt-2 text-2xl font-black text-gray-950">{p.queued==="true"?"Absensi tersimpan di perangkat":"Absensi tercatat"}</Text><Text className="mt-2 text-sm leading-5 text-gray-600">{p.queued==="true"?"Data akan divalidasi server saat koneksi tersedia.":"Bukti ini menggunakan hasil validasi server AyoHadir."}</Text></SoftCard><GlassCard>{[["Sesi",p.session_name],["Kode unik",p.unique_code],["Status",p.attendance_status],["Waktu scan",p.scanned_at],["Tercatat server",p.server_recorded_at],["Perangkat",p.device_name],["Lokasi terverifikasi",p.location_verified]].map(([k,v])=>v?<View key={k} className="flex-row justify-between border-b border-gray-100 py-3"><Text className="text-xs text-gray-500">{k}</Text><Text className="max-w-[62%] text-right text-sm font-bold text-gray-900">{v}</Text></View>:null)}{p.queued==="true"?<><Badge tone="yellow">Menunggu sinkronisasi</Badge><SecondaryButton className="mt-4" onPress={()=>router.push("/screens/sync-data")}><Text className="text-sm font-bold text-[#3E5219]">Lihat Sinkronisasi</Text></SecondaryButton></>:null}</GlassCard>{p.queued!=="true"&&p.attendance_id?<SecondaryButton onPress={()=>router.push({pathname:"/screens/cancellation-request",params:{attendance_id:p.attendance_id}})}><Text className="text-sm font-bold text-red-700">Ajukan Pembatalan</Text></SecondaryButton>:null}</Screen>;
 }export function HistoryWiredScreen(){
  const {user}=useAuth(); const router=useRouter();
  const [mode,setMode]=useState("Absensi Saya"); const [query,setQuery]=useState("");
@@ -180,7 +180,7 @@ export function AttendanceProofWiredScreen(){
   setLoading(true);
   try{
    const [a,s]=await Promise.all([
-    supabase.from("attendance").select("id,qr_id,status,unique_code,location_verified,location_accuracy_meters,server_recorded_at,scanned_at,sync_status,qr_sessions(name)").eq("user_id",user.id).order("server_recorded_at",{ascending:false}).limit(100),
+    supabase.from("attendance").select("id,qr_id,status,unique_code,device_name,location_verified,location_accuracy_meters,server_recorded_at,scanned_at,sync_status,qr_sessions(name)").eq("user_id",user.id).order("server_recorded_at",{ascending:false}).limit(100),
     supabase.from("qr_sessions").select("id,name,starts_at,ends_at,status,gps_enabled").eq("owner_id",user.id).order("starts_at",{ascending:false}).limit(100)
    ]);
    setRows(a.data??[]);
@@ -217,7 +217,7 @@ export function AttendanceProofWiredScreen(){
       </View>
       <View className="mt-4 flex-row items-center justify-between border-t border-gray-100 pt-3">
        <Text className="text-[11px] font-black tracking-[1px] text-gray-400">{row.unique_code||"-"}</Text>
-       <Pressable onPress={()=>router.push({pathname:"/screens/attendance-proof",params:{attendance_id:row.id,session_name:row.qr_sessions?.name||"Sesi QR",unique_code:row.unique_code||"",attendance_status:row.status||"",scanned_at:row.scanned_at||"",server_recorded_at:row.server_recorded_at||"",location_verified:row.location_verified===true?"Terverifikasi":row.location_verified===false?"Tidak terverifikasi":"",sync_status:row.sync_status||""}})}><Text className="font-bold text-[#3E5219]">Detail</Text></Pressable>
+       <Pressable onPress={()=>router.push({pathname:"/screens/attendance-proof",params:{attendance_id:row.id,session_name:row.qr_sessions?.name||"Sesi QR",unique_code:row.unique_code||"",attendance_status:row.status||"",scanned_at:row.scanned_at||"",server_recorded_at:row.server_recorded_at||"",device_name:row.device_name||"",location_verified:row.location_verified===true?"Terverifikasi":row.location_verified===false?"Tidak terverifikasi":"",sync_status:row.sync_status||""}})}><Text className="font-bold text-[#3E5219]">Detail</Text></Pressable>
       </View>
      </GlassCard>):<GlassCard><Text className="font-bold text-gray-900">Tidak ada hasil untuk filter ini.</Text></GlassCard>)
    :(filteredSessions.length?filteredSessions.map(session=><GlassCard key={session.id}>
@@ -239,7 +239,7 @@ export function HistorySessionWiredScreen(){
    setError("");
    const [infoResult,attendanceResult,allowedResult,profileCountResult]=await Promise.all([
     supabase.rpc("get_qr_owner_details",{p_qr_id:p.qr_id}),
-    supabase.from("attendance").select("id,user_id,status,unique_code,server_recorded_at,scanned_at,sync_status,location_verified,location_accuracy_meters,profiles(display_name)").eq("qr_id",p.qr_id).order("server_recorded_at",{ascending:false}),
+    supabase.from("attendance").select("id,user_id,status,unique_code,device_name,server_recorded_at,scanned_at,sync_status,location_verified,location_accuracy_meters,profiles(display_name)").eq("qr_id",p.qr_id).order("server_recorded_at",{ascending:false}),
     supabase.from("qr_allowed_users").select("user_id").eq("qr_id",p.qr_id),
     supabase.from("profiles").select("id",{count:"exact",head:true})
    ]);
