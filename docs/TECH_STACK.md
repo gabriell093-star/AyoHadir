@@ -8,7 +8,6 @@
 - NativeWind 4
 
 ## State
-- Zustand
 
 ## Backend
 - Supabase
@@ -27,4 +26,4 @@ Generate Android files with:
 npx expo prebuild --platform android --non-interactive
 ```
 
-CI generates Android files temporarily and builds a release APK for verification.
+CI validates source and Edge Functions; Android native files are generated only for the final build.
