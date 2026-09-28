@@ -72,7 +72,7 @@ jobs:
           cache: true
 
       - name: Type check Edge Functions
-        run: deno check --all supabase/functions/*/index.ts
+        run: deno check --all --config supabase/deno.json supabase/functions/*/index.ts
 
       - name: Guard legacy green tokens
         run: |
