@@ -26,7 +26,15 @@ jobs:
           node-version: 24
 
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        run: npm install
+
+      - name: Secret and debug guard
+        shell: bash
+        run: |
+          set -euo pipefail
+          ! grep -RIn --exclude-dir=.git --exclude='package-lock.json' --exclude='*.md' -E '(BEGIN (RSA|EC|OPENSSH|PRIVATE) KEY|SUPABASE_SERVICE_ROLE_KEY|service_role|ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{20,})' . 
+          ! grep -RIn --exclude-dir=.git -E 'dangerouslySetInnerHTML|<WebView|eval\(|new Function\(' app src
+          ! grep -RIn --exclude-dir=.git -E 'console\.(log|debug|info)\(' app src supabase/functions || true --no-audit --no-fund
 
       - name: Expo doctor
         run: npx expo-doctor
