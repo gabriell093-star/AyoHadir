@@ -20,7 +20,6 @@ When a required product screen/state is absent from the approved references, cre
 - TypeScript
 - Expo Router
 - NativeWind v4
-- Zustand
 - Supabase
 - expo-sqlite
 - expo-secure-store
@@ -30,8 +29,6 @@ When a required product screen/state is absent from the approved references, cre
 - src/components/: reusable UI
 - src/features/: feature-specific logic
 - src/lib/: integrations/infrastructure
-- src/state/: Zustand stores
-- src/theme/: design tokens
 
 ## Security
 - Client may use only the Supabase publishable/anon key.
