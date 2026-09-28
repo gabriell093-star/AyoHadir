@@ -62,7 +62,7 @@ export function CreateSessionWiredScreen(){
  const [error,setError]=useState("");
  useEffect(()=>{
   if(target!=="Pengguna Tertentu"){setUsers([]);setSelected([]);return;}
-  void supabase.from("profiles").select("id,display_name").ilike("display_name","%"+userQuery.trim()+"%").order("display_name",{ascending:true}).limit(100).then(({data,error:e})=>{if(e){setError(e.message);setUsers([]);return;}setUsers(data??[]);});
+  void supabase.from("profiles").select("id,display_name").ilike("display_name","%"+userQuery.trim()+"%").order("display_name",{ascending:true}).limit(100).then(({data,error:e})=>{if(e){setError("Daftar pengguna tidak dapat dimuat.");setUsers([]);return;}setUsers(data??[]);});
  },[target,userQuery]);
  const adjust=(hours:number)=>{const next=Math.max(1,Math.min(24,hours));setDuration(next);const d=parseTime(start);d.setHours(d.getHours()+next);setEnd(timeText(d));};
  const review=()=>{
@@ -265,9 +265,9 @@ export function HistorySessionWiredScreen(){
    supabase.rpc("get_qr_owner_missing_users",{p_qr_id:p.qr_id,p_limit:50,p_offset:0})
   ]);
   const detail=Array.isArray(infoResult.data)?infoResult.data[0]:infoResult.data;
-  if(infoResult.error||!detail){setError(infoResult.error?.message||"Detail sesi tidak tersedia.");return;}
-  if(attendanceResult.error){setError(attendanceResult.error.message);return;}
-  if(missingResult.error){setError(missingResult.error.message);return;}
+  if(infoResult.error||!detail){setError("Detail sesi tidak tersedia.");return;}
+  if(attendanceResult.error){setError("Riwayat kehadiran tidak dapat dimuat.");return;}
+  if(missingResult.error){setError("Daftar peserta yang belum absen tidak dapat dimuat.");return;}
   const missing=(missingResult.data??[]).map((row:any)=>({user_id:String(row.user_id),display_name:row.display_name??null}));
   setInfo(detail); setRows(attendanceResult.data??[]); setMissingUsers(missing);
   setMissingTotal(Number(missingResult.data?.[0]?.total_count??0));
@@ -277,7 +277,7 @@ export function HistorySessionWiredScreen(){
   if(!p.qr_id||missingUsers.length>=missingTotal)return;
   const nextOffset=missingOffset+missingUsers.length;
   const {data,error:e}=await supabase.rpc("get_qr_owner_missing_users",{p_qr_id:p.qr_id,p_limit:50,p_offset:nextOffset});
-  if(e){setError(e.message);return;}
+  if(e){setError("Sesi QR tidak dapat dimuat.");return;}
   const next=(data??[]).map((row:any)=>({user_id:String(row.user_id),display_name:row.display_name??null}));
   setMissingOffset(nextOffset);
   setMissingUsers(current=>[...current,...next]);
@@ -332,7 +332,7 @@ export function NotificationsWiredScreen(){
  const [loaded,setLoaded]=useState(false); const [busy,setBusy]=useState(false); const [error,setError]=useState("");
  const [title,setTitle]=useState(""); const [target,setTarget]=useState("Semua Pengguna"); const [late,setLate]=useState(15); const [gps,setGps]=useState(false); const [radius,setRadius]=useState(150); const [start,setStart]=useState(""); const [end,setEnd]=useState(""); const [lat,setLat]=useState<number|null>(null); const [lon,setLon]=useState<number|null>(null);
  const [users,setUsers]=useState<{id:string;display_name:string|null}[]>([]); const [selected,setSelected]=useState<string[]>([]); const [userQuery,setUserQuery]=useState("");
- const load=async()=>{setError("");if(!p.qr_id)return;const{data,error:e}=await supabase.rpc("get_qr_owner_details",{p_qr_id:p.qr_id});const row=Array.isArray(data)?data[0]:data;if(e||!row){setError(e?.message||"Sesi QR tidak ditemukan.");return;}setTitle(row.name||"");setTarget(row.target_mode==="specific_users"?"Pengguna Tertentu":"Semua Pengguna");setLate(Number(row.late_after_minutes||15));setGps(Boolean(row.gps_enabled));setRadius(Number(row.radius_m||150));setLat(typeof row.latitude==="number"?row.latitude:null);setLon(typeof row.longitude==="number"?row.longitude:null);const sd=new Date(row.starts_at),ed=new Date(row.ends_at);setStart(timeText(sd));setEnd(timeText(ed));const{data:allowed}=await supabase.from("qr_allowed_users").select("user_id").eq("qr_id",p.qr_id);setSelected((allowed??[]).map((x:any)=>x.user_id));setLoaded(true);};
+ const load=async()=>{setError("");if(!p.qr_id)return;const{data,error:e}=await supabase.rpc("get_qr_owner_details",{p_qr_id:p.qr_id});const row=Array.isArray(data)?data[0]:data;if(e||!row){setError("Sesi QR tidak ditemukan.");return;}setTitle(row.name||"");setTarget(row.target_mode==="specific_users"?"Pengguna Tertentu":"Semua Pengguna");setLate(Number(row.late_after_minutes||15));setGps(Boolean(row.gps_enabled));setRadius(Number(row.radius_m||150));setLat(typeof row.latitude==="number"?row.latitude:null);setLon(typeof row.longitude==="number"?row.longitude:null);const sd=new Date(row.starts_at),ed=new Date(row.ends_at);setStart(timeText(sd));setEnd(timeText(ed));const{data:allowed}=await supabase.from("qr_allowed_users").select("user_id").eq("qr_id",p.qr_id);setSelected((allowed??[]).map((x:any)=>x.user_id));setLoaded(true);};
  useEffect(()=>{void load();},[p.qr_id]);
  useEffect(()=>{if(target!=="Pengguna Tertentu")return;void supabase.from("profiles").select("id,display_name").ilike("display_name","%"+userQuery.trim()+"%").order("display_name",{ascending:true}).limit(100).then(({data})=>setUsers(data??[]));},[target,userQuery]);
  const save=async()=>{if(busy)return;setError("");if(!/^\\d{1,2}:\\d{2}$/.test(start)||!/^\\d{1,2}:\\d{2}$/.test(end))return setError("Waktu mulai dan selesai harus menggunakan format HH:mm.");const {start:s,end:e,durationHours}=parseTimeRange(start,end),ms=durationHours*3600000;if(ms<3600000||ms>86400000)return setError("Durasi sesi harus antara 1 dan 24 jam.");if(target==="Pengguna Tertentu"&&(selected.length<1||selected.length>100))return setError("Pilih minimal 1 dan maksimal 100 pengguna unik.");let latitude=lat,longitude=lon;if(gps&&(latitude===null||longitude===null)){const permission=await Location.requestForegroundPermissionsAsync();if(!permission.granted)return setError("Izin lokasi diperlukan saat GPS diaktifkan.");const loc=await Location.getCurrentPositionAsync({accuracy:Location.Accuracy.High});latitude=loc.coords.latitude;longitude=loc.coords.longitude;}if(gps&&(latitude===null||longitude===null))return setError("Lokasi pusat QR tidak tersedia.");setBusy(true);try{await invokeEdgeFunction("update-qr",{qr_id:p.qr_id,name:title.trim(),target_mode:target==="Pengguna Tertentu"?"specific_users":"all_users",starts_at:s.toISOString(),ends_at:e.toISOString(),late_after_minutes:late,gps_enabled:gps,latitude:gps?latitude:null,longitude:gps?longitude:null,radius_m:gps?radius:null,allowed_user_ids:target==="Pengguna Tertentu"?selected:[]});router.replace({pathname:"/screens/active-qr",params:{qr_id:p.qr_id,title:title.trim(),starts_at:s.toISOString(),ends_at:e.toISOString(),gps:String(gps),radius:String(radius)}});}catch(err){setError(msg(err));}finally{setBusy(false);}};
