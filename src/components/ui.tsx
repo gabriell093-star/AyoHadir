@@ -583,7 +583,7 @@ export function ProgressBar({ value }: { value: number }) {
   );
 }
 
-export function MiniCalendar({ date = "15 Agustus 2024" }: { date?: string }) {
+export function MiniCalendar({ date = "Tanggal sesi" }: { date?: string }) {
   return (
     <View className="flex-row items-center rounded-2xl bg-gray-50 px-4 py-3">
       <Text className="mr-3 text-lg text-[#3E5219]">▣</Text>
