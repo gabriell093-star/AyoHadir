@@ -348,38 +348,6 @@ export function NotificationsPermissionScreen() {
 }
 
 
-export function ExpiredQrScreen() {
-  const router = useRouter();
-  const p = useLocalSearchParams<Record<string,string>>();
-  return (
-    <Screen bottomNav="history">
-      <BackHeader title="Detail Sesi" />
-      <View className="items-center pt-3">
-        <View className="h-20 w-20 items-center justify-center rounded-full bg-gray-100"><Text className="text-3xl text-gray-500">×</Text></View>
-        <Text className="mt-5 text-2xl font-black text-gray-950">QR Kedaluwarsa</Text>
-        <Badge tone="gray">Kedaluwarsa</Badge>
-      </View>
-      <GlassCard>
-        <Text className="text-base font-black text-gray-900">{p.title || "Sesi QR"}</Text>
-        <Text className="mt-1 text-sm text-gray-500">{p.ends_at ? "Berakhir " + p.ends_at : "Sesi sudah berakhir"}</Text>
-        <Text className="mt-4 text-sm leading-6 text-gray-600">Sesi sudah tidak dapat digunakan untuk absensi. Riwayat tetap tersimpan sebagai arsip.</Text>
-      </GlassCard>
-      <PrimaryButton onPress={() => router.push({pathname:"/history",params:{mode:"Sesi Saya"}} as any)}><ButtonText>Lihat Riwayat</ButtonText></PrimaryButton>
-    </Screen>
-  );
-}
-
-async function loadCancellationByAttendance(attendanceId: string) {
-  const { data, error } = await supabase
-    .from("cancellation_requests")
-    .select("id,attendance_id,requester_id,reason,status,reviewer_reason,created_at,reviewed_at")
-    .eq("attendance_id", attendanceId)
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  if (error) throw error;
-  return data;
-}
 
 export function CancellationSubmittedScreen() {
   const router = useRouter();
@@ -405,29 +373,4 @@ export function CancellationSubmittedScreen() {
   );
 }
 
-export function CancellationApprovedScreen() {
-  const p = useLocalSearchParams<Record<string,string>>();
-  return <CancellationStatusScreen status="approved" id={p.attendance_id} />;
-}
 
-export function CancellationRejectedScreen() {
-  const p = useLocalSearchParams<Record<string,string>>();
-  return <CancellationStatusScreen status="rejected" id={p.attendance_id} />;
-}
-
-function CancellationStatusScreen({status,id}:{status:"approved"|"rejected";id?:string}) {
-  const router=useRouter();
-  const [item,setItem]=useState<any|null>(null);
-  useEffect(()=>{if(id) void loadCancellationByAttendance(id).then(setItem).catch(()=>{});},[id]);
-  const approved=status==="approved";
-  return <Screen bottomNav="notifications">
-    <BackHeader title="Status Pembatalan"/>
-    <GlassCard>
-      <Badge tone={approved?"green":"red"}>{approved?"Disetujui":"Ditolak"}</Badge>
-      <Text className="mt-3 text-2xl font-black text-gray-950">{approved?"Permintaan pembatalan disetujui":"Pengajuan pembatalan ditolak"}</Text>
-      <Text className="mt-2 text-sm leading-5 text-gray-500">{item?.reason||"Catatan pembatalan tersimpan bersama jejak keputusan."}</Text>
-    </GlassCard>
-    {item?.reviewer_reason?<GlassCard><Text className="text-xs font-bold text-gray-500">Catatan Peninjau</Text><Text className="mt-2 text-sm leading-5 text-gray-700">{item.reviewer_reason}</Text></GlassCard>:null}
-    <PrimaryButton onPress={()=>router.push("/history")}><ButtonText>Kembali ke Riwayat</ButtonText></PrimaryButton>
-  </Screen>;
-}
