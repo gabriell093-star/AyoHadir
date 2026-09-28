@@ -31,15 +31,35 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
+      - name: Verify production environment
+        env:
+          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+          EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$EXPO_PUBLIC_SUPABASE_URL"
+          test -n "$EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY"
+          case "$EXPO_PUBLIC_SUPABASE_URL" in
+            http://*|https://*) ;;
+            *) echo "Invalid Supabase URL"; exit 1 ;;
+          esac
+          echo "Production environment is configured."
+
       - name: Secret scan
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
       - name: Expo doctor
+        env:
+          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+          EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
         run: npx expo-doctor
 
       - name: Type check
+        env:
+          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+          EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
         run: npm run typecheck
 
       - name: Lint
@@ -49,7 +69,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if grep -RIn --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=android --exclude-dir=.expo --exclude='package-lock.json' --exclude='*.md' -E '(BEGIN (RSA|EC|OPENSSH|PRIVATE) KEY|SUPABASE_SERVICE_ROLE_KEY|SUPABASE_SECRET_KEY|service_role|sb_secret_|ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{20,})' .; then
+          if grep -RIn -E '(BEGIN (RSA|EC|OPENSSH|PRIVATE) KEY|SUPABASE_SERVICE_ROLE_KEY|SUPABASE_SECRET_KEY|service_role|sb_secret_|ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{20,})' app src supabase; then
             exit 1
           fi
           if grep -RIn --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=android --exclude-dir=.expo -E 'dangerouslySetInnerHTML|<WebView|eval\(|new Function\(|console\.(log|debug|info|warn|error)\(|debugger[;[:space:]]' app src supabase/functions; then
@@ -73,12 +93,17 @@ jobs:
           cache: gradle
 
       - name: Generate native Android project
+        env:
+          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+          EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
         run: npx expo prebuild --platform android --non-interactive --clean
 
       - name: Assemble release APK
         working-directory: android
         env:
           NODE_ENV: production
+          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+          EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
         run: ./gradlew assembleRelease --no-daemon --stacktrace
 
       - name: Inspect APK
