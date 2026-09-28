@@ -50,9 +50,7 @@ export default function AuthCallbackScreen() {
       })
       .catch((error: unknown) => {
         setErrorMessage(
-          error instanceof Error
-            ? error.message
-            : "Autentikasi gagal. Coba lagi."
+          "Autentikasi gagal atau tautan sudah tidak berlaku. Coba lagi."
         );
       });
   }, [params, router]);
