@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, ScrollView, Share, Switch, Text, TextInput, View } from "react-native";
 import { Camera, CameraView, useCameraPermissions } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
@@ -10,7 +10,7 @@ import * as Sharing from "expo-sharing";
 import * as FileSystem from "expo-file-system/legacy";
 import * as Crypto from "expo-crypto";
 import QRCode from "react-native-qrcode-svg";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useAuth } from "@/auth/auth-context";
 import { invokeEdgeFunction, BackendFunctionError } from "@/lib/backend";
 import { getDeviceIdHash, getDeviceName } from "@/lib/device-id";
@@ -127,11 +127,15 @@ export function ActiveQrWiredScreen(){
 
  useEffect(()=>{
   void loadInfo();
-  void rotate();
   const refresh=setInterval(()=>void rotate(),600000);
   const clock=setInterval(()=>setNow(Date.now()),1000);
   return()=>{clearInterval(refresh);clearInterval(clock);};
  },[p.qr_id]);
+
+ useFocusEffect(useCallback(()=>{
+  void loadInfo();
+  void rotate();
+ },[p.qr_id]));
 
  const remaining=expires?Math.max(0,Math.floor((Date.parse(expires)-now)/1000)):null;
  const sessionEnded=info?.ends_at?Date.parse(info.ends_at)<=now:(p.ends_at?Date.parse(p.ends_at)<=now:false);
