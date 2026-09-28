@@ -1,0 +1,14 @@
+title = "AyoHadir secret scanning"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Supabase publishable client key is intentionally public in the mobile bundle"
+paths = [
+  '''(^|/)app\.json$'''
+]
+regexTarget = "line"
+regexes = [
+  '''"supabasePublishableKey"\s*:\s*"sb_publishable_[A-Za-z0-9_-]+"'''
+]
