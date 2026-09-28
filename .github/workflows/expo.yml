@@ -32,15 +32,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if grep -RIn --exclude-dir=.git --exclude='package-lock.json' --exclude='*.md' -E '(BEGIN (RSA|EC|OPENSSH|PRIVATE) KEY|SUPABASE_SERVICE_ROLE_KEY|SUPABASE_SECRET_KEY|service_role|sb_secret_|ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{20,})' .; then
+          if grep -RIn -E '(BEGIN (RSA|EC|OPENSSH|PRIVATE) KEY|SUPABASE_SERVICE_ROLE_KEY|SUPABASE_SECRET_KEY|service_role|sb_secret_|ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{20,})' app src supabase; then
             echo "Potential secret detected in repository."
             exit 1
           fi
-          if grep -RIn --exclude-dir=.git -E 'dangerouslySetInnerHTML|<WebView|eval\(|new Function\(' app src; then
+          if grep -RIn -E 'dangerouslySetInnerHTML|<WebView|eval\(|new Function\(' app src; then
             echo "Unsafe web/eval primitive detected."
             exit 1
           fi
-          if grep -RIn --exclude-dir=.git -E 'console\.(log|debug|info|warn|error)\(|debugger[;[:space:]]' app src supabase/functions; then
+          if grep -RIn -E 'console\.(log|debug|info|warn|error)\(|debugger[;[:space:]]' app src supabase/functions; then
             echo "Debug logging or debugger statement detected."
             exit 1
           fi
