@@ -1,2 +1,2 @@
-import { NotificationsPermissionScreen } from "@/features/approved-screens";
+import { NotificationsPermissionScreen } from "@/features/runtime-screens";
 export default NotificationsPermissionScreen;
