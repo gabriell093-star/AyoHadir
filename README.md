@@ -52,9 +52,9 @@ Data transaksi pada Supabase saat audit 28 September 2026 kosong. Repository tid
 
 ## Gate sebelum publikasi
 
-1. Organisasi Supabase harus menggunakan paket Pro sesuai kebutuhan deployment.
-2. Aktifkan Leaked Password Protection pada Supabase Auth.
-3. Pastikan GitHub Actions terbaru berhasil untuk install dependency, Expo Doctor, TypeScript, lint, guard source, dan Deno type-check Edge Functions.
+1. Supabase Free tetap didukung oleh arsitektur aplikasi; tidak ada ketergantungan runtime yang mensyaratkan Pro.
+2. Leaked Password Protection tidak tersedia pada Supabase Free; mitigasi yang tetap aktif adalah password policy/Auth bawaan, SecureStore, PKCE, RLS, dan validasi server.
+3. Pastikan GitHub Actions terbaru berhasil untuk install dependency, Expo Doctor, TypeScript, lint, source-secret guards, dan Deno type-check Edge Functions.
 4. Setelah source gate lulus, lakukan satu build APK final dan uji perangkat nyata untuk kamera, GPS, QR dinamis, share/download, offline-sync, deep link auth, system UI, dan pembatalan.
 
 ## Validasi
