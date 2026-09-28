@@ -10,6 +10,7 @@ jobs:
   build-apk:
     name: Build signed release APK
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -18,16 +19,31 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 24
-          cache: npm
-
-      - name: Set up Expo and EAS
-        uses: expo/expo-github-action@v8
-        with:
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Build final APK
-        run: eas build --platform android --profile final-apk --non-interactive --wait
+      - name: Check Expo token
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          test -n "$EXPO_TOKEN" || {
+            echo "EXPO_TOKEN GitHub Actions secret belum diatur."
+            exit 1
+          }
+
+      - name: Link EAS project
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: npx eas-cli@latest init --force --non-interactive
+
+      - name: Build signed release APK
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: npx eas-cli@latest build --platform android --profile final-apk --non-interactive --wait
+
+      - name: Show latest EAS build
+        if: always()
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: npx eas-cli@latest build:list --platform android --limit 1 --json --non-interactive
