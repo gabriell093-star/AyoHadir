@@ -1,2 +1,2 @@
-import { PermissionNeededScreen } from "@/features/approved-screens";
+import { PermissionNeededScreen } from "@/features/runtime-screens";
 export default PermissionNeededScreen;
