@@ -27,7 +27,7 @@ export default function ForgotPasswordScreen() {
     const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, { redirectTo });
 
     if (error) {
-      setNotice(error.message);
+      setNotice("Permintaan reset password tidak dapat diproses. Coba lagi.");
     } else {
       setNotice("Jika akun dengan email tersebut tersedia, tautan reset password telah dikirim. Cek inbox dan folder spam.");
     }
