@@ -38,7 +38,7 @@ export default function VerifyEmailScreen() {
     });
 
     if (error) {
-      setNotice(error.message);
+      setNotice("Email verifikasi tidak dapat dikirim ulang. Coba lagi beberapa saat.");
     } else {
       setNotice("Email verifikasi dikirim ulang. Cek kotak masuk dan folder spam.");
     }
