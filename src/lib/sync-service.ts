@@ -1,12 +1,18 @@
 import { AppState } from "react-native";
 import * as SecureStore from "expo-secure-store";
-import { getPendingAttendanceQueue, markAttendanceQueueStatus } from "@/lib/attendance-queue";
+
+import {
+  getPendingAttendanceQueue,
+  markAttendanceQueueStatus
+} from "@/lib/attendance-queue";
 import { invokeEdgeFunction } from "@/lib/backend";
 import { supabase } from "@/lib/supabase";
 
-const HEALTH_URL = "https://sqrvntrxoytjnbgticpd.supabase.co/auth/v1/health";
-let activeSync: Promise<{ synced: number; delayed: number }> | null = null;
+const HEALTH_URL =
+  "https://sqrvntrxoytjnbgticpd.supabase.co/auth/v1/health";
 const AUTO_SYNC_KEY = "ayohadir_auto_sync_enabled_v1";
+
+let activeSync: Promise<{ synced: number; delayed: number }> | null = null;
 
 function errorMessage(error: unknown) {
   return error instanceof Error ? error.message : "Sinkronisasi gagal.";
@@ -27,7 +33,9 @@ async function isAutoSyncEnabled() {
 }
 
 export async function syncPendingAttendance(userId?: string) {
-  if (activeSync) return activeSync;
+  if (activeSync) {
+    return activeSync;
+  }
 
   activeSync = (async () => {
     if (!userId || !(await isBackendOnline())) {
@@ -41,39 +49,43 @@ export async function syncPendingAttendance(userId?: string) {
       try {
         await invokeEdgeFunction("record-attendance", {
           qr_id: item.qr_id,
-        token: item.token,
-        scanned_at: item.scanned_at,
-        device_id_hash: item.device_id_hash,
-        device_name: item.device_name,
-        latitude: item.latitude,
-        longitude: item.longitude,
-        accuracy_meters: item.accuracy,
-        sync_status: "pending",
-                  client_event_id: item.client_event_id
+          token: item.token,
+          scanned_at: item.scanned_at,
+          device_id_hash: item.device_id_hash,
+          device_name: item.device_name,
+          latitude: item.latitude,
+          longitude: item.longitude,
+          accuracy_meters: item.accuracy,
+          sync_status: "pending",
+          client_event_id: item.client_event_id
         });
-      await markAttendanceQueueStatus(
-        item.client_event_id,
-        "Tersinkronisasi"
-      );
-      synced += 1;
-    } catch (error) {
-      const reason = errorMessage(error);
-      await markAttendanceQueueStatus(
-        item.client_event_id,
-        "Sinkronisasi tertunda",
-        reason
-      );
-      try {
-        await supabase.rpc("notify_sync_delayed", {
-          p_user_id: userId,
-          p_client_event_id: item.client_event_id,
-          p_qr_id: item.qr_id,
-          p_reason: reason
-        });
-      } catch {
-        // Notification failure must not block the retry state of the queue item.
-      }
-      delayed += 1;
+
+        await markAttendanceQueueStatus(
+          item.client_event_id,
+          "Tersinkronisasi"
+        );
+        synced += 1;
+      } catch (error) {
+        const reason = errorMessage(error);
+
+        await markAttendanceQueueStatus(
+          item.client_event_id,
+          "Sinkronisasi tertunda",
+          reason
+        );
+
+        try {
+          await supabase.rpc("notify_sync_delayed", {
+            p_user_id: userId,
+            p_client_event_id: item.client_event_id,
+            p_qr_id: item.qr_id,
+            p_reason: reason
+          });
+        } catch {
+          // Notification failure must not block the queue retry state.
+        }
+
+        delayed += 1;
       }
     }
 
@@ -88,29 +100,39 @@ export async function syncPendingAttendance(userId?: string) {
 }
 
 export function startForegroundSync(userId?: string) {
-  if (!userId) return () => {};
+  if (!userId) {
+    return () => {};
+  }
 
   let active = true;
   let running = false;
 
   const attempt = async () => {
-    if (!active || running) return;
-    if (!(await isAutoSyncEnabled())) return;
+    if (!active || running || !(await isAutoSyncEnabled())) {
+      return;
+    }
+
     running = true;
+
     try {
       await syncPendingAttendance(userId);
     } catch {
-      // Keep the foreground retry loop alive if local storage or another unexpected
-      // synchronization error occurs.
+      // Keep the foreground retry loop alive after an unexpected failure.
     } finally {
       running = false;
     }
   };
 
   void attempt();
-  const interval = setInterval(() => void attempt(), 60_000);
-  const subscription = AppState.addEventListener("change", state => {
-    if (state === "active") void attempt();
+
+  const interval = setInterval(() => {
+    void attempt();
+  }, 60_000);
+
+  const subscription = AppState.addEventListener("change", (state) => {
+    if (state === "active") {
+      void attempt();
+    }
   });
 
   return () => {
