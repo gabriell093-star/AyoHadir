@@ -3,7 +3,6 @@ import type { PropsWithChildren, ReactNode } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { SymbolView } from "expo-symbols";
-import QRCode from "react-native-qrcode-svg";
 import { Circle, Ellipse, G, Path, Rect, Svg } from "react-native-svg";
 import { useRouter } from "expo-router";
 
@@ -547,47 +546,6 @@ export function Segmented({
           </Pressable>
         );
       })}
-    </View>
-  );
-}
-
-export function QrVisual({
-  size = 236,
-  label = "QR",
-  value = "AyoHadir QR"
-}: {
-  size?: number;
-  label?: string;
-  value?: string;
-}) {
-  return (
-    <View className="items-center justify-center rounded-xl border-2 border-[#DDE8C9] bg-white p-3">
-      <QRCode
-        value={value}
-        size={size}
-        backgroundColor="#FFFFFF"
-        color="#111827"
-        quietZone={4}
-        ecl="M"
-      />
-      <Text className="mt-2 text-[10px] font-bold tracking-[2px] text-gray-300">{label}</Text>
-    </View>
-  );
-}
-
-export function ProgressBar({ value }: { value: number }) {
-  return (
-    <View className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
-      <View className="h-full rounded-full bg-[#3E5219]" style={{ width: `${Math.max(0, Math.min(100, value))}%` }} />
-    </View>
-  );
-}
-
-export function MiniCalendar({ date = "Tanggal sesi" }: { date?: string }) {
-  return (
-    <View className="flex-row items-center rounded-2xl bg-gray-50 px-4 py-3">
-      <Text className="mr-3 text-lg text-[#3E5219]">▣</Text>
-      <Text className="text-sm font-semibold text-gray-700">{date}</Text>
     </View>
   );
 }
