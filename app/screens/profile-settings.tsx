@@ -1,2 +1,2 @@
-import { ProfileSettingsScreen } from "@/features/approved-screens";
+import { ProfileSettingsScreen } from "@/features/runtime-screens";
 export default ProfileSettingsScreen;
