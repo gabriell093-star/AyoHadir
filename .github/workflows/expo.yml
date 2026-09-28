@@ -49,6 +49,10 @@ jobs:
         run: |
           ! grep -R -n -E 'onPress=\{\(\) => \{\}\}|onPress=\{\(\) => null\}|onPress=\{\(\) => undefined\}' app src
 
+      - name: Guard committed secrets
+        run: |
+          ! grep -R -n -E 'sb_secret_|service_role|SUPABASE_SERVICE_ROLE_KEY|-----BEGIN .*PRIVATE KEY-----|re_[A-Za-z0-9]{20,}' app src supabase .env.example package.json app.json 2>/dev/null
+
       - name: Set up Deno
         uses: denoland/setup-deno@v2
         with:
