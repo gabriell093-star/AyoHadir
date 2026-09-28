@@ -70,4 +70,4 @@ npm run typecheck
 npm run lint
 npx expo prebuild --platform android --non-interactive
 cd android && ./gradlew assembleRelease
-```
+```\n## Release candidate\n\nVersion: `0.3.5` · Android package: `com.ayohadir.app`\n\nSource/runtime test fixtures are excluded from the production bundle. Transactional Supabase tables are empty at final audit time.\n
