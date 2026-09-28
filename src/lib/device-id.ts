@@ -1,5 +1,6 @@
 import * as Crypto from "expo-crypto";
 import * as SecureStore from "expo-secure-store";
+import * as Device from "expo-device";
 
 const DEVICE_ID_KEY = "ayohadir_device_installation_id_v1";
 
@@ -10,4 +11,11 @@ export async function getDeviceIdHash(): Promise<string> {
     await SecureStore.setItemAsync(DEVICE_ID_KEY, deviceId);
   }
   return Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, deviceId);
+}
+
+export function getDeviceName(): string {
+  const parts = [Device.manufacturer, Device.modelName].filter(
+    (value): value is string => Boolean(value)
+  );
+  return parts.join(" ") || Device.deviceName || "Android";
 }
