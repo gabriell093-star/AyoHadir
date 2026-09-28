@@ -1,2 +1,2 @@
-import { QrHubScreen } from "@/features/approved-screens";
-export default QrHubScreen;
+import { QrHubWiredScreen } from "@/features/prd-wired-screens";
+export default QrHubWiredScreen;
