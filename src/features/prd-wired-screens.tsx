@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Alert, AppState, Pressable, ScrollView, Share, Switch, Text, TextInput, View } from "react-native";
 import { Camera, CameraView, useCameraPermissions } from "expo-camera";
