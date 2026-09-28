@@ -27,7 +27,7 @@ Deno.serve(withSupabase({ auth: 'user' }, async (req, ctx) => {
       throw new Error('QR duration must be between 1 and 24 hours')
     }
     const { error } = await ctx.supabase.rpc('server_update_qr', {
-      p_owner_id: ctx.userClaims!.sub,
+      p_owner_id: ctx.userClaims!.id,
       p_qr_id: body.qr_id,
       p_name: body.name,
       p_target_mode: body.target_mode,
