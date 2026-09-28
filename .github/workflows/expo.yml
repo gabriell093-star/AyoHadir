@@ -79,6 +79,11 @@ jobs:
         run: |
           ! grep -R -n -E 'emerald-[0-9]+|#10B981|#059669' app src
 
+      - name: Guard debug artifacts and hardcoded secrets
+        run: |
+          ! grep -R -n -E '(^|[^A-Za-z])(console\.log|debugger|__DEV__)([^A-Za-z]|$)' app src
+          ! grep -R -n -E 'BEGIN (RSA|EC|OPENSSH|PRIVATE) KEY|service_role|SUPABASE_SERVICE_ROLE_KEY|ghp_[A-Za-z0-9_]+|sk_live_[A-Za-z0-9]+' app src .github supabase
+
 
   build-apk:
     name: Build signed Android APK
