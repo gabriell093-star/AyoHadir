@@ -144,6 +144,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (!cleanedName) {
           throw new Error("Nama tidak boleh kosong.");
         }
+        if (cleanedName.length > 80) {
+          throw new Error("Nama maksimal 80 karakter.");
+        }
 
         const { data, error } = await supabase
           .from("profiles")
