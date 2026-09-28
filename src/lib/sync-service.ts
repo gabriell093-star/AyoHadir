@@ -1,6 +1,5 @@
 import { AppState } from "react-native";
 import * as SecureStore from "expo-secure-store";
-import * as SecureStore from "expo-secure-store";
 import { getPendingAttendanceQueue, markAttendanceQueueStatus } from "@/lib/attendance-queue";
 import { invokeEdgeFunction } from "@/lib/backend";
 import { supabase } from "@/lib/supabase";
@@ -40,7 +39,7 @@ export async function syncPendingAttendance(userId?: string) {
 
     for (const item of await getPendingAttendanceQueue()) {
       try {
-      await invokeEdgeFunction("record-attendance", {
+        await invokeEdgeFunction("record-attendance", {
         qr_id: item.qr_id,
         token: item.token,
         scanned_at: item.scanned_at,
@@ -74,7 +73,7 @@ export async function syncPendingAttendance(userId?: string) {
       } catch {
         // Notification failure must not block the retry state of the queue item.
       }
-      delayed += 1;
+        delayed += 1;
       }
     }
 
