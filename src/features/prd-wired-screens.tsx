@@ -21,7 +21,21 @@ import { supabase } from "@/lib/supabase";
 import { AppIcon, BackHeader, Badge, ButtonText, DangerButton, GlassCard, OfflineBanner, PrimaryButton, Screen, SecondaryButton, SectionTitle, Segmented, SoftCard } from "@/components/ui";
 
 const GPS_SHARE_WARNING = "Perhatian: QR yang dibagikan secara online memiliki risiko penyalahgunaan. Kami menyarankan mengaktifkan verifikasi lokasi (GPS) untuk meningkatkan keamanan absensi.";
-const msg=(e:unknown)=>e instanceof BackendFunctionError||e instanceof Error?e.message:"Terjadi kesalahan.";
+const SAFE_ERROR_PATTERNS: Array<[RegExp,string]> = [
+  [/izin lokasi diperlukan/i,"Izin lokasi diperlukan untuk melanjutkan."],
+  [/izin galeri diperlukan/i,"Izin galeri diperlukan untuk menyimpan QR."],
+  [/qr belum siap/i,"QR belum siap. Coba lagi."],
+  [/server tidak mengembalikan/i,"Server tidak mengembalikan data yang diperlukan."],
+  [/lokasi pusat qr tidak tersedia/i,"Lokasi pusat QR tidak tersedia."],
+  [/sesi qr tidak ditemukan/i,"Sesi QR tidak ditemukan."],
+  [/attendance tidak ditemukan/i,"Data absensi tidak ditemukan."],
+  [/alasan minimal/i,"Alasan pembatalan terlalu pendek."],
+];
+const msg=(e:unknown)=>{
+  const raw=e instanceof BackendFunctionError||e instanceof Error?e.message:"";
+  const safe=SAFE_ERROR_PATTERNS.find(([pattern])=>pattern.test(raw));
+  return safe?.[1]??(e instanceof BackendFunctionError?raw:"Terjadi kesalahan. Coba lagi.");
+};
 const pick=(d:any,...keys:string[])=>{for(const k of keys){const v=d?.[k]??d?.data?.[k]??d?.result?.[k]??d?.attendance?.[k]??d?.data?.attendance?.[k];if(v!==undefined&&v!==null)return v;}return undefined;};
 const parseTime=(s:string)=>{const m=/^(\d{1,2}):(\d{2})$/.exec(s.trim());const d=new Date();if(m)d.setHours(Math.min(23,+m[1]),Math.min(59,+m[2]),0,0);return d;};
 const timeText=(d:Date)=>d.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit",hour12:false});
