@@ -3,12 +3,12 @@ title = "AyoHadir secret scanning"
 [extend]
 useDefault = true
 
-[[allowlists]]
-description = "Supabase publishable client key is intentionally public in the mobile bundle"
-paths = [
-  '''(^|/)app\.json$'''
-]
-regexTarget = "line"
-regexes = [
-  '''"supabasePublishableKey"\s*:\s*"sb_publishable_[A-Za-z0-9_-]+"'''
-]
+[[rules]]
+id = "generic-api-key"
+
+  [[rules.allowlists]]
+  description = "Supabase publishable key is intentionally bundled in the mobile client"
+  condition = "AND"
+  regexTarget = "line"
+  paths = ['''^app\.json$''']
+  regexes = ['''"supabasePublishableKey"\s*:\s*"sb_publishable_[A-Za-z0-9_-]+"''']
