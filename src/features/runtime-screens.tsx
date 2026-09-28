@@ -203,7 +203,7 @@ export function ProfileSettingsScreen() {
       setAvatar(data.publicUrl);
       setNotice("Foto profil berhasil diperbarui.");
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Foto profil gagal disimpan.");
+      setNotice("Foto profil gagal disimpan. Periksa ukuran/format file dan coba lagi.");
     } finally {
       setAvatarBusy(false);
     }
@@ -219,7 +219,7 @@ export function ProfileSettingsScreen() {
       await updateDisplayName(name);
       setNotice("Perubahan profil berhasil disimpan.");
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Profil tidak dapat disimpan.");
+      setNotice("Profil tidak dapat disimpan. Periksa nama lalu coba lagi.");
     } finally {
       setSaving(false);
     }
