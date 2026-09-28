@@ -6,6 +6,7 @@ import { invokeEdgeFunction } from "@/lib/backend";
 import { supabase } from "@/lib/supabase";
 
 const HEALTH_URL = "https://sqrvntrxoytjnbgticpd.supabase.co/auth/v1/health";
+let activeSync: Promise<{ synced: number; delayed: number }> | null = null;
 const AUTO_SYNC_KEY = "ayohadir_auto_sync_enabled_v1";
 
 function errorMessage(error: unknown) {
@@ -27,15 +28,18 @@ async function isAutoSyncEnabled() {
 }
 
 export async function syncPendingAttendance(userId?: string) {
-  if (!userId || !(await isBackendOnline())) {
-    return { synced: 0, delayed: 0 };
-  }
+  if (activeSync) return activeSync;
 
-  let synced = 0;
-  let delayed = 0;
+  activeSync = (async () => {
+    if (!userId || !(await isBackendOnline())) {
+      return { synced: 0, delayed: 0 };
+    }
 
-  for (const item of await getPendingAttendanceQueue()) {
-    try {
+    let synced = 0;
+    let delayed = 0;
+
+    for (const item of await getPendingAttendanceQueue()) {
+      try {
       await invokeEdgeFunction("record-attendance", {
         qr_id: item.qr_id,
         token: item.token,
@@ -71,10 +75,17 @@ export async function syncPendingAttendance(userId?: string) {
         // Notification failure must not block the retry state of the queue item.
       }
       delayed += 1;
+      }
     }
-  }
 
-  return { synced, delayed };
+    return { synced, delayed };
+  })();
+
+  try {
+    return await activeSync;
+  } finally {
+    activeSync = null;
+  }
 }
 
 async function isAutoSyncEnabled() {
