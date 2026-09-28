@@ -46,9 +46,9 @@ Semua function produksi diharuskan memakai autentikasi JWT.
 
 ## Status fitur
 
-Alur utama PRD sudah dihubungkan ke backend nyata: akun, verifikasi email, pembuatan QR, target pengguna, GPS, token dinamis, scan online/offline, sinkronisasi, riwayat, pembatalan, notifikasi, dan audit.
+Implementasi runtime utama sudah dihubungkan ke backend nyata: akun, verifikasi email, pembuatan QR, target pengguna, GPS, token dinamis, scan online/offline, sinkronisasi, riwayat, pembatalan, notifikasi, dan audit.
 
-Data transaksi pada Supabase saat audit terakhir kosong; repository juga tidak menyimpan screen test dengan data absensi contoh.
+Data transaksi pada Supabase saat audit 28 September 2026 kosong. Repository tidak menyimpan screen test dengan data absensi contoh.
 
 ## Gate sebelum publikasi
 
