@@ -1,6 +1,5 @@
 import { AppState } from "react-native";
 import * as SecureStore from "expo-secure-store";
-import * as SecureStore from "expo-secure-store";
 import { getPendingAttendanceQueue, markAttendanceQueueStatus } from "@/lib/attendance-queue";
 import { invokeEdgeFunction } from "@/lib/backend";
 import { supabase } from "@/lib/supabase";
