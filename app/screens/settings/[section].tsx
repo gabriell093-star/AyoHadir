@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Linking, Platform, Switch, Text, View } from "react-native";
+import * as SecureStore from "expo-secure-store";
 import { useLocalSearchParams } from "expo-router";
 
 import { AppIcon, BackHeader, Badge, ButtonText, GlassCard, PrimaryButton, Screen, SecondaryButton } from "@/components/ui";
@@ -126,8 +127,18 @@ function LocationSettings() {
 }
 
 function PreferenceSettings() {
-  const [notifications, setNotifications] = useState(true);
   const [autoSync, setAutoSync] = useState(true);
+
+  useEffect(() => {
+    void SecureStore.getItemAsync("ayohadir_auto_sync_enabled_v1").then(value => {
+      if (value === "false") setAutoSync(false);
+    });
+  }, []);
+
+  const toggleAutoSync = async (value: boolean) => {
+    setAutoSync(value);
+    await SecureStore.setItemAsync("ayohadir_auto_sync_enabled_v1", String(value));
+  };
 
   return (
     <Screen>
@@ -137,24 +148,35 @@ function PreferenceSettings() {
       <GlassCard className="mt-1">
         <View className="flex-row items-center justify-between">
           <View className="flex-1 pr-4">
-            <Text className="text-base font-black text-gray-950">Notifikasi</Text>
-            <Text className="mt-1 text-xs leading-5 text-gray-500">Pembaruan absensi, QR, dan sinkronisasi.</Text>
+            <Text className="text-base font-black text-gray-950">Notifikasi in-app</Text>
+            <Text className="mt-1 text-xs leading-5 text-gray-500">
+              Pembaruan absensi, QR, dan sinkronisasi tersedia di pusat notifikasi.
+            </Text>
           </View>
-          <Switch value={notifications} onValueChange={setNotifications} trackColor={{ false: "#D9DCD1", true: "#879B5A" }} thumbColor="#FFFFFF" />
+          <Badge>Aktif</Badge>
         </View>
+
         <View className="mt-5 border-t border-gray-100 pt-4">
           <View className="flex-row items-center justify-between">
             <View className="flex-1 pr-4">
               <Text className="text-base font-black text-gray-950">Sinkronisasi otomatis</Text>
-              <Text className="mt-1 text-xs leading-5 text-gray-500">Kirim data offline saat koneksi tersedia.</Text>
+              <Text className="mt-1 text-xs leading-5 text-gray-500">
+                Kirim data offline saat koneksi tersedia dan aplikasi aktif.
+              </Text>
             </View>
-            <Switch value={autoSync} onValueChange={setAutoSync} trackColor={{ false: "#D9DCD1", true: "#879B5A" }} thumbColor="#FFFFFF" />
+            <Switch
+              value={autoSync}
+              onValueChange={toggleAutoSync}
+              trackColor={{ false: "#D9DCD1", true: "#879B5A" }}
+              thumbColor="#FFFFFF"
+            />
           </View>
         </View>
       </GlassCard>
     </Screen>
   );
 }
+
 
 function HelpSettings() {
   const faqs = [
