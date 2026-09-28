@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Alert, AppState, Pressable, ScrollView, Share, Switch, Text, TextInput, View } from "react-native";
 import { Camera, CameraView, useCameraPermissions } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
+import * as Linking from "expo-linking";
 import * as Location from "expo-location";
 import * as MediaLibrary from "expo-media-library";
 import * as Sharing from "expo-sharing";
@@ -87,7 +88,14 @@ export function QrSuccessWiredScreen(){const p=useLocalSearchParams<Record<strin
 
 export function ActiveQrWiredScreen(){
  const p=useLocalSearchParams<Record<string,string>>(); const router=useRouter(); const ref=useRef<any>(null);
- const [token,setToken]=useState(p.token||""); const [expires,setExpires]=useState(p.token_expires_at||""); const [rotating,setRotating]=useState(false); const [now,setNow]=useState(Date.now());
+ const [token,setToken]=useState(p.token||""); const [expires,setExpires]=useState(p.token_expires_at||""); const [rotating,setRotating]=useState(false); const [now,setNow]=useState(Date.now()); const [info,setInfo]=useState<any|null>(null);
+
+ const loadInfo=async()=>{
+  if(!p.qr_id)return;
+  const {data}=await supabase.rpc("get_qr_owner_details",{p_qr_id:p.qr_id});
+  const row=Array.isArray(data)?data[0]:data;
+  if(row)setInfo(row);
+ };
 
  const rotate=async()=>{
   if(!p.qr_id||rotating)return;
@@ -102,6 +110,7 @@ export function ActiveQrWiredScreen(){
  };
 
  useEffect(()=>{
+  void loadInfo();
   void rotate();
   const refresh=setInterval(()=>void rotate(),600000);
   const clock=setInterval(()=>setNow(Date.now()),1000);
@@ -109,6 +118,7 @@ export function ActiveQrWiredScreen(){
  },[p.qr_id]);
 
  const remaining=expires?Math.max(0,Math.floor((Date.parse(expires)-now)/1000)):null;
+ const sessionEnded=p.ends_at?Date.parse(p.ends_at)<=now:false;
  const countdown=remaining===null?"-":String(Math.floor(remaining/60)).padStart(2,"0")+":"+String(remaining%60).padStart(2,"0");
 
  const remove=async()=>{
@@ -117,30 +127,36 @@ export function ActiveQrWiredScreen(){
  };
 
  const openArchive=()=>router.replace({pathname:"/screens/history-session",params:{qr_id:p.qr_id||""}});
+ const openMap=()=>{
+  if(info?.latitude==null||info?.longitude==null)return;
+  void Linking.openURL("https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(info.latitude+","+info.longitude));
+ };
 
  return <Screen>
   <BackHeader title="Detail Sesi QR"/>
-  <Text className="text-2xl font-black text-[#3E5219]">{p.title||"Sesi QR"}</Text>
-  <Text className="mt-1 text-xs text-gray-500">{p.starts_at||""} → {p.ends_at||""}</Text>
+  <Text className="text-2xl font-black text-[#3E5219]">{p.title||info?.name||"Sesi QR"}</Text>
+  <Text className="mt-1 text-xs text-gray-500">{p.starts_at||info?.starts_at||""} → {p.ends_at||info?.ends_at||""}</Text>
+  {sessionEnded?<SoftCard><Text className="font-black text-gray-900">Sesi ini sudah kedaluwarsa</Text><Text className="mt-1 text-xs leading-5 text-gray-600">QR tidak dapat digunakan lagi. Riwayat absensi tetap tersimpan sebagai arsip.</Text><PrimaryButton className="mt-4" onPress={openArchive}><ButtonText>Lihat Arsip</ButtonText></PrimaryButton></SoftCard>:null}
   <GlassCard className="mt-5 items-center">
    <View className="flex-row items-center gap-2">
-    <Badge tone={remaining===0?"red":"green"}>{remaining===0?"Token Kedaluwarsa":"QR Aktif"}</Badge>
-    {rotating?<ActivityIndicator size="small" color="#3E5219"/>:null}
+    <Badge tone={sessionEnded||remaining===0?"red":"green"}>{sessionEnded?"Sesi Kedaluwarsa":remaining===0?"Token Kedaluwarsa":"QR Aktif"}</Badge>
+    {rotating&&!sessionEnded?<ActivityIndicator size="small" color="#3E5219"/>:null}
    </View>
-   <Text className="mt-3 text-4xl font-black tracking-[2px] text-[#3E5219]">{countdown}</Text>
-   <Text className="mt-1 text-xs text-gray-500">{remaining===0?"Token perlu diperbarui.":"Sisa token dinamis"}</Text>
-   <View className="mt-4 rounded-xl border-2 border-[#DDE8C9] bg-white p-4">
+   <Text className="mt-3 text-4xl font-black tracking-[2px] text-[#3E5219]">{sessionEnded?"--:--":countdown}</Text>
+   <Text className="mt-1 text-xs text-gray-500">{sessionEnded?"Sesi telah berakhir":remaining===0?"Token perlu diperbarui.":"Sisa token dinamis"}</Text>
+   {!sessionEnded?<View className="mt-4 rounded-xl border-2 border-[#DDE8C9] bg-white p-4">
     <QRCode getRef={(r:any)=>{ref.current=r}} value={createQrPayload({qr_id:p.qr_id||"",token,token_expires_at:expires||undefined,gps_enabled:p.gps==="true"})} size={232}/>
-   </View>
-   <Text className="mt-3 text-[11px] text-gray-400">{expires?("Berlaku sampai "+new Date(expires).toLocaleTimeString()):"Menunggu token server"}</Text>
+   </View>:null}
+   {!sessionEnded?<Text className="mt-3 text-[11px] text-gray-400">{expires?("Berlaku sampai "+new Date(expires).toLocaleTimeString()):"Menunggu token server"}</Text>:null}
   </GlassCard>
-  {remaining===0?<PrimaryButton onPress={()=>void rotate()} disabled={rotating}><ButtonText>{rotating?"Memperbarui token…":"Perbarui token"}</ButtonText></PrimaryButton>:null}
-  <View className="flex-row gap-3">
+  {!sessionEnded&&remaining===0?<PrimaryButton onPress={()=>void rotate()} disabled={rotating}><ButtonText>{rotating?"Memperbarui token…":"Perbarui token"}</ButtonText></PrimaryButton>:null}
+  {!sessionEnded?<View className="flex-row gap-3">
    <SecondaryButton className="flex-1" onPress={()=>void shareQr(ref.current,p.gps==="true")}><Text className="font-bold">Bagikan QR</Text></SecondaryButton>
    <SecondaryButton className="flex-1" onPress={()=>void saveQr(ref.current)}><Text className="font-bold">Download</Text></SecondaryButton>
-  </View>
+  </View>:null}
+  {info?.gps_enabled?<GlassCard><Text className="text-sm font-black text-[#3E5219]">Verifikasi lokasi aktif</Text><Text className="mt-1 text-xs leading-5 text-gray-600">Radius {info.radius_m} m · Pusat {Number(info.latitude).toFixed(6)}, {Number(info.longitude).toFixed(6)}</Text>{info.latitude!=null&&info.longitude!=null?<SecondaryButton className="mt-3" onPress={openMap}><Text className="text-sm font-bold text-[#3E5219]">Buka Peta</Text></SecondaryButton>:null}</GlassCard>:<GlassCard><Text className="text-xs text-gray-500">GPS tidak digunakan pada sesi ini.</Text></GlassCard>}
   <View className="flex-row gap-3">
-   <SecondaryButton className="flex-1" onPress={()=>router.push({pathname:"/screens/edit-qr",params:{qr_id:p.qr_id||""}})}><Text className="font-bold text-[#3E5219]">Edit Sesi</Text></SecondaryButton>
+   <SecondaryButton className="flex-1" onPress={()=>router.push({pathname:"/screens/edit-qr",params:{qr_id:p.qr_id||""}})} disabled={sessionEnded}><Text className="font-bold text-[#3E5219]">Edit Sesi</Text></SecondaryButton>
    <SecondaryButton className="flex-1" onPress={openArchive}><Text className="font-bold">Riwayat Kehadiran</Text></SecondaryButton>
   </View>
   <DangerButton onPress={()=>void remove()}><Text className="font-bold text-red-700">Hapus Sesi</Text></DangerButton>
