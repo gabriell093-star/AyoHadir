@@ -522,24 +522,62 @@ export function HistorySessionWiredScreen(){
 }
 
 export function NotificationsWiredScreen(){
- const {user}=useAuth(); const [items,setItems]=useState<any[]>([]);
+ const {user}=useAuth(); const router=useRouter(); const [items,setItems]=useState<any[]>([]);
  const load=async()=>{if(!user?.id)return;const{data}=await supabase.from("notifications").select("id,title,body,type,read_at,created_at,data").eq("user_id",user.id).order("created_at",{ascending:false}).limit(100);setItems(data??[]);};
  const mark=async(id:string)=>{const{error}=await supabase.rpc("mark_notification_read",{p_notification_id:id});if(!error)setItems(current=>current.map(item=>item.id===id?{...item,read_at:item.read_at??new Date().toISOString()}:item));};
+ const openNotification=async(item:any)=>{
+  await mark(item.id);
+  const data=item.data??{};
+  if(item.type==="attendance_success"||item.type==="attendance_sync_complete"){
+   if(data.attendance_id) router.push({pathname:"/screens/attendance-proof",params:{attendance_id:String(data.attendance_id)}});
+   return;
+  }
+  if(item.type==="qr_expiring"){
+   if(data.qr_id) router.push({pathname:"/screens/active-qr",params:{qr_id:String(data.qr_id),title:String(data.qr_name??"Sesi QR")}});
+   return;
+  }
+  if(item.type==="qr_expired"){
+   if(data.qr_id) router.push({pathname:"/screens/history-session",params:{qr_id:String(data.qr_id)}});
+   return;
+  }
+  if(item.type==="cancellation_requested"){
+   router.push("/screens/cancellation-review");
+   return;
+  }
+  if(item.type==="cancellation_approved"||item.type==="cancellation_rejected"||item.type==="attendance_cancelled"){
+   if(data.attendance_id) router.push({pathname:"/screens/cancellation-submitted",params:{attendance_id:String(data.attendance_id)}});
+  }
+ };
  useEffect(()=>{
   void load();
   if(!user?.id)return;
   const channel=supabase.channel("notifications:"+user.id)
-    .on("postgres_changes",{event:"INSERT",schema:"public",table:"notifications",filter:"user_id=eq."+user.id},payload=>{
-      setItems(current=>{
-        if(current.some(item=>item.id===payload.new.id))return current;
-        return [payload.new,...current].slice(0,100);
-      });
-    })
-    .subscribe();
+   .on("postgres_changes",{event:"INSERT",schema:"public",table:"notifications",filter:"user_id=eq."+user.id},payload=>{
+    setItems(current=>current.some(item=>item.id===payload.new.id)?current:[payload.new,...current].slice(0,100));
+   })
+   .subscribe();
   return()=>{void supabase.removeChannel(channel);};
  },[user?.id]);
- return <Screen bottomNav="notifications"><View className="flex-row items-center justify-between"><View><Text className="text-[28px] font-black text-gray-950">Notifikasi</Text><Text className="mt-1 text-sm text-gray-500">Pembaruan absensi, QR, dan sinkronisasi.</Text></View><Pressable onPress={()=>void load()} className="rounded-full bg-[#E4F1D2] px-3 py-2"><Text className="text-xs font-bold text-[#3E5219]">Refresh</Text></Pressable></View>{items.length?items.map(item=><Pressable key={item.id} onPress={()=>void mark(item.id)}><GlassCard className={item.read_at?"opacity-70":""}><View className="flex-row items-start justify-between"><Text className="flex-1 text-sm font-black text-gray-900">{item.title||item.type||"Notifikasi"}</Text>{!item.read_at?<Badge tone="yellow">Baru</Badge>:null}</View><Text className="mt-2 text-sm leading-5 text-gray-600">{item.body||""}</Text><Text className="mt-2 text-[11px] text-gray-400">{item.created_at||""}</Text></GlassCard></Pressable>):<GlassCard><Text className="font-bold text-gray-900">Belum ada notifikasi.</Text></GlassCard>}</Screen>;
-}export function EditQrWiredScreen(){
+
+ return <Screen bottomNav="notifications">
+  <View className="flex-row items-center justify-between">
+   <View><Text className="text-[28px] font-black text-gray-950">Notifikasi</Text><Text className="mt-1 text-sm text-gray-500">Pembaruan absensi, QR, dan sinkronisasi.</Text></View>
+   <Pressable onPress={()=>void load()} className="rounded-full bg-[#E4F1D2] px-3 py-2"><Text className="text-xs font-bold text-[#3E5219]">Refresh</Text></Pressable>
+  </View>
+  {items.length?items.map(item=><Pressable key={item.id} onPress={()=>void openNotification(item)}>
+   <GlassCard className={item.read_at?"opacity-70":""}>
+    <View className="flex-row items-start justify-between">
+     <Text className="flex-1 text-sm font-black text-gray-900">{item.title||item.type||"Notifikasi"}</Text>
+     {!item.read_at?<Badge tone="yellow">Baru</Badge>:null}
+    </View>
+    <Text className="mt-2 text-sm leading-5 text-gray-600">{item.body||""}</Text>
+    <Text className="mt-2 text-[11px] text-gray-400">{item.created_at||""}</Text>
+   </GlassCard>
+  </Pressable>):<GlassCard><Text className="font-bold text-gray-900">Belum ada notifikasi.</Text></GlassCard>}
+ </Screen>;
+}
+
+export function EditQrWiredScreen(){
  const p=useLocalSearchParams<Record<string,string>>(); const router=useRouter();
  const [loaded,setLoaded]=useState(false); const [busy,setBusy]=useState(false); const [error,setError]=useState("");
  const [title,setTitle]=useState(""); const [target,setTarget]=useState("Semua Pengguna"); const [late,setLate]=useState(15); const [gps,setGps]=useState(false); const [radius,setRadius]=useState(150); const [start,setStart]=useState(""); const [end,setEnd]=useState(""); const [originalStart,setOriginalStart]=useState(""); const [lat,setLat]=useState<number|null>(null); const [lon,setLon]=useState<number|null>(null);
