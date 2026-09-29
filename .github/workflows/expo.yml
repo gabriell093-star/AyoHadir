@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -43,7 +43,7 @@ jobs:
           test -n "$SUPABASE_PUBLISHABLE_KEY" || { echo "Missing GitHub Actions secret SUPABASE_PUBLISHABLE_KEY"; exit 1; }
 
       - name: Gitleaks history scan
-        uses: gitleaks/gitleaks-action@v2
+        uses: gitleaks/gitleaks-action@v3
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
