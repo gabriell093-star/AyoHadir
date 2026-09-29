@@ -24,13 +24,6 @@ on:
 permissions:
   contents: read
 
-env:
-  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-  SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
-  ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-  ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-  ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-  ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
 
 concurrency:
   group: expo-source-validation-${{ github.ref }}
@@ -39,6 +32,9 @@ concurrency:
 jobs:
   validate-source:
     runs-on: ubuntu-latest
+    env:
+      SUPABASE_URL: https://example.invalid
+      SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -112,6 +108,13 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' && inputs.build_apk == true }}
     needs: validate-source
     runs-on: ubuntu-latest
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+      ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
     timeout-minutes: 20
     permissions:
       contents: read
