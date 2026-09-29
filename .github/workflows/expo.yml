@@ -35,6 +35,13 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
+      - name: Validate build environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$SUPABASE_URL" || { echo "Missing GitHub Actions secret SUPABASE_URL"; exit 1; }
+          test -n "$SUPABASE_PUBLISHABLE_KEY" || { echo "Missing GitHub Actions secret SUPABASE_PUBLISHABLE_KEY"; exit 1; }
+
       - name: Gitleaks history scan
         uses: gitleaks/gitleaks-action@v2
         env:
@@ -100,6 +107,13 @@ jobs:
 
       - name: Install dependencies
         run: npm install --no-audit --no-fund
+
+      - name: Validate build environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$SUPABASE_URL" || { echo "Missing GitHub Actions secret SUPABASE_URL"; exit 1; }
+          test -n "$SUPABASE_PUBLISHABLE_KEY" || { echo "Missing GitHub Actions secret SUPABASE_PUBLISHABLE_KEY"; exit 1; }
 
       - name: Set up Java
         uses: actions/setup-java@v5
