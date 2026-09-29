@@ -8,7 +8,7 @@ import {
   TextInput,
   View
 } from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 
 import { AyoHadirLogo } from "@/components/ui";
 import { useAuth } from "@/auth/auth-context";
@@ -17,7 +17,6 @@ import { supabase } from "@/lib/supabase";
 export default function UpdatePasswordScreen() {
   const router = useRouter();
   const { user, passwordRecovery, clearPasswordRecovery } = useAuth();
-  const params = useLocalSearchParams<{ mode?: string | string[] }>();
   const isRecovery = passwordRecovery;
 
   const [currentPassword, setCurrentPassword] = useState("");
