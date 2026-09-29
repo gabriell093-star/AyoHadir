@@ -44,6 +44,19 @@ const parseTimeRange=(startText:string,endText:string)=>{
  if(end.getTime()<=start.getTime()) end.setDate(end.getDate()+1);
  return {start,end,durationHours:(end.getTime()-start.getTime())/3600000};
 };
+type CreateQrDraft = {
+ title: string;
+ target: string;
+ duration: string;
+ lateMinutes: string;
+ gps: string;
+ radius: string;
+ starts_at: string;
+ ends_at: string;
+ allowed_user_ids: string[];
+};
+let createQrDraft: CreateQrDraft | null = null;
+
 const attendanceMsg=(s:string)=>{const m=s.toLowerCase();if(m.includes("expired"))return"QR expired.";if(m.includes("invalid")||m.includes("token"))return"QR invalid.";if(m.includes("allow"))return"Anda tidak diizinkan mengikuti sesi ini.";if(m.includes("already")||m.includes("duplicate"))return"Anda sudah absen untuk sesi ini.";if(m.includes("gps")||m.includes("location"))return"Lokasi tidak dapat diverifikasi.";if(m.includes("inactive"))return"Sesi tidak aktif.";if(m.includes("verif"))return"Email perlu diverifikasi sebelum absensi dapat diselesaikan.";return s;};
 
 export function CreateSessionWiredScreen(){
@@ -233,19 +246,24 @@ export function CreateSessionWiredScreen(){
 export function ConfirmQrWiredScreen(){
  const router=useRouter();
  const p=useLocalSearchParams<Record<string,string>>();
+ const d=createQrDraft;
  const [busy,setBusy]=useState(false);
  const [error,setError]=useState("");
  const create=async()=>{
   setBusy(true);setError("");
   try{
-   const targetMode=p.target==="Pengguna Tertentu"?"specific_users":"all_users";
-   let allowedUserIds:string[]=[]; if(p.allowed_user_ids){const parsed=JSON.parse(p.allowed_user_ids);if(Array.isArray(parsed))allowedUserIds=parsed.filter((x):x is string=>typeof x==="string");}
+   const targetValue=d?.target??p.target??"Semua Pengguna";
+   const targetMode=targetValue==="Pengguna Tertentu"?"specific_users":"all_users";
+   const allowedUserIds=d?.allowed_user_ids??[];
    let latitude:number|null=null,longitude:number|null=null;
    if(p.gps==="true"){const permission=await Location.requestForegroundPermissionsAsync();if(!permission.granted)throw new Error("Izin lokasi diperlukan saat GPS diaktifkan.");const location=await Location.getCurrentPositionAsync({accuracy:Location.Accuracy.High});latitude=location.coords.latitude;longitude=location.coords.longitude;}
-   const response=await invokeEdgeFunction<any>("create-qr",{name:p.title?.trim()||"",target_mode:targetMode,starts_at:p.starts_at,ends_at:p.ends_at,late_after_minutes:Number(p.lateMinutes||15),gps_enabled:p.gps==="true",latitude,longitude,radius_m:p.gps==="true"?Number(p.radius||150):null,allowed_user_ids:targetMode==="specific_users"?allowedUserIds:[]});
+   const gpsValue=d?.gps??p.gps??"false";
+   const response=await invokeEdgeFunction<any>("create-qr",{name:(d?.title??p.title??"").trim(),target_mode:targetMode,starts_at:d?.starts_at??p.starts_at,ends_at:d?.ends_at??p.ends_at,late_after_minutes:Number(d?.lateMinutes??p.lateMinutes??15),gps_enabled:gpsValue==="true",latitude,longitude,radius_m:gpsValue==="true"?Number(d?.radius??p.radius??150):null,allowed_user_ids:targetMode==="specific_users"?allowedUserIds:[]});
    const qrId=pick(response,"qr_id","id"),token=pick(response,"token"),expires=pick(response,"token_expires_at");
    if(!qrId||!token)throw new Error("Server tidak mengembalikan QR atau token.");
-   router.replace({pathname:"/screens/qr-success",params:{qr_id:String(qrId),title:p.title||"Sesi Absensi",target:p.target||"Semua Pengguna",starts_at:p.starts_at||"",ends_at:p.ends_at||"",lateMinutes:p.lateMinutes||"15",gps:p.gps||"false",radius:p.radius||"150",token:String(token),token_expires_at:expires?String(expires):""}});
+   const gpsValue=d?.gps??p.gps??"false";
+   createQrDraft=null;
+   router.replace({pathname:"/screens/qr-success",params:{qr_id:String(qrId),title:d?.title??p.title??"Sesi Absensi",target:targetValue,starts_at:d?.starts_at??p.starts_at??"",ends_at:d?.ends_at??p.ends_at??"",lateMinutes:d?.lateMinutes??p.lateMinutes??"15",gps:gpsValue,radius:d?.radius??p.radius??"150",token:String(token),token_expires_at:expires?String(expires):""}});
   }catch(e){setError(msg(e));}finally{setBusy(false);}
  };
  const askCreate=()=>Alert.alert(
