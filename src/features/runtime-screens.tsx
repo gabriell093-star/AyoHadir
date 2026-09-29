@@ -197,6 +197,16 @@ export function ProfileSettingsScreen() {
       if (buffer.byteLength > 2 * 1024 * 1024) {
         throw new Error("Ukuran foto maksimal 2 MB.");
       }
+      if (
+        !Number.isFinite(asset.width) ||
+        !Number.isFinite(asset.height) ||
+        asset.width <= 0 ||
+        asset.height <= 0 ||
+        asset.width > 4096 ||
+        asset.height > 4096
+      ) {
+        throw new Error("Resolusi foto terlalu besar.");
+      }
 
       const bytes = new Uint8Array(buffer);
       const validSignature =
