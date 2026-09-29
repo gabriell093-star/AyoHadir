@@ -12,6 +12,14 @@ on:
         required: true
         default: false
         type: boolean
+      signing_mode:
+        description: "Signing mode for the APK"
+        required: true
+        default: "temporary_test"
+        type: choice
+        options:
+          - temporary_test
+          - stable_public
 
 permissions:
   contents: read
@@ -19,6 +27,10 @@ permissions:
 env:
   SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
   SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+  ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+  ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+  ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+  ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
 
 concurrency:
   group: expo-source-validation-${{ github.ref }}
@@ -128,7 +140,26 @@ jobs:
           distribution: temurin
           java-version: "17"
 
+      - name: Prepare stable public signing key
+        if: ${{ inputs.signing_mode == 'stable_public' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${ANDROID_KEYSTORE_BASE64:-}" || { echo "Missing ANDROID_KEYSTORE_BASE64"; exit 1; }
+          test -n "${ANDROID_KEYSTORE_PASSWORD:-}" || { echo "Missing ANDROID_KEYSTORE_PASSWORD"; exit 1; }
+          test -n "${ANDROID_KEY_ALIAS:-}" || { echo "Missing ANDROID_KEY_ALIAS"; exit 1; }
+          test -n "${ANDROID_KEY_PASSWORD:-}" || { echo "Missing ANDROID_KEY_PASSWORD"; exit 1; }
+          KEYSTORE="$RUNNER_TEMP/ayohadir-release.keystore"
+          printf "%s" "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$KEYSTORE"
+          {
+            echo "AYOHADIR_KEYSTORE=$KEYSTORE"
+            echo "AYOHADIR_KEYSTORE_PASSWORD=$ANDROID_KEYSTORE_PASSWORD"
+            echo "AYOHADIR_KEY_ALIAS=$ANDROID_KEY_ALIAS"
+            echo "AYOHADIR_KEY_PASSWORD=$ANDROID_KEY_PASSWORD"
+          } >> "$GITHUB_ENV"
+
       - name: Generate temporary release signing key
+        if: ${{ inputs.signing_mode != 'stable_public' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -157,7 +188,7 @@ jobs:
                       storeFile file(System.getenv("AYOHADIR_KEYSTORE"))
                       storePassword System.getenv("AYOHADIR_KEYSTORE_PASSWORD")
                       keyAlias System.getenv("AYOHADIR_KEY_ALIAS")
-                      keyPassword System.getenv("AYOHADIR_KEYSTORE_PASSWORD")
+                      keyPassword System.getenv("AYOHADIR_KEY_PASSWORD")
                   }
               }
               buildTypes {
