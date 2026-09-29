@@ -20,6 +20,8 @@ type AuthContextValue = {
   session: Session | null;
   user: User | null;
   profile: AuthProfile | null;
+  passwordRecovery: boolean;
+  clearPasswordRecovery: () => void;
   refreshProfile: () => Promise<void>;
   updateDisplayName: (displayName: string) => Promise<void>;
   updateAvatarUrl: (avatarUrl: string | null) => Promise<void>;
@@ -45,6 +47,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<AuthProfile | null>(null);
+  const [passwordRecovery, setPasswordRecovery] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -67,8 +70,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setSession(nextSession);
         setLoading(false);
 
+        if (_event === "PASSWORD_RECOVERY") {
+          setPasswordRecovery(true);
+        }
+
         if (!nextSession) {
           setProfile(null);
+          setPasswordRecovery(false);
         }
       }
     });
@@ -126,6 +134,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       session,
       user: session?.user ?? null,
       profile,
+      passwordRecovery,
+      clearPasswordRecovery: () => setPasswordRecovery(false),
       refreshProfile: async () => {
         if (!session?.user.id) {
           setProfile(null);
