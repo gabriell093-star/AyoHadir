@@ -105,7 +105,7 @@ jobs:
           ! grep -R -n -E 'emerald-[0-9]+|#10B981|#059669' app src
 
   build-android:
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.build_apk == true }}
+    if: ${{ (github.event_name == 'workflow_dispatch' && inputs.build_apk == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[build-apk]')) }}
     needs: validate-source
     runs-on: ubuntu-latest
     env:
