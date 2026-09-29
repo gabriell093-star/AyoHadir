@@ -210,7 +210,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         });
       }
     }),
-    [loading, profile, session]
+    [loading, passwordRecovery, profile, session]
   );
 
   return (
