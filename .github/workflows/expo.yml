@@ -170,6 +170,7 @@ jobs:
             echo "AYOHADIR_KEYSTORE=$KEYSTORE"
             echo "AYOHADIR_KEYSTORE_PASSWORD=$PASSWORD"
             echo "AYOHADIR_KEY_ALIAS=ayohadir"
+            echo "AYOHADIR_KEY_PASSWORD=$PASSWORD"
           } >> "$GITHUB_ENV"
 
       - name: Generate Android project
