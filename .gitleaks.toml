@@ -11,12 +11,9 @@ id = "generic-api-key"
   condition = "AND"
   regexTarget = "line"
   paths = ['''^app\.json$''']
-  regexes = [
-    '''"supabasePublishableKey"\s*:\s*"sb_publishable_[A-Za-z0-9_-]+"'''
-  ]
+  regexes = ['''"supabasePublishableKey"\s*:\s*"sb_publishable_[A-Za-z0-9_-]+"''']
 
   [[rules.allowlists]]
   description = "Historical Supabase publishable key in client config is public by design, retained only in Git history"
-  paths = ['''^src/lib/supabase\.ts
-'']
+  paths = ['''^src/lib/supabase\.ts$''']
   regexes = ['''sb_publishable_[A-Za-z0-9_-]+''']
