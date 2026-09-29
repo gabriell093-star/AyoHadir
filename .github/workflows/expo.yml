@@ -10,6 +10,10 @@ on:
 permissions:
   contents: read
 
+env:
+  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+  SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+
 concurrency:
   group: expo-source-validation-${{ github.ref }}
   cancel-in-progress: true
