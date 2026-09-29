@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      build_apk:
+        description: "Build a release APK after validation"
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -91,6 +97,7 @@ jobs:
           ! grep -R -n -E 'emerald-[0-9]+|#10B981|#059669' app src
 
   build-android:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.build_apk == true }}
     needs: validate-source
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -98,7 +105,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Set up Node
         uses: actions/setup-node@v6
