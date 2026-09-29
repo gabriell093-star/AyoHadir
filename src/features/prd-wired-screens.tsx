@@ -118,6 +118,7 @@ export function CreateSessionWiredScreen(){
   if(step===2){
    if(!/^\d{1,2}:\d{2}$/.test(start.trim())||!/^\d{1,2}:\d{2}$/.test(end.trim()))return setError("Waktu mulai dan selesai harus menggunakan format HH:mm.");
    const {durationHours}=parseTimeRange(start,end);
+   if(!Number.isFinite(durationHours))return setError("Waktu mulai dan selesai tidak valid.");
    if(durationHours<1||durationHours>24)return setError("Durasi sesi harus antara 1 dan 24 jam.");
    return true;
   }
@@ -130,20 +131,19 @@ export function CreateSessionWiredScreen(){
   if(!validateStep())return;
   if(step<3){setStep(value=>value+1);return;}
   const {start:s,end:e,durationHours}=parseTimeRange(start,end);
-  router.push({
-   pathname:"/screens/confirm-qr",
-   params:{
-    title:title.trim(),
-    target,
-    duration:String(durationHours),
-    lateMinutes:String(late),
-    gps:String(gps),
-    radius:String(radius),
-    starts_at:s.toISOString(),
-    ends_at:e.toISOString(),
-    allowed_user_ids:JSON.stringify(selected)
-   }
-  });
+  if(!Number.isFinite(durationHours))return setError("Waktu mulai dan selesai tidak valid.");
+  createQrDraft={
+   title:title.trim(),
+   target,
+   duration:String(durationHours),
+   lateMinutes:String(late),
+   gps:String(gps),
+   radius:String(radius),
+   starts_at:s.toISOString(),
+   ends_at:e.toISOString(),
+   allowed_user_ids:[...selected]
+  };
+  router.push({pathname:"/screens/confirm-qr"});
  };
 
  const computedDuration=(()=>{
@@ -265,16 +265,22 @@ export function ConfirmQrWiredScreen(){
  const create=async()=>{
   setBusy(true);setError("");
   try{
+   if(!d&&!p.title)throw new Error("Data QR tidak tersedia.");
+   const titleValue=d?.title??p.title??"";
    const targetValue=d?.target??p.target??"Semua Pengguna";
    const targetMode=targetValue==="Pengguna Tertentu"?"specific_users":"all_users";
    const allowedUserIds=d?.allowed_user_ids??[];
-   let latitude:number|null=null,longitude:number|null=null;
-   if(p.gps==="true"){const permission=await Location.requestForegroundPermissionsAsync();if(!permission.granted)throw new Error("Izin lokasi diperlukan saat GPS diaktifkan.");const location=await Location.getCurrentPositionAsync({accuracy:Location.Accuracy.High});latitude=location.coords.latitude;longitude=location.coords.longitude;}
    const gpsValue=d?.gps??p.gps??"false";
-   const response=await invokeEdgeFunction<any>("create-qr",{name:(d?.title??p.title??"").trim(),target_mode:targetMode,starts_at:d?.starts_at??p.starts_at,ends_at:d?.ends_at??p.ends_at,late_after_minutes:Number(d?.lateMinutes??p.lateMinutes??15),gps_enabled:gpsValue==="true",latitude,longitude,radius_m:gpsValue==="true"?Number(d?.radius??p.radius??150):null,allowed_user_ids:targetMode==="specific_users"?allowedUserIds:[]});
+   let latitude:number|null=null,longitude:number|null=null;
+   if(gpsValue==="true"){
+    const permission=await Location.requestForegroundPermissionsAsync();
+    if(!permission.granted)throw new Error("Izin lokasi diperlukan saat GPS diaktifkan.");
+    const location=await Location.getCurrentPositionAsync({accuracy:Location.Accuracy.High});
+    latitude=location.coords.latitude;longitude=location.coords.longitude;
+   }
+   const response=await invokeEdgeFunction<any>("create-qr",{name:titleValue.trim(),target_mode:targetMode,starts_at:d?.starts_at??p.starts_at,ends_at:d?.ends_at??p.ends_at,late_after_minutes:Number(d?.lateMinutes??p.lateMinutes??15),gps_enabled:gpsValue==="true",latitude,longitude,radius_m:gpsValue==="true"?Number(d?.radius??p.radius??150):null,allowed_user_ids:targetMode==="specific_users"?allowedUserIds:[]});
    const qrId=pick(response,"qr_id","id"),token=pick(response,"token"),expires=pick(response,"token_expires_at");
    if(!qrId||!token)throw new Error("Server tidak mengembalikan QR atau token.");
-   const gpsValue=d?.gps??p.gps??"false";
    createQrDraft=null;
    router.replace({pathname:"/screens/qr-success",params:{qr_id:String(qrId),title:d?.title??p.title??"Sesi Absensi",target:targetValue,starts_at:d?.starts_at??p.starts_at??"",ends_at:d?.ends_at??p.ends_at??"",lateMinutes:d?.lateMinutes??p.lateMinutes??"15",gps:gpsValue,radius:d?.radius??p.radius??"150",token:String(token),token_expires_at:expires?String(expires):""}});
   }catch(e){setError(msg(e));}finally{setBusy(false);}
@@ -284,7 +290,7 @@ export function ConfirmQrWiredScreen(){
   "Sesi ini akan didaftarkan ke server dan mulai mengikuti waktu yang sudah Anda tetapkan.",
   [{text:"Batal",style:"cancel"},{text:"Buat QR",onPress:()=>void create()}]
  );
- return <Screen><BackHeader title="Konfirmasi QR"/><SoftCard><Text className="text-xs font-bold uppercase tracking-[2px] text-[#3E5219]">Review Sebelum Dibuat</Text><Text className="mt-2 text-2xl font-black text-gray-950">{p.title||"Sesi Absensi"}</Text><Text className="mt-2 text-sm leading-5 text-gray-500">Periksa seluruh pengaturan. QR baru didaftarkan ke server setelah tombol konfirmasi ditekan.</Text></SoftCard><GlassCard>{[["Target",p.target||"Semua Pengguna"],["Mulai",p.starts_at||"-"],["Selesai",p.ends_at||"-"],["Durasi",p.duration?(p.duration+" jam"):"-"],["Batas terlambat",(p.lateMinutes||"15")+" menit"],["GPS",p.gps==="true"?"Aktif · "+(p.radius||"150")+" m":"Nonaktif"]].map(([key,value])=><View key={key} className="flex-row justify-between border-b border-gray-100 py-3"><Text className="text-xs font-semibold text-gray-500">{key}</Text><Text className="max-w-[67%] text-right text-sm font-bold text-gray-900">{value}</Text></View>)}<PrimaryButton className="mt-5" disabled={busy} onPress={askCreate}>{busy?<ActivityIndicator color="#FFFFFF"/>:<ButtonText>Konfirmasi & Buat QR</ButtonText>}</PrimaryButton><SecondaryButton className="mt-3" onPress={()=>router.back()} disabled={busy}><Text className="text-sm font-bold text-[#45483C]">Edit Pengaturan</Text></SecondaryButton>{error?<View className="mt-4 rounded-2xl border border-red-100 bg-red-50 p-4"><Text className="text-sm font-semibold leading-5 text-red-700">{error}</Text></View>:null}</GlassCard></Screen>;
+ return <Screen><BackHeader title="Konfirmasi QR"/><View className="flex-row items-center gap-2 px-1">{["Info Dasar","Waktu","Lokasi","Review"].map((label,index)=><View key={label} className="flex-1"><View className={"h-1.5 rounded-full "+(index===3?"bg-[#3E5219]":"bg-[#DDE8C9]")}/><Text className={"mt-2 text-[10px] font-bold "+(index===3?"text-[#3E5219]":"text-gray-400")}>{label}</Text></View>)}</View><SoftCard><Text className="text-xs font-bold uppercase tracking-[2px] text-[#3E5219]">Review Sebelum Dibuat</Text><Text className="mt-2 text-2xl font-black text-gray-950">{d?.title??p.title??"Sesi Absensi"}</Text><Text className="mt-2 text-sm leading-5 text-gray-500">Periksa seluruh pengaturan. QR baru didaftarkan ke server setelah tombol konfirmasi ditekan.</Text></SoftCard><GlassCard>{[["Target",d?.target??p.target??"Semua Pengguna"],["Mulai",dateTimeText(d?.starts_at??p.starts_at)],["Selesai",dateTimeText(d?.ends_at??p.ends_at)],["Durasi",(d?.duration??p.duration)?(d?.duration??p.duration)+" jam":"-"],["Batas terlambat",(d?.lateMinutes??p.lateMinutes??"15")+" menit"],["GPS",(d?.gps??p.gps)==="true"?"Aktif · "+(d?.radius??p.radius??"150")+" m":"Nonaktif"]].map(([key,value])=><View key={key} className="flex-row justify-between border-b border-gray-100 py-3"><Text className="text-xs font-semibold text-gray-500">{key}</Text><Text className="max-w-[67%] text-right text-sm font-bold text-gray-900">{value}</Text></View>)}<PrimaryButton className="mt-5" disabled={busy} onPress={askCreate}>{busy?<ActivityIndicator color="#FFFFFF"/>:<ButtonText>Konfirmasi & Buat QR</ButtonText>}</PrimaryButton><SecondaryButton className="mt-3" onPress={()=>router.back()} disabled={busy}><Text className="text-sm font-bold text-[#45483C]">Edit Pengaturan</Text></SecondaryButton>{error?<View className="mt-4 rounded-2xl border border-red-100 bg-red-50 p-4"><Text className="text-sm font-semibold leading-5 text-red-700">{error}</Text></View>:null}</GlassCard></Screen>;
 }async function qrFile(ref:any){return await new Promise<string>((resolve,reject)=>{if(!ref?.toDataURL)return reject(new Error("QR belum siap."));ref.toDataURL((data:string)=>{const uri=`${FileSystem.cacheDirectory}ayohadir-${Date.now()}.png`;void FileSystem.writeAsStringAsync(uri,data,{encoding:FileSystem.EncodingType.Base64}).then(()=>resolve(uri)).catch(reject);});});}
 async function shareQr(ref:any,gps:boolean){if(!gps)Alert.alert("Peringatan keamanan",GPS_SHARE_WARNING);const uri=await qrFile(ref);if(await Sharing.isAvailableAsync())await Sharing.shareAsync(uri,{mimeType:"image/png",dialogTitle:"Bagikan QR AyoHadir"});else await Share.share({message:"QR AyoHadir",url:uri});}
 async function saveQr(ref:any){const p=await MediaLibrary.requestPermissionsAsync();if(!p.granted)throw new Error("Izin galeri diperlukan.");await MediaLibrary.saveToLibraryAsync(await qrFile(ref));}
