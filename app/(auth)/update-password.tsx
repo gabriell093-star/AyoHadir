@@ -16,10 +16,9 @@ import { supabase } from "@/lib/supabase";
 
 export default function UpdatePasswordScreen() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, passwordRecovery, clearPasswordRecovery } = useAuth();
   const params = useLocalSearchParams<{ mode?: string | string[] }>();
-  const mode = Array.isArray(params.mode) ? params.mode[0] : params.mode;
-  const isRecovery = mode === "recovery";
+  const isRecovery = passwordRecovery;
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [password, setPassword] = useState("");
@@ -88,6 +87,7 @@ export default function UpdatePasswordScreen() {
       setPassword("");
       setConfirmation("");
       if (isRecovery) {
+        clearPasswordRecovery();
         setTimeout(() => router.replace("/"), 700);
       }
     }
