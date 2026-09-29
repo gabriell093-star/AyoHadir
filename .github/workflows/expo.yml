@@ -82,9 +82,9 @@ jobs:
   build-android:
     needs: validate-source
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     permissions:
       contents: read
-      actions: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -103,17 +103,67 @@ jobs:
           distribution: temurin
           java-version: "17"
 
+      - name: Generate temporary release signing key
+        shell: bash
+        run: |
+          set -euo pipefail
+          KEYSTORE="$RUNNER_TEMP/ayohadir-release.keystore"
+          PASSWORD="$(openssl rand -hex 24)"
+          keytool -genkeypair -v             -keystore "$KEYSTORE"             -storepass "$PASSWORD"             -keypass "$PASSWORD"             -alias ayohadir             -keyalg RSA             -keysize 2048             -validity 10000             -dname "CN=AyoHadir, OU=Mobile, O=AyoHadir, C=ID"
+          {
+            echo "AYOHADIR_KEYSTORE=$KEYSTORE"
+            echo "AYOHADIR_KEYSTORE_PASSWORD=$PASSWORD"
+            echo "AYOHADIR_KEY_ALIAS=ayohadir"
+          } >> "$GITHUB_ENV"
+
       - name: Generate Android project
         run: npx expo prebuild --platform android --non-interactive
+
+      - name: Configure release signing
+        working-directory: android
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat >> app/build.gradle <<'EOF'
+
+          android {
+              signingConfigs {
+                  release {
+                      storeFile file(System.getenv("AYOHADIR_KEYSTORE"))
+                      storePassword System.getenv("AYOHADIR_KEYSTORE_PASSWORD")
+                      keyAlias System.getenv("AYOHADIR_KEY_ALIAS")
+                      keyPassword System.getenv("AYOHADIR_KEYSTORE_PASSWORD")
+                  }
+              }
+              buildTypes {
+                  release {
+                      signingConfig signingConfigs.release
+                  }
+              }
+          }
+          EOF
 
       - name: Build release APK
         working-directory: android
         run: ./gradlew assembleRelease --no-daemon --stacktrace
 
+      - name: Verify release APK signature and debug state
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="android/app/build/outputs/apk/release/app-release.apk"
+          BUILD_TOOLS="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -n 1)"
+          "$BUILD_TOOLS/apksigner" verify --verbose "$APK"
+          "$BUILD_TOOLS/aapt2" dump xmltree "$APK" --file AndroidManifest.xml | tee "$RUNNER_TEMP/manifest.txt"
+          if grep -qi "debuggable" "$RUNNER_TEMP/manifest.txt"; then
+            echo "Release APK manifest must not declare debuggable."
+            exit 1
+          fi
+
       - name: Upload release APK
         uses: actions/upload-artifact@v4
         with:
           name: AyoHadir-Android-release
-          path: android/app/build/outputs/apk/release/*.apk
+          path: android/app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
           retention-days: 14
