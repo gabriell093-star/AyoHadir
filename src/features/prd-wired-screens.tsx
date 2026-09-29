@@ -37,8 +37,21 @@ const msg=(e:unknown)=>{
   return safe?.[1]??(e instanceof BackendFunctionError?raw:"Terjadi kesalahan. Coba lagi.");
 };
 const pick=(d:any,...keys:string[])=>{for(const k of keys){const v=d?.[k]??d?.data?.[k]??d?.result?.[k]??d?.attendance?.[k]??d?.data?.attendance?.[k];if(v!==undefined&&v!==null)return v;}return undefined;};
-const parseTime=(s:string)=>{const m=/^(\d{1,2}):(\d{2})$/.exec(s.trim());const d=new Date();if(m)d.setHours(Math.min(23,+m[1]),Math.min(59,+m[2]),0,0);return d;};
+const parseTime=(s:string)=>{
+ const m=/^(\d{1,2}):(\d{2})$/.exec(s.trim());
+ const d=new Date();
+ if(!m)return new Date(Number.NaN);
+ const hour=Number(m[1]),minute=Number(m[2]);
+ if(hour>23||minute>59)return new Date(Number.NaN);
+ d.setHours(hour,minute,0,0);
+ return d;
+};
 const timeText=(d:Date)=>d.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit",hour12:false});
+const dateTimeText=(value:string|undefined)=>{
+ if(!value)return "-";
+ const date=new Date(value);
+ return Number.isNaN(date.getTime())?"-":date.toLocaleString("id-ID",{dateStyle:"medium",timeStyle:"short"});
+};
 const parseTimeRange=(startText:string,endText:string)=>{
  const start=parseTime(startText),end=parseTime(endText);
  if(end.getTime()<=start.getTime()) end.setDate(end.getDate()+1);
