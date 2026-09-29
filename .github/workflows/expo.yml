@@ -172,9 +172,9 @@ jobs:
           APK="android/app/build/outputs/apk/release/app-release.apk"
           BUILD_TOOLS="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -n 1)"
           "$BUILD_TOOLS/apksigner" verify --verbose "$APK"
-          "$BUILD_TOOLS/aapt2" dump xmltree "$APK" --file AndroidManifest.xml | tee "$RUNNER_TEMP/manifest.txt"
-          if grep -qi "debuggable" "$RUNNER_TEMP/manifest.txt"; then
-            echo "Release APK manifest must not declare debuggable."
+          "$BUILD_TOOLS/aapt2" dump badging "$APK" | tee "$RUNNER_TEMP/badging.txt"
+          if grep -q "application-debuggable" "$RUNNER_TEMP/badging.txt"; then
+            echo "Release APK is debuggable."
             exit 1
           fi
 
