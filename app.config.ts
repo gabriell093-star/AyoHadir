@@ -20,7 +20,6 @@ const config: ExpoConfig = {
   android: {
     package: "com.ayohadir.app",
     versionCode: 35,
-    usesCleartextTraffic: false,
     adaptiveIcon: {
       backgroundColor: "#FFFFFF",
       foregroundImage: "./assets/images/ayo-hadir-icon.png"
