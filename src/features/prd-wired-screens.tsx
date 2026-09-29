@@ -48,6 +48,7 @@ const attendanceMsg=(s:string)=>{const m=s.toLowerCase();if(m.includes("expired"
 
 export function CreateSessionWiredScreen(){
  const router=useRouter();
+ const [step,setStep]=useState(1);
  const [title,setTitle]=useState("");
  const [target,setTarget]=useState("Semua Pengguna");
  const [duration,setDuration]=useState(2);
@@ -60,21 +61,175 @@ export function CreateSessionWiredScreen(){
  const [selected,setSelected]=useState<string[]>([]);
  const [userQuery,setUserQuery]=useState("");
  const [error,setError]=useState("");
+
  useEffect(()=>{
   if(target!=="Pengguna Tertentu"){setUsers([]);setSelected([]);return;}
-  void supabase.from("profiles").select("id,display_name").ilike("display_name","%"+userQuery.trim()+"%").order("display_name",{ascending:true}).limit(100).then(({data,error:e})=>{if(e){setError("Daftar pengguna tidak dapat dimuat.");setUsers([]);return;}setUsers(data??[]);});
+  void supabase
+   .from("profiles")
+   .select("id,display_name")
+   .ilike("display_name","%"+userQuery.trim()+"%")
+   .order("display_name",{ascending:true})
+   .limit(100)
+   .then(({data,error:e})=>{
+    if(e){setError("Daftar pengguna tidak dapat dimuat.");setUsers([]);return;}
+    setUsers(data??[]);
+   });
  },[target,userQuery]);
- const adjust=(hours:number)=>{const next=Math.max(1,Math.min(24,hours));setDuration(next);const d=parseTime(start);d.setHours(d.getHours()+next);setEnd(timeText(d));};
- const review=()=>{
-  setError("");
-  if(!title.trim())return setError("Judul sesi wajib diisi.");
-  if(!/^\\d{1,2}:\\d{2}$/.test(start.trim())||!/^\\d{1,2}:\\d{2}$/.test(end.trim()))return setError("Waktu mulai dan selesai harus menggunakan format HH:mm.");
-  const {start:s,end:e,durationHours}=parseTimeRange(start,end),ms=durationHours*3600000;
-  if(ms<3600000||ms>86400000)return setError("Durasi sesi harus antara 1 dan 24 jam.");
-  if(target==="Pengguna Tertentu"&&(selected.length<1||selected.length>100))return setError("Pilih minimal 1 dan maksimal 100 pengguna unik.");
-  router.push({pathname:"/screens/confirm-qr",params:{title:title.trim(),target,duration:String(Math.round(ms/3600000)),lateMinutes:String(late),gps:String(gps),radius:String(radius),starts_at:s.toISOString(),ends_at:e.toISOString(),allowed_user_ids:JSON.stringify(selected)}});
+
+ const adjust=(hours:number)=>{
+  const next=Math.max(1,Math.min(24,hours));
+  setDuration(next);
+  const d=parseTime(start);
+  d.setHours(d.getHours()+next);
+  setEnd(timeText(d));
  };
- return <Screen scroll={false}><BackHeader title="Buat Sesi Absensi"/><ScrollView keyboardShouldPersistTaps="handled" contentContainerClassName="gap-4 px-5 pb-8 pt-4"><View className="flex-row items-center gap-2">{["Info Dasar","Waktu","Lokasi","Review"].map((label,index)=><View key={label} className="flex-1"><View className={"h-1.5 rounded-full "+(index<3?"bg-[#3E5219]":"bg-[#C5C8B8]/40")}/><Text className={"mt-2 text-[10px] font-bold "+(index===0?"text-[#3E5219]":"text-gray-400")}>{label}</Text></View>)}</View><SoftCard><Text className="text-xs font-black uppercase tracking-[2px] text-[#3E5219]">Sesi baru</Text><Text className="mt-1 text-xl font-black text-gray-950">Atur sesi sebelum QR dibuat.</Text><Text className="mt-1 text-xs leading-5 text-gray-600">Semua pengaturan akan diperiksa kembali sebelum didaftarkan ke server.</Text></SoftCard><GlassCard><SectionTitle title="1. Info Dasar"/><Text className="mt-4 text-sm font-bold text-gray-900">Judul Sesi</Text><TextInput value={title} onChangeText={setTitle} placeholder="Contoh: Rapat Tim Pagi" placeholderTextColor="#8A8D82" className="mt-2 rounded-2xl border border-[#C5C8B8] bg-[#FAF9F6] px-4 py-3.5 text-base"/><Text className="mt-5 text-sm font-bold text-gray-900">Target Peserta</Text><Segmented items={["Semua Pengguna","Pengguna Tertentu"]} value={target} onChange={setTarget}/>{target==="Pengguna Tertentu"?<View className="mt-4 rounded-2xl border border-[#C5C8B8] bg-white p-3"><TextInput value={userQuery} onChangeText={setUserQuery} placeholder="Cari nama pengguna…" placeholderTextColor="#8A8D82" autoCorrect={false} className="mb-3 rounded-xl border border-[#C5C8B8] bg-[#FAF9F6] px-3 py-3 text-sm text-gray-900"/><Text className="mb-2 text-xs font-semibold text-gray-500">Dipilih: {selected.length}/100</Text>{users.map(u=>{const chosen=selected.includes(u.id);return <Pressable key={u.id} onPress={()=>setSelected(s=>chosen?s.filter(id=>id!==u.id):s.length<100?[...s,u.id]:s)} className="flex-row items-center justify-between border-b border-gray-100 py-3"><Text className="flex-1 font-bold text-gray-900">{u.display_name||"Tanpa nama"}</Text><Badge tone={chosen?"green":"gray"}>{chosen?"Dipilih":"Pilih"}</Badge></Pressable>;})}</View>:null}</GlassCard><GlassCard><SectionTitle title="2. Waktu"/><Text className="mt-4 text-xs font-semibold text-gray-500">Mulai (HH:mm)</Text><TextInput value={start} onChangeText={setStart} keyboardType="numbers-and-punctuation" className="mt-2 rounded-2xl border border-[#C5C8B8] bg-white px-4 py-3.5 text-base"/><Text className="mt-4 text-xs font-semibold text-gray-500">Selesai (HH:mm)</Text><TextInput value={end} onChangeText={setEnd} keyboardType="numbers-and-punctuation" className="mt-2 rounded-2xl border border-[#C5C8B8] bg-white px-4 py-3.5 text-base"/><Text className="mt-4 text-xs font-semibold text-gray-500">Durasi</Text><View className="mt-2 flex-row items-center justify-between rounded-2xl bg-[#F4F3F1] p-2"><Pressable onPress={()=>adjust(duration-1)} className="h-11 w-11 items-center justify-center rounded-xl bg-white"><Text className="text-2xl text-[#3E5219]">−</Text></Pressable><Text className="text-xl font-black text-[#3E5219]">{duration} jam</Text><Pressable onPress={()=>adjust(duration+1)} className="h-11 w-11 items-center justify-center rounded-xl bg-white"><Text className="text-2xl text-[#3E5219]">+</Text></Pressable></View><View className="mt-3 flex-row flex-wrap gap-2">{[1,2,4,8,12,24].map(h=><Pressable key={h} onPress={()=>adjust(h)} className="rounded-full border border-[#C5C8B8] bg-white px-4 py-2.5"><Text className="text-xs font-bold text-[#45483C]">{h} jam</Text></Pressable>)}</View><Text className="mt-4 text-xs font-semibold text-gray-500">Batas terlambat</Text><View className="mt-2 flex-row flex-wrap gap-2">{[10,15,30,60].map(n=><Pressable key={n} onPress={()=>setLate(n)} className={"rounded-full border px-4 py-2.5 "+(late===n?"border-[#3E5219] bg-[#3E5219]":"border-[#C5C8B8] bg-white")}><Text className={"text-xs font-bold "+(late===n?"text-white":"text-[#45483C]")}>{n} menit</Text></Pressable>)}</View></GlassCard><GlassCard><SectionTitle title="3. Lokasi"/><View className="mt-4 flex-row items-center justify-between"><View className="flex-1 pr-4"><Text className="font-bold text-gray-900">Verifikasi lokasi</Text><Text className="mt-1 text-xs leading-5 text-gray-500">Saat QR dibuat, koordinat aktual pembuat menjadi titik pusat.</Text></View><Switch value={gps} onValueChange={setGps}/></View>{gps?<View className="mt-4 flex-row items-center gap-3"><Text className="text-xs font-semibold text-gray-600">Radius</Text><TextInput value={String(radius)} onChangeText={v=>setRadius(Math.max(5,Math.min(3000,Number(v.replace(/\\D/g,""))||5)))} keyboardType="number-pad" className="flex-1 rounded-2xl border border-[#C5C8B8] bg-white px-4 py-3.5 text-base"/><Text className="text-xs font-bold text-[#3E5219]">meter</Text></View>:<View className="mt-4"><OfflineBanner text="GPS nonaktif. QR tetap dapat dibuat tanpa verifikasi lokasi."/></View>}</GlassCard>{error?<View className="rounded-2xl border border-red-100 bg-red-50 p-4"><Text className="font-semibold text-red-700">{error}</Text></View>:null}<PrimaryButton onPress={review}><ButtonText>Review QR</ButtonText></PrimaryButton></ScrollView></Screen>;
+
+ const validateStep=()=>{
+  setError("");
+  if(step===1){
+   if(!title.trim())return setError("Judul sesi wajib diisi.");
+   if(title.trim().length>120)return setError("Judul sesi maksimal 120 karakter.");
+   if(target==="Pengguna Tertentu"&&(selected.length<1||selected.length>100))return setError("Pilih minimal 1 dan maksimal 100 pengguna unik.");
+   return true;
+  }
+
+  if(step===2){
+   if(!/^\d{1,2}:\d{2}$/.test(start.trim())||!/^\d{1,2}:\d{2}$/.test(end.trim()))return setError("Waktu mulai dan selesai harus menggunakan format HH:mm.");
+   const {durationHours}=parseTimeRange(start,end);
+   if(durationHours<1||durationHours>24)return setError("Durasi sesi harus antara 1 dan 24 jam.");
+   return true;
+  }
+
+  if(gps&&(radius<5||radius>3000))return setError("Radius GPS harus 5 sampai 3.000 meter.");
+  return true;
+ };
+
+ const next=()=>{
+  if(!validateStep())return;
+  if(step<3){setStep(value=>value+1);return;}
+  const {start:s,end:e,durationHours}=parseTimeRange(start,end);
+  router.push({
+   pathname:"/screens/confirm-qr",
+   params:{
+    title:title.trim(),
+    target,
+    duration:String(Math.round(durationHours)),
+    lateMinutes:String(late),
+    gps:String(gps),
+    radius:String(radius),
+    starts_at:s.toISOString(),
+    ends_at:e.toISOString(),
+    allowed_user_ids:JSON.stringify(selected)
+   }
+  });
+ };
+
+ const computedDuration=(()=>{
+  if(!/^\d{1,2}:\d{2}$/.test(start.trim())||!/^\d{1,2}:\d{2}$/.test(end.trim()))return null;
+  const value=parseTimeRange(start,end).durationHours;
+  return Number.isInteger(value)?value:value.toFixed(1);
+ })();
+
+ const stepLabels=["Info Dasar","Waktu","Lokasi","Review"];
+
+ return <Screen scroll={false}>
+  <BackHeader title="Buat Sesi Absensi"/>
+  <View className="flex-1">
+   <ScrollView keyboardShouldPersistTaps="handled" contentContainerClassName="gap-4 px-5 pb-32 pt-4">
+    <View className="flex-row items-center gap-2">
+     {stepLabels.map((label,index)=>{
+      const active=index+1===step;
+      const done=index+1<step;
+      return <View key={label} className="flex-1">
+       <View className={"h-1.5 rounded-full "+(done||active?"bg-[#3E5219]":"bg-[#C5C8B8]/40")}/>
+       <Text className={"mt-2 text-[10px] font-bold "+(active?"text-[#3E5219]":done?"text-gray-600":"text-gray-400")}>{label}</Text>
+      </View>;
+     })}
+    </View>
+
+    {step===1?<View className="gap-4">
+     <SoftCard>
+      <Text className="text-xs font-black uppercase tracking-[2px] text-[#3E5219]">Langkah 1 dari 3</Text>
+      <Text className="mt-2 text-2xl font-black text-gray-950">Info Dasar</Text>
+      <Text className="mt-1 text-xs leading-5 text-gray-600">Tentukan nama sesi dan siapa yang dapat melakukan absensi.</Text>
+     </SoftCard>
+     <GlassCard>
+      <Text className="text-sm font-bold text-gray-900">Judul Sesi</Text>
+      <TextInput value={title} onChangeText={setTitle} maxLength={120} placeholder="Contoh: Rapat Tim Pagi" placeholderTextColor="#8A8D82" className="mt-2 rounded-2xl border border-[#C5C8B8] bg-[#FAF9F6] px-4 py-3.5 text-base text-gray-900"/>
+      <Text className="mt-2 text-right text-[11px] text-gray-400">{title.length}/120</Text>
+
+      <Text className="mt-4 text-sm font-bold text-gray-900">Target Peserta</Text>
+      <Segmented items={["Semua Pengguna","Pengguna Tertentu"]} value={target} onChange={setTarget}/>
+
+      {target==="Pengguna Tertentu"?<View className="mt-4 rounded-2xl border border-[#C5C8B8] bg-white p-3">
+       <TextInput value={userQuery} onChangeText={setUserQuery} placeholder="Cari nama pengguna…" placeholderTextColor="#8A8D82" autoCorrect={false} className="mb-3 rounded-xl border border-[#C5C8B8] bg-[#FAF9F6] px-3 py-3 text-sm text-gray-900"/>
+       <Text className="mb-2 text-xs font-semibold text-gray-500">Dipilih: {selected.length}/100</Text>
+       {selected.length? <View className="mb-2 rounded-xl bg-[#F2F5E8] p-3"><Text className="text-xs font-semibold text-[#3E5219]">Peserta terpilih akan tetap tersimpan meskipun Anda mengubah pencarian.</Text></View>:null}
+       {users.length?users.map(u=>{
+        const chosen=selected.includes(u.id);
+        return <Pressable key={u.id} onPress={()=>setSelected(current=>chosen?current.filter(id=>id!==u.id):current.length<100?[...current,u.id]:current)} className="flex-row items-center justify-between border-b border-gray-100 py-3">
+         <Text className="flex-1 pr-3 font-bold text-gray-900">{u.display_name||"Tanpa nama"}</Text>
+         <Badge tone={chosen?"green":"gray"}>{chosen?"Dipilih":"Pilih"}</Badge>
+        </Pressable>;
+       }):<Text className="py-4 text-sm text-gray-500">Pengguna tidak ditemukan.</Text>}
+      </View>:null}
+     </GlassCard>
+    </View>:null}
+
+    {step===2?<View className="gap-4">
+     <SoftCard>
+      <Text className="text-xs font-black uppercase tracking-[2px] text-[#3E5219]">Langkah 2 dari 3</Text>
+      <Text className="mt-2 text-2xl font-black text-gray-950">Waktu</Text>
+      <Text className="mt-1 text-xs leading-5 text-gray-600">Sesi berlaku minimal 1 jam dan maksimal 24 jam.</Text>
+     </SoftCard>
+     <GlassCard>
+      <Text className="text-sm font-bold text-gray-900">Waktu Mulai</Text>
+      <TextInput value={start} onChangeText={setStart} keyboardType="numbers-and-punctuation" className="mt-2 rounded-2xl border border-[#C5C8B8] bg-white px-4 py-3.5 text-base text-gray-900"/>
+      <Text className="mt-4 text-sm font-bold text-gray-900">Waktu Selesai</Text>
+      <TextInput value={end} onChangeText={setEnd} keyboardType="numbers-and-punctuation" className="mt-2 rounded-2xl border border-[#C5C8B8] bg-white px-4 py-3.5 text-base text-gray-900"/>
+      <View className="mt-4 flex-row items-center justify-between rounded-2xl bg-[#F4F3F1] p-2">
+       <Pressable onPress={()=>adjust(duration-1)} className="h-11 w-11 items-center justify-center rounded-xl bg-white"><Text className="text-2xl text-[#3E5219]">−</Text></Pressable>
+       <View className="items-center"><Text className="text-xl font-black text-[#3E5219]">{computedDuration??duration} jam</Text><Text className="mt-1 text-[11px] text-gray-500">Durasi terhitung</Text></View>
+       <Pressable onPress={()=>adjust(duration+1)} className="h-11 w-11 items-center justify-center rounded-xl bg-white"><Text className="text-2xl text-[#3E5219]">+</Text></Pressable>
+      </View>
+      <View className="mt-3 flex-row flex-wrap gap-2">{[1,2,4,8,12,24].map(h=><Pressable key={h} onPress={()=>adjust(h)} className={"rounded-full border px-4 py-2.5 "+(Number(computedDuration)===h?"border-[#3E5219] bg-[#3E5219]":"border-[#C5C8B8] bg-white")}><Text className={"text-xs font-bold "+(Number(computedDuration)===h?"text-white":"text-[#45483C]")}>{h} jam</Text></Pressable>)}</View>
+      <Text className="mt-5 text-sm font-bold text-gray-900">Batas Terlambat</Text>
+      <Text className="mt-1 text-xs leading-5 text-gray-500">Peserta yang scan setelah batas ini akan diberi status Terlambat.</Text>
+      <View className="mt-2 flex-row flex-wrap gap-2">{[10,15,30,60].map(n=><Pressable key={n} onPress={()=>setLate(n)} className={"rounded-full border px-4 py-2.5 "+(late===n?"border-[#3E5219] bg-[#3E5219]":"border-[#C5C8B8] bg-white")}><Text className={"text-xs font-bold "+(late===n?"text-white":"text-[#45483C]")}>{n} menit</Text></Pressable>)}</View>
+     </GlassCard>
+    </View>:null}
+
+    {step===3?<View className="gap-4">
+     <SoftCard>
+      <Text className="text-xs font-black uppercase tracking-[2px] text-[#3E5219]">Langkah 3 dari 3</Text>
+      <Text className="mt-2 text-2xl font-black text-gray-950">Lokasi</Text>
+      <Text className="mt-1 text-xs leading-5 text-gray-600">GPS opsional. Saat aktif, lokasi perangkat saat QR dibuat menjadi titik pusat.</Text>
+     </SoftCard>
+     <GlassCard>
+      <View className="flex-row items-center justify-between">
+       <View className="flex-1 pr-4"><Text className="font-bold text-gray-900">Verifikasi lokasi</Text><Text className="mt-1 text-xs leading-5 text-gray-500">Server memeriksa jarak peserta terhadap pusat lokasi QR.</Text></View>
+       <Switch value={gps} onValueChange={setGps}/>
+      </View>
+      {gps?<View className="mt-5">
+       <View className="flex-row items-center justify-between"><Text className="text-sm font-bold text-gray-900">Radius</Text><Text className="text-sm font-black text-[#3E5219]">{radius} meter</Text></View>
+       <TextInput value={String(radius)} onChangeText={v=>setRadius(Math.max(5,Math.min(3000,Number(v.replace(/\D/g,""))||5)))} keyboardType="number-pad" maxLength={4} className="mt-3 rounded-2xl border border-[#C5C8B8] bg-white px-4 py-3.5 text-base text-gray-900"/>
+       <View className="mt-3 flex-row flex-wrap gap-2">{[5,50,150,500,1000,3000].map(rm=><Pressable key={rm} onPress={()=>setRadius(rm)} className={"rounded-full border px-4 py-2.5 "+(radius===rm?"border-[#3E5219] bg-[#3E5219]":"border-[#C5C8B8] bg-white")}><Text className={"text-xs font-bold "+(radius===rm?"text-white":"text-[#45483C]")}>{rm} m</Text></Pressable>)}</View>
+       <View className="mt-4 rounded-2xl border border-[#DDE8C9] bg-[#F2F5E8] p-4"><Text className="text-xs leading-5 text-[#2F4014]">Lokasi tepat akan diminta saat Anda menekan “Buat QR” pada halaman review.</Text></View>
+      </View>:<View className="mt-4"><OfflineBanner text="GPS nonaktif. QR tetap dapat dibuat tanpa verifikasi lokasi."/></View>}
+     </GlassCard>
+    </View>:null}
+
+    {error?<View className="rounded-2xl border border-red-100 bg-red-50 p-4"><Text className="font-semibold leading-5 text-red-700">{error}</Text></View>:null}
+   </ScrollView>
+
+   <View className="border-t border-[#C5C8B8]/30 bg-white px-5 pb-4 pt-3">
+    <View className="flex-row gap-3">
+     <SecondaryButton className="flex-1" onPress={()=>step>1?setStep(value=>value-1):router.back()}><Text className="font-bold text-gray-800">{step===1?"Batal":"Kembali"}</Text></SecondaryButton>
+     <PrimaryButton className="flex-[1.6]" onPress={next}><ButtonText>{step===3?"Review QR":"Lanjut"}</ButtonText></PrimaryButton>
+    </View>
+   </View>
+  </View>
+ </Screen>;
 }
 
 export function ConfirmQrWiredScreen(){
