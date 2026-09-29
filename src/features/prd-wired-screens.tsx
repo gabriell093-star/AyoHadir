@@ -250,7 +250,12 @@ export function ConfirmQrWiredScreen(){
    router.replace({pathname:"/screens/qr-success",params:{qr_id:String(qrId),title:p.title||"Sesi Absensi",target:p.target||"Semua Pengguna",starts_at:p.starts_at||"",ends_at:p.ends_at||"",lateMinutes:p.lateMinutes||"15",gps:p.gps||"false",radius:p.radius||"150",token:String(token),token_expires_at:expires?String(expires):""}});
   }catch(e){setError(msg(e));}finally{setBusy(false);}
  };
- return <Screen><BackHeader title="Konfirmasi QR"/><SoftCard><Text className="text-xs font-bold uppercase tracking-[2px] text-[#3E5219]">Review Sebelum Dibuat</Text><Text className="mt-2 text-2xl font-black text-gray-950">{p.title||"Sesi Absensi"}</Text><Text className="mt-2 text-sm leading-5 text-gray-500">Periksa seluruh pengaturan. QR baru didaftarkan ke server setelah tombol konfirmasi ditekan.</Text></SoftCard><GlassCard>{[["Target",p.target||"Semua Pengguna"],["Mulai",p.starts_at||"-"],["Selesai",p.ends_at||"-"],["Durasi",p.duration?(p.duration+" jam"):"-"],["Batas terlambat",(p.lateMinutes||"15")+" menit"],["GPS",p.gps==="true"?"Aktif · "+(p.radius||"150")+" m":"Nonaktif"]].map(([key,value])=><View key={key} className="flex-row justify-between border-b border-gray-100 py-3"><Text className="text-xs font-semibold text-gray-500">{key}</Text><Text className="max-w-[67%] text-right text-sm font-bold text-gray-900">{value}</Text></View>)}<PrimaryButton className="mt-5" disabled={busy} onPress={()=>void create()}>{busy?<ActivityIndicator color="#FFFFFF"/>:<ButtonText>Konfirmasi & Buat QR</ButtonText>}</PrimaryButton><SecondaryButton className="mt-3" onPress={()=>router.back()} disabled={busy}><Text className="text-sm font-bold text-[#45483C]">Edit Pengaturan</Text></SecondaryButton>{error?<View className="mt-4 rounded-2xl border border-red-100 bg-red-50 p-4"><Text className="text-sm font-semibold leading-5 text-red-700">{error}</Text></View>:null}</GlassCard></Screen>;
+ const askCreate=()=>Alert.alert(
+  "Buat QR sekarang?",
+  "Sesi ini akan didaftarkan ke server dan mulai mengikuti waktu yang sudah Anda tetapkan.",
+  [{text:"Batal",style:"cancel"},{text:"Buat QR",onPress:()=>void create()}]
+ );
+ return <Screen><BackHeader title="Konfirmasi QR"/><SoftCard><Text className="text-xs font-bold uppercase tracking-[2px] text-[#3E5219]">Review Sebelum Dibuat</Text><Text className="mt-2 text-2xl font-black text-gray-950">{p.title||"Sesi Absensi"}</Text><Text className="mt-2 text-sm leading-5 text-gray-500">Periksa seluruh pengaturan. QR baru didaftarkan ke server setelah tombol konfirmasi ditekan.</Text></SoftCard><GlassCard>{[["Target",p.target||"Semua Pengguna"],["Mulai",p.starts_at||"-"],["Selesai",p.ends_at||"-"],["Durasi",p.duration?(p.duration+" jam"):"-"],["Batas terlambat",(p.lateMinutes||"15")+" menit"],["GPS",p.gps==="true"?"Aktif · "+(p.radius||"150")+" m":"Nonaktif"]].map(([key,value])=><View key={key} className="flex-row justify-between border-b border-gray-100 py-3"><Text className="text-xs font-semibold text-gray-500">{key}</Text><Text className="max-w-[67%] text-right text-sm font-bold text-gray-900">{value}</Text></View>)}<PrimaryButton className="mt-5" disabled={busy} onPress={askCreate}>{busy?<ActivityIndicator color="#FFFFFF"/>:<ButtonText>Konfirmasi & Buat QR</ButtonText>}</PrimaryButton><SecondaryButton className="mt-3" onPress={()=>router.back()} disabled={busy}><Text className="text-sm font-bold text-[#45483C]">Edit Pengaturan</Text></SecondaryButton>{error?<View className="mt-4 rounded-2xl border border-red-100 bg-red-50 p-4"><Text className="text-sm font-semibold leading-5 text-red-700">{error}</Text></View>:null}</GlassCard></Screen>;
 }async function qrFile(ref:any){return await new Promise<string>((resolve,reject)=>{if(!ref?.toDataURL)return reject(new Error("QR belum siap."));ref.toDataURL((data:string)=>{const uri=`${FileSystem.cacheDirectory}ayohadir-${Date.now()}.png`;void FileSystem.writeAsStringAsync(uri,data,{encoding:FileSystem.EncodingType.Base64}).then(()=>resolve(uri)).catch(reject);});});}
 async function shareQr(ref:any,gps:boolean){if(!gps)Alert.alert("Peringatan keamanan",GPS_SHARE_WARNING);const uri=await qrFile(ref);if(await Sharing.isAvailableAsync())await Sharing.shareAsync(uri,{mimeType:"image/png",dialogTitle:"Bagikan QR AyoHadir"});else await Share.share({message:"QR AyoHadir",url:uri});}
 async function saveQr(ref:any){const p=await MediaLibrary.requestPermissionsAsync();if(!p.granted)throw new Error("Izin galeri diperlukan.");await MediaLibrary.saveToLibraryAsync(await qrFile(ref));}
@@ -301,6 +306,11 @@ export function ActiveQrWiredScreen(){
   catch(e){Alert.alert("Hapus sesi",msg(e));}
  };
 
+ const askDelete=()=>Alert.alert(
+  "Hapus sesi QR?",
+  "Sesi akan dihapus dari daftar Anda. Rekam absensi yang sudah tersimpan tetap menjadi arsip.",
+  [{text:"Batal",style:"cancel"},{text:"Hapus",style:"destructive",onPress:()=>void remove()}]
+ );
  const openArchive=()=>router.replace({pathname:"/screens/history-session",params:{qr_id:p.qr_id||""}});
  const openMap=()=>{
   if(info?.latitude==null||info?.longitude==null)return;
@@ -337,7 +347,7 @@ export function ActiveQrWiredScreen(){
   <SecondaryButton onPress={()=>router.push("/screens/cancellation-review")}>
    <Text className="font-bold text-[#3E5219]">Review Pembatalan</Text>
   </SecondaryButton>
-  <DangerButton onPress={()=>void remove()}><Text className="font-bold text-red-700">Hapus Sesi</Text></DangerButton>
+  <DangerButton onPress={askDelete}><Text className="font-bold text-red-700">Hapus Sesi</Text></DangerButton>
  </Screen>;
 }
 
@@ -514,7 +524,16 @@ export function NotificationsWiredScreen(){
 export function OwnerCancelAttendanceWiredScreen(){
  const p=useLocalSearchParams<Record<string,string>>(); const router=useRouter(); const [reason,setReason]=useState(""); const [busy,setBusy]=useState(false); const [error,setError]=useState("");
  const submit=async()=>{setError("");if(!p.attendance_id)return setError("Attendance tidak ditemukan.");if(reason.trim().length<3)return setError("Alasan minimal 3 karakter.");if(reason.trim().length>1000)return setError("Alasan maksimal 1000 karakter.");setBusy(true);try{await invokeEdgeFunction("cancel-attendance",{attendance_id:p.attendance_id,reason:reason.trim()});router.replace({pathname:"/screens/history-session",params:{qr_id:p.qr_id||""}});}catch(e){setError(msg(e));}finally{setBusy(false);}};
- return <Screen><BackHeader title="Batalkan Absensi"/><SoftCard><Text className="text-xs font-bold uppercase tracking-[2px] text-red-700">Pemilik QR</Text><Text className="mt-1 text-xl font-black text-gray-950">Batalkan absensi {p.user_name||"Pengguna"}</Text><Text className="mt-2 text-sm leading-5 text-gray-600">Tindakan ini tidak menghapus rekam asli. Keputusan dicatat dalam audit log.</Text></SoftCard><GlassCard><Text className="text-sm font-bold text-gray-900">Alasan pembatalan</Text><TextInput value={reason} onChangeText={v=>setReason(v.slice(0,1000))} maxLength={1000} multiline textAlignVertical="top" placeholder="Jelaskan alasan pembatalan…" placeholderTextColor="#8A8D82" className="mt-3 min-h-32 rounded-2xl border border-[#C5C8B8] bg-white px-4 py-3.5"/>{error?<View className="mt-3 rounded-2xl bg-red-50 p-3"><Text className="text-sm text-red-700">{error}</Text></View>:null}<PrimaryButton className="mt-4" disabled={busy} onPress={()=>void submit()}>{busy?<ActivityIndicator color="#FFF"/>:<Text className="font-bold text-white">Batalkan Absensi</Text>}</PrimaryButton><SecondaryButton className="mt-3" onPress={()=>router.back()} disabled={busy}><Text className="font-bold text-gray-800">Kembali</Text></SecondaryButton></GlassCard></Screen>;
+ const askCancel=()=>{
+  if(!p.attendance_id)return setError("Attendance tidak ditemukan.");
+  if(reason.trim().length<3)return setError("Alasan minimal 3 karakter.");
+  Alert.alert(
+   "Batalkan absensi?",
+   "Tindakan ini akan mengubah status absensi dan dicatat dalam audit log.",
+   [{text:"Batal",style:"cancel"},{text:"Batalkan",style:"destructive",onPress:()=>void submit()}]
+  );
+ };
+ return <Screen><BackHeader title="Batalkan Absensi"/><SoftCard><Text className="text-xs font-bold uppercase tracking-[2px] text-red-700">Pemilik QR</Text><Text className="mt-1 text-xl font-black text-gray-950">Batalkan absensi {p.user_name||"Pengguna"}</Text><Text className="mt-2 text-sm leading-5 text-gray-600">Tindakan ini tidak menghapus rekam asli. Keputusan dicatat dalam audit log.</Text></SoftCard><GlassCard><Text className="text-sm font-bold text-gray-900">Alasan pembatalan</Text><TextInput value={reason} onChangeText={v=>setReason(v.slice(0,1000))} maxLength={1000} multiline textAlignVertical="top" placeholder="Jelaskan alasan pembatalan…" placeholderTextColor="#8A8D82" className="mt-3 min-h-32 rounded-2xl border border-[#C5C8B8] bg-white px-4 py-3.5"/>{error?<View className="mt-3 rounded-2xl bg-red-50 p-3"><Text className="text-sm text-red-700">{error}</Text></View>:null}<PrimaryButton className="mt-4" disabled={busy} onPress={askCancel}>{busy?<ActivityIndicator color="#FFF"/>:<Text className="font-bold text-white">Batalkan Absensi</Text>}</PrimaryButton><SecondaryButton className="mt-3" onPress={()=>router.back()} disabled={busy}><Text className="font-bold text-gray-800">Kembali</Text></SecondaryButton></GlassCard></Screen>;
 }
 export function SyncWiredScreen(){
  const {user}=useAuth(); const [items,setItems]=useState<AttendanceQueueItem[]>([]); const [busy,setBusy]=useState(false);
