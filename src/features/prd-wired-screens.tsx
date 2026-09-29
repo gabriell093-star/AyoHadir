@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Alert, Pressable, ScrollView, Share, Switch, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, Share, Switch, Text, TextInput, View } from "react-native";
 import { Camera, CameraView, useCameraPermissions } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 import * as Linking from "expo-linking";
@@ -113,7 +113,7 @@ export function CreateSessionWiredScreen(){
    params:{
     title:title.trim(),
     target,
-    duration:String(Math.round(durationHours)),
+    duration:String(durationHours),
     lateMinutes:String(late),
     gps:String(gps),
     radius:String(radius),
@@ -134,6 +134,7 @@ export function CreateSessionWiredScreen(){
 
  return <Screen scroll={false}>
   <BackHeader title="Buat Sesi Absensi"/>
+  <KeyboardAvoidingView className="flex-1" behavior={Platform.OS==="ios"?"padding":undefined}>
   <View className="flex-1">
    <ScrollView keyboardShouldPersistTaps="handled" contentContainerClassName="gap-4 px-5 pb-32 pt-4">
     <View className="flex-row items-center gap-2">
@@ -229,6 +230,7 @@ export function CreateSessionWiredScreen(){
     </View>
    </View>
   </View>
+  </KeyboardAvoidingView>
  </Screen>;
 }
 
@@ -285,16 +287,12 @@ export function ActiveQrWiredScreen(){
   finally{setRotating(false);}
  };
 
- useEffect(()=>{
-  void loadInfo();
-  const refresh=setInterval(()=>void rotate(),600000);
-  const clock=setInterval(()=>setNow(Date.now()),1000);
-  return()=>{clearInterval(refresh);clearInterval(clock);};
- },[p.qr_id]);
-
  useFocusEffect(useCallback(()=>{
   void loadInfo();
   void rotate();
+  const refresh=setInterval(()=>void rotate(),600000);
+  const clock=setInterval(()=>setNow(Date.now()),1000);
+  return()=>{clearInterval(refresh);clearInterval(clock);};
  },[p.qr_id]));
 
  const remaining=expires?Math.max(0,Math.floor((Date.parse(expires)-now)/1000)):null;
