@@ -24,7 +24,6 @@ on:
 permissions:
   contents: read
 
-
 concurrency:
   group: expo-source-validation-${{ github.ref }}
   cancel-in-progress: true
@@ -144,7 +143,7 @@ jobs:
           java-version: "17"
 
       - name: Prepare stable public signing key
-        if: ${{ inputs.signing_mode == 'stable_public' || github.event_name == 'push' }}
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.build_apk == true && inputs.signing_mode == 'stable_public' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -162,13 +161,21 @@ jobs:
           } >> "$GITHUB_ENV"
 
       - name: Generate temporary release signing key
-        if: ${{ inputs.signing_mode != 'stable_public' && github.event_name == 'workflow_dispatch' }}
+        if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.build_apk == true && inputs.signing_mode == 'temporary_test') }}
         shell: bash
         run: |
           set -euo pipefail
           KEYSTORE="$RUNNER_TEMP/ayohadir-release.keystore"
           PASSWORD="$(openssl rand -hex 24)"
-          keytool -genkeypair -v             -keystore "$KEYSTORE"             -storepass "$PASSWORD"             -keypass "$PASSWORD"             -alias ayohadir             -keyalg RSA             -keysize 2048             -validity 10000             -dname "CN=AyoHadir, OU=Mobile, O=AyoHadir, C=ID"
+          keytool -genkeypair -v \
+            -keystore "$KEYSTORE" \
+            -storepass "$PASSWORD" \
+            -keypass "$PASSWORD" \
+            -alias ayohadir \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=AyoHadir, OU=Mobile, O=AyoHadir, C=ID"
           {
             echo "AYOHADIR_KEYSTORE=$KEYSTORE"
             echo "AYOHADIR_KEYSTORE_PASSWORD=$PASSWORD"
@@ -223,7 +230,7 @@ jobs:
       - name: Upload release APK
         uses: actions/upload-artifact@v4
         with:
-          name: AyoHadir-Android-release
+          name: AyoHadir-Android-release-${{ github.event_name == 'push' && 'temporary' || inputs.signing_mode }}
           path: android/app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
           retention-days: 14
