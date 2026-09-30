@@ -21,7 +21,9 @@ function errorMessage(error: unknown) {
 export async function isBackendOnline() {
   try {
     const response = await fetch(HEALTH_URL);
-    return response.ok;
+    // A 401/403 proves the Supabase endpoint is reachable; only 5xx
+    // (or a network exception) should be treated as backend outage.
+    return response.status < 500;
   } catch {
     return false;
   }
