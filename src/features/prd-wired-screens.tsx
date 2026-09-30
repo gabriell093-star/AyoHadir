@@ -44,7 +44,14 @@ const parseTime=(s:string)=>{
  const hour=Number(m[1]),minute=Number(m[2]);
  if(hour>23||minute>59)return new Date(Number.NaN);
  d.setHours(hour,minute,0,0);
+ d.setSeconds(0,0);
  return d;
+};
+const buildSchedule=(startText:string,endText:string)=>{
+ const start=parseTime(startText),end=parseTime(endText);
+ if(Number.isNaN(start.getTime())||Number.isNaN(end.getTime())) return null;
+ if(end.getTime()<=start.getTime()) end.setDate(end.getDate()+1);
+ return {start,end,durationHours:(end.getTime()-start.getTime())/3600000};
 };
 const timeText=(d:Date)=>d.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit",hour12:false});
 const dateTimeText=(value:string|undefined)=>{
@@ -52,11 +59,7 @@ const dateTimeText=(value:string|undefined)=>{
  const date=new Date(value);
  return Number.isNaN(date.getTime())?"-":date.toLocaleString("id-ID",{dateStyle:"medium",timeStyle:"short"});
 };
-const parseTimeRange=(startText:string,endText:string)=>{
- const start=parseTime(startText),end=parseTime(endText);
- if(end.getTime()<=start.getTime()) end.setDate(end.getDate()+1);
- return {start,end,durationHours:(end.getTime()-start.getTime())/3600000};
-};
+const parseTimeRange=(startText:string,endText:string)=>buildSchedule(startText,endText) ?? {start:new Date(Number.NaN),end:new Date(Number.NaN),durationHours:Number.NaN};
 type CreateQrDraft = {
  title: string;
  target: string;
@@ -81,8 +84,8 @@ export function CreateSessionWiredScreen(){
  const [late,setLate]=useState(15);
  const [gps,setGps]=useState(false);
  const [radius,setRadius]=useState(150);
- const [start,setStart]=useState(() => timeText(new Date()));
- const [end,setEnd]=useState(() => timeText(new Date(Date.now()+7200000)));
+ const [start,setStart]=useState(() => timeText(new Date(Date.now()+5*60000)));
+ const [end,setEnd]=useState(() => timeText(new Date(Date.now()+125*60000)));
  const [users,setUsers]=useState<{id:string;display_name:string|null}[]>([]);
  const [selected,setSelected]=useState<string[]>([]);
  const [userQuery,setUserQuery]=useState("");
@@ -117,9 +120,10 @@ export function CreateSessionWiredScreen(){
 
   if(step===2){
    if(!/^\d{1,2}:\d{2}$/.test(start.trim())||!/^\d{1,2}:\d{2}$/.test(end.trim()))return setError("Waktu mulai dan selesai harus menggunakan format HH:mm.");
-   const {durationHours}=parseTimeRange(start,end);
-   if(!Number.isFinite(durationHours))return setError("Waktu mulai dan selesai tidak valid.");
-   if(durationHours<1||durationHours>24)return setError("Durasi sesi harus antara 1 dan 24 jam.");
+   const schedule=buildSchedule(start,end);
+   if(!schedule)return setError("Waktu mulai dan selesai tidak valid.");
+   if(schedule.durationHours<1||schedule.durationHours>24)return setError("Durasi sesi harus antara 1 dan 24 jam.");
+   if(schedule.end.getTime()<=Date.now())return setError("Waktu selesai sudah lewat. Pilih waktu yang masih akan berlangsung.");
    return true;
   }
 
@@ -130,8 +134,11 @@ export function CreateSessionWiredScreen(){
  const next=()=>{
   if(!validateStep())return;
   if(step<3){setStep(value=>value+1);return;}
-  const {start:s,end:e,durationHours}=parseTimeRange(start,end);
-  if(!Number.isFinite(durationHours))return setError("Waktu mulai dan selesai tidak valid.");
+  const schedule=buildSchedule(start,end);
+  if(!schedule)return setError("Waktu mulai dan selesai tidak valid.");
+  const {start:s,end:e,durationHours}=schedule;
+  if(durationHours<1||durationHours>24)return setError("Durasi sesi harus antara 1 dan 24 jam.");
+  if(e.getTime()<=Date.now())return setError("Waktu selesai sudah lewat. Pilih waktu yang masih akan berlangsung.");
   createQrDraft={
    title:title.trim(),
    target,
