@@ -10,7 +10,7 @@ export function DashboardWiredScreen(){
  const load=useCallback(async()=>{
   const userId=user?.id;
   if(!userId)return;
-  const onlineResult=await fetch("https://sqrvntrxoytjnbgticpd.supabase.co/auth/v1/health").then(r=>r.ok).catch(()=>false);
+  const onlineResult=await fetch("https://sqrvntrxoytjnbgticpd.supabase.co/auth/v1/health").then(r=>r.status<500).catch(()=>false);
   setOnline(Boolean(onlineResult));
   const a=await supabase.from("attendance").select("id,qr_id,status,unique_code,server_recorded_at,scanned_at,qr_sessions(name)").eq("user_id",userId).order("server_recorded_at",{ascending:false}).limit(5);
   setAttendance(a.data||[]);
