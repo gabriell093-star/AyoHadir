@@ -15,7 +15,7 @@ on:
       signing_mode:
         description: "Signing mode for the APK"
         required: true
-        default: "temporary_test"
+        default: "stable_public"
         type: choice
         options:
           - temporary_test
@@ -144,7 +144,7 @@ jobs:
           java-version: "17"
 
       - name: Prepare stable public signing key
-        if: ${{ inputs.signing_mode == 'stable_public' }}
+        if: ${{ inputs.signing_mode == 'stable_public' || github.event_name == 'push' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -162,7 +162,7 @@ jobs:
           } >> "$GITHUB_ENV"
 
       - name: Generate temporary release signing key
-        if: ${{ inputs.signing_mode != 'stable_public' }}
+        if: ${{ inputs.signing_mode != 'stable_public' && github.event_name == 'workflow_dispatch' }}
         shell: bash
         run: |
           set -euo pipefail
