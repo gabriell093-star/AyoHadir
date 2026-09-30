@@ -191,6 +191,19 @@ jobs:
           chmod 600 "$KEYSTORE" "$PROPERTIES"
           echo "AYOHADIR_SIGNING_PROPERTIES=$PROPERTIES" >> "$GITHUB_ENV"
 
+      - name: Install required Android SDK components
+        shell: bash
+        run: |
+          set -euo pipefail
+          yes | sdkmanager --licenses >/dev/null 2>&1 || true
+          sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0" "ndk;27.1.12297006"
+
+      - name: Verify required NDK
+        shell: bash
+        run: |
+          test -d "$ANDROID_HOME/ndk/27.1.12297006"
+          echo "NDK 27.1.12297006 is installed."
+
       - name: Generate Android project
         run: npx expo prebuild --platform android --non-interactive
 
