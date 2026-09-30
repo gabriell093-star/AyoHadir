@@ -114,7 +114,7 @@ jobs:
       ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
       ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
       ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-    timeout-minutes: 20
+    timeout-minutes: 30
     permissions:
       contents: read
     steps:
@@ -185,6 +185,16 @@ jobs:
 
       - name: Generate Android project
         run: npx expo prebuild --platform android --non-interactive
+
+      - name: Limit Android build to ARM64 phones
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -q '^reactNativeArchitectures=' android/gradle.properties; then
+            sed -i 's/^reactNativeArchitectures=.*/reactNativeArchitectures=arm64-v8a/' android/gradle.properties
+          else
+            echo 'reactNativeArchitectures=arm64-v8a' >> android/gradle.properties
+          fi
 
       - name: Configure release signing
         working-directory: android
