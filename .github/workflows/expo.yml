@@ -110,10 +110,6 @@ jobs:
     env:
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
-      ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
     timeout-minutes: 30
     permissions:
       contents: read
@@ -145,6 +141,11 @@ jobs:
       - name: Prepare stable public signing key
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.build_apk == true && inputs.signing_mode == 'stable_public' }}
         shell: bash
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           set -euo pipefail
           test -n "${ANDROID_KEYSTORE_BASE64:-}" || { echo "Missing ANDROID_KEYSTORE_BASE64"; exit 1; }
@@ -152,13 +153,16 @@ jobs:
           test -n "${ANDROID_KEY_ALIAS:-}" || { echo "Missing ANDROID_KEY_ALIAS"; exit 1; }
           test -n "${ANDROID_KEY_PASSWORD:-}" || { echo "Missing ANDROID_KEY_PASSWORD"; exit 1; }
           KEYSTORE="$RUNNER_TEMP/ayohadir-release.keystore"
+          PROPERTIES="$RUNNER_TEMP/ayohadir-signing.properties"
           printf "%s" "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$KEYSTORE"
           {
-            echo "AYOHADIR_KEYSTORE=$KEYSTORE"
-            echo "AYOHADIR_KEYSTORE_PASSWORD=$ANDROID_KEYSTORE_PASSWORD"
-            echo "AYOHADIR_KEY_ALIAS=$ANDROID_KEY_ALIAS"
-            echo "AYOHADIR_KEY_PASSWORD=$ANDROID_KEY_PASSWORD"
-          } >> "$GITHUB_ENV"
+            echo "storeFile=$KEYSTORE"
+            echo "storePassword=$ANDROID_KEYSTORE_PASSWORD"
+            echo "keyAlias=$ANDROID_KEY_ALIAS"
+            echo "keyPassword=$ANDROID_KEY_PASSWORD"
+          } > "$PROPERTIES"
+          chmod 600 "$KEYSTORE" "$PROPERTIES"
+          echo "AYOHADIR_SIGNING_PROPERTIES=$PROPERTIES" >> "$GITHUB_ENV"
 
       - name: Generate temporary release signing key
         if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.build_apk == true && inputs.signing_mode == 'temporary_test') }}
@@ -166,7 +170,9 @@ jobs:
         run: |
           set -euo pipefail
           KEYSTORE="$RUNNER_TEMP/ayohadir-release.keystore"
+          PROPERTIES="$RUNNER_TEMP/ayohadir-signing.properties"
           PASSWORD="$(openssl rand -hex 24)"
+          echo "::add-mask::$PASSWORD"
           keytool -genkeypair -v \
             -keystore "$KEYSTORE" \
             -storepass "$PASSWORD" \
@@ -177,11 +183,13 @@ jobs:
             -validity 10000 \
             -dname "CN=AyoHadir, OU=Mobile, O=AyoHadir, C=ID"
           {
-            echo "AYOHADIR_KEYSTORE=$KEYSTORE"
-            echo "AYOHADIR_KEYSTORE_PASSWORD=$PASSWORD"
-            echo "AYOHADIR_KEY_ALIAS=ayohadir"
-            echo "AYOHADIR_KEY_PASSWORD=$PASSWORD"
-          } >> "$GITHUB_ENV"
+            echo "storeFile=$KEYSTORE"
+            echo "storePassword=$PASSWORD"
+            echo "keyAlias=ayohadir"
+            echo "keyPassword=$PASSWORD"
+          } > "$PROPERTIES"
+          chmod 600 "$KEYSTORE" "$PROPERTIES"
+          echo "AYOHADIR_SIGNING_PROPERTIES=$PROPERTIES" >> "$GITHUB_ENV"
 
       - name: Generate Android project
         run: npx expo prebuild --platform android --non-interactive
@@ -206,10 +214,16 @@ jobs:
           android {
               signingConfigs {
                   release {
-                      storeFile file(System.getenv("AYOHADIR_KEYSTORE"))
-                      storePassword System.getenv("AYOHADIR_KEYSTORE_PASSWORD")
-                      keyAlias System.getenv("AYOHADIR_KEY_ALIAS")
-                      keyPassword System.getenv("AYOHADIR_KEY_PASSWORD")
+                      def signingPropertiesPath = System.getenv("AYOHADIR_SIGNING_PROPERTIES")
+                      if (signingPropertiesPath == null) {
+                          throw new GradleException("Missing Android signing properties")
+                      }
+                      def signingProperties = new Properties()
+                      file(signingPropertiesPath).withInputStream { signingProperties.load(it) }
+                      storeFile file(signingProperties["storeFile"])
+                      storePassword signingProperties["storePassword"]
+                      keyAlias signingProperties["keyAlias"]
+                      keyPassword signingProperties["keyPassword"]
                   }
               }
               buildTypes {
@@ -236,6 +250,12 @@ jobs:
             echo "Release APK is debuggable."
             exit 1
           fi
+
+      - name: Remove signing material
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          rm -f "${AYOHADIR_SIGNING_PROPERTIES:-}" "$RUNNER_TEMP/ayohadir-signing.properties" "$RUNNER_TEMP/ayohadir-release.keystore"
 
       - name: Upload release APK
         uses: actions/upload-artifact@v4
