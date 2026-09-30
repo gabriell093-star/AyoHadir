@@ -43,9 +43,11 @@ export default function SignInScreen() {
     try {
       await action();
     } catch (error) {
-      setMessage(
-        "Email atau kata sandi tidak valid, atau layanan sedang tidak tersedia. Coba lagi."
-      );
+      const raw = error instanceof Error ? error.message : "";
+      const safe = /email address.*not authorized|rate limit|too many/i.test(raw)
+        ? "Email belum dapat diproses. Coba lagi beberapa saat."
+        : "Email atau kata sandi tidak valid, atau layanan sedang tidak tersedia. Coba lagi.";
+      setMessage(safe);
     } finally {
       setBusy(false);
     }
@@ -91,6 +93,15 @@ export default function SignInScreen() {
 
         if (error) {
           throw error;
+        }
+
+        if (!data.user) {
+          throw new Error("Akun tidak dapat dibuat.");
+        }
+
+        if (!data.session && data.user.identities?.length === 0) {
+          setMessage("Akun dengan email ini sudah terdaftar. Silakan masuk atau gunakan Lupa password.");
+          return;
         }
 
         if (data.session) {
