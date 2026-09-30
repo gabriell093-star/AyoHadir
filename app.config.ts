@@ -19,6 +19,13 @@ const config: ExpoConfig = {
   icon: "./assets/images/ayo-hadir-icon.png",
   android: {
     package: "com.ayohadir.app",
+    blockedPermissions: [
+      "android.permission.RECORD_AUDIO",
+      "android.permission.SYSTEM_ALERT_WINDOW",
+      "android.permission.USE_BIOMETRIC",
+      "android.permission.READ_MEDIA_AUDIO",
+      "android.permission.READ_MEDIA_VIDEO"
+    ],
     versionCode: 35,
     adaptiveIcon: {
       backgroundColor: "#FFFFFF",
@@ -28,10 +35,20 @@ const config: ExpoConfig = {
   plugins: [
     "expo-router",
     "expo-secure-store",
-    "expo-camera",
+    [
+      "expo-camera",
+      {
+        "recordAudioAndroid": false
+      }
+    ],
     "expo-image-picker",
     "expo-location",
-    "expo-media-library"
+    [
+      "expo-media-library",
+      {
+        "granularPermissions": ["photo"]
+      }
+    ]
   ],
   experiments: {
     typedRoutes: true
