@@ -20,7 +20,7 @@ export default function VerifyEmailScreen() {
     "Buka email verifikasi yang kami kirim, lalu tekan tautannya untuk mengaktifkan akun."
   );
 
-  const resend = async () => {
+  const checkVerification = async () => { setBusy(true); setNotice("Memeriksa status verifikasi…"); try { const { data, error } = await supabase.auth.getUser(); if (error) throw error; if (data.user?.email_confirmed_at) { router.replace("/"); return; } setNotice("Email belum terverifikasi. Buka tautan dari email lalu coba cek lagi."); } catch { setNotice("Status verifikasi belum dapat diperiksa. Pastikan koneksi internet tersedia."); } finally { setBusy(false); } };\n\n  const resend = async () => {
     if (!email) {
       setNotice("Alamat email tidak tersedia.");
       return;
@@ -82,11 +82,11 @@ export default function VerifyEmailScreen() {
         </Pressable>
 
         <Pressable
-          className="w-full items-center rounded-2xl border border-gray-200 bg-white px-4 py-4"
-          onPress={() => router.replace("/sign-in")}
+          className="w-full items-center rounded-2xl border border-[#DDE8C9] bg-[#F2F5E8] px-4 py-4"
+          onPress={() => void checkVerification()}
           disabled={busy}
         >
-          <Text className="font-bold text-gray-800">Kembali ke masuk</Text>
+          {busy ? <ActivityIndicator color="#3E5219" /> : <Text className="font-bold text-[#3E5219]">Saya sudah verifikasi</Text>}
         </Pressable>
       </View>
     </View>
