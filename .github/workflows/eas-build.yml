@@ -45,7 +45,7 @@ jobs:
           test -n "${SUPABASE_PUBLISHABLE_KEY:-}" || { echo "Missing SUPABASE_PUBLISHABLE_KEY"; exit 1; }
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install --no-audit --no-fund
 
       - name: Initialize or link EAS project
         shell: bash
