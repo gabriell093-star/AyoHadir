@@ -62,7 +62,7 @@ const RadiusSlider=({value,onChange}:{value:number;onChange:(value:number)=>void
   onMoveShouldSetPanResponder:()=>true,
   onPanResponderGrant:(event)=>onChange(clamp(event.nativeEvent.locationX)),
   onPanResponderMove:(event)=>onChange(clamp(event.nativeEvent.locationX)),
- }).current);
+ }));
  const progress=(value-5)/2995;
  return <View className="mt-5">
   <View className="flex-row items-center justify-between">
