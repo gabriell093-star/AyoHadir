@@ -210,9 +210,9 @@ export function Screen({ children, scroll = true, contentClassName = "", bottomN
       className="flex-1 bg-[#FAF9F6]"
       contentInsetAdjustmentBehavior="never"
       keyboardShouldPersistTaps="handled"
-      contentContainerClassName={"gap-5 px-5 pt-5 " + contentClassName}
+      contentContainerClassName={"gap-4 px-4 pt-4 " + contentClassName}
       contentContainerStyle={{
-        paddingBottom: bottomNav ? insets.bottom + 96 : insets.bottom + 32
+        paddingBottom: bottomNav ? insets.bottom + 116 : insets.bottom + 32
       }}
     >
       {children}
@@ -294,7 +294,7 @@ export function PrimaryButton({
       onPress={onPress}
       disabled={disabled}
       className={
-        "min-h-12 items-center justify-center rounded-lg bg-[#3E5219] px-5 py-3.5 " +
+        "min-h-[54px] items-center justify-center rounded-2xl bg-[#3E5219] px-5 py-3.5 shadow-sm " +
         (disabled ? "opacity-50 " : "") +
         className
       }
@@ -320,7 +320,7 @@ export function SecondaryButton({
       onPress={onPress}
       disabled={disabled}
       className={
-        "min-h-12 items-center justify-center rounded-lg border border-[#75796B] bg-white px-5 py-3.5 " +
+        "min-h-[54px] items-center justify-center rounded-2xl border border-[#C5C8B8] bg-white px-5 py-3.5 " +
         (disabled ? "opacity-50 " : "") +
         className
       }
@@ -354,11 +354,11 @@ export function BackHeader({
 }) {
   const router = useRouter();
   return (
-    <View className="flex-row items-center justify-between border-b border-[#DDE8C9]/70 bg-white px-4 py-3">
-      <Pressable onPress={() => router.back()} className="h-10 w-10 items-center justify-center rounded-full bg-gray-50">
+    <View className="h-16 flex-row items-center justify-between border-b border-[#C5C8B8]/20 bg-white px-4">
+      <Pressable onPress={() => router.back()} className="h-11 w-11 items-center justify-center rounded-full bg-[#F4F3F1]">
         <AppIcon name="arrow_back" size={22} color={UI.text} />
       </Pressable>
-      <Text className="flex-1 px-3 text-base font-extrabold text-[#3E5219]">{title}</Text>
+      <Text className="flex-1 px-3 text-[18px] font-extrabold text-[#3E5219]">{title}</Text>
       <View className="min-w-10 items-end">{right}</View>
     </View>
   );
@@ -379,27 +379,27 @@ export function BottomNav({ active }: { active: NavKey }) {
 
   return (
     <View
-      className="border-t border-[#C5C8B8]/30 bg-[#FAF9F6]"
-      style={{ paddingBottom: Math.max(insets.bottom, 8) }}
+      className="border-t border-[#C5C8B8]/25 bg-white"
+      style={{ paddingBottom: Math.max(insets.bottom, 10) }}
     >
-      <View className="flex-row items-center justify-around px-3 pt-2">
+      <View className="h-[70px] flex-row items-end justify-between px-2 pt-2">
         {items.map((item) => {
           const selected = active === item.key;
           return (
             <Pressable
               key={item.key}
               onPress={() => router.push(item.route as any)}
-              className="min-w-[60px] items-center px-2 pb-1"
+              className="min-w-[60px] flex-1 items-center px-1"
             >
               {item.key === "qr" ? (
-                <View className="-mt-7 h-14 w-14 items-center justify-center rounded-full bg-[#3E5219] shadow-md">
-                  <AppIcon name="qr" size={26} color="#FFFFFF" />
+                <View className="-mt-6 h-14 w-14 items-center justify-center rounded-full bg-[#3E5219] shadow-md">
+                  <AppIcon name="qr" size={25} color="#FFFFFF" />
                 </View>
               ) : (
-                <View className={selected ? "h-9 w-14 items-center justify-center rounded-full bg-[#E4F1D2]" : "h-9 w-14 items-center justify-center"}>
+                <View className={selected ? "h-9 w-12 items-center justify-center rounded-full bg-[#E4F1D2]" : "h-9 w-12 items-center justify-center"}>
                   <AppIcon
                     name={item.icon}
-                    size={23}
+                    size={22}
                     color={selected ? UI.greenDark : UI.faint}
                   />
                 </View>
@@ -464,7 +464,7 @@ export function RowButton({
 
   return (
     <Pressable onPress={onPress} className="flex-row items-center border-b border-gray-100 px-1 py-4">
-      <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-[#F2F5E8]">
+      <View className="mr-3 h-11 w-11 items-center justify-center rounded-2xl bg-[#F2F5E8]">
         <AppIcon name={iconName} size={19} color={UI.greenDark} />
       </View>
       <View className="flex-1">
