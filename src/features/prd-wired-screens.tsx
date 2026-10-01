@@ -307,8 +307,104 @@ async function saveQr(ref:any){
  await MediaLibrary.Asset.create(uri);
 }
 
-export function QrSuccessWiredScreen(){const p=useLocalSearchParams<Record<string,string>>();const router=useRouter();const ref=useRef<any>(null);const[token,setToken]=useState(p.token||"");const[expires,setExpires]=useState(p.token_expires_at||"");const rotate=async()=>{try{const r=await invokeEdgeFunction<any>("rotate-qr-token",{qr_id:p.qr_id});setToken(pick(r,"token")||token);setExpires(pick(r,"token_expires_at")||expires);}catch(e){Alert.alert("Token",msg(e));}};useEffect(()=>{void rotate();const i=setInterval(()=>void rotate(),600000);return()=>clearInterval(i);},[p.qr_id]);return <Screen><BackHeader title="QR Berhasil Dibuat"/><GlassCard className="items-center"><Badge>Aktif</Badge><Text className="mt-3 text-xl font-black">{p.title}</Text><View className="mt-5 rounded-xl border-2 border-[#DDE8C9] bg-white p-4"><QRCode getRef={(r:any)=>{ref.current=r}} value={createQrPayload({qr_id:p.qr_id||"",token,token_expires_at:expires||undefined,gps_enabled:p.gps==="true"})} size={220}/></View><Text className="mt-3 text-xs text-gray-500">{expires?("Token berlaku sampai "+new Date(expires).toLocaleTimeString()):"Menunggu token server"}</Text></GlassCard><View className="flex-row gap-3"><SecondaryButton className="flex-1" onPress={()=>void shareQr(ref.current,p.gps==="true").catch(e=>Alert.alert("Bagikan QR",msg(e)))}><Text className="font-bold">Bagikan</Text></SecondaryButton><SecondaryButton className="flex-1" onPress={()=>void saveQr(ref.current).catch(e=>Alert.alert("Unduh QR",msg(e)))}><Text className="font-bold">Unduh</Text></SecondaryButton></View><PrimaryButton onPress={()=>router.push({pathname:"/screens/active-qr",params:{...p,token,token_expires_at:expires}})}><ButtonText>Lihat Sesi</ButtonText></PrimaryButton></Screen>}
+export function QrSuccessWiredScreen(){
+ const p=useLocalSearchParams<Record<string,string>>();
+ const router=useRouter();
+ const ref=useRef<any>(null);
+ const [token,setToken]=useState(p.token||"");
+ const [expires,setExpires]=useState(p.token_expires_at||"");
+ const [qrReady,setQrReady]=useState(false);
+ const [busy,setBusy]=useState(false);
 
+ const rotate=async()=>{
+  try{
+   const r=await invokeEdgeFunction<any>("rotate-qr-token",{qr_id:p.qr_id});
+   setToken(String(pick(r,"token")||""));
+   setExpires(String(pick(r,"token_expires_at")||""));
+  }catch(e){
+   Alert.alert("Token QR",msg(e));
+  }
+ };
+
+ useEffect(()=>{
+  void rotate();
+  const interval=setInterval(()=>void rotate(),600000);
+  return()=>clearInterval(interval);
+ },[p.qr_id]);
+
+ const download=async()=>{
+  if(!qrReady||busy)return;
+  setBusy(true);
+  try{
+   await saveQr(ref.current);
+   Alert.alert("QR tersimpan","Gambar QR berhasil disimpan ke galeri.");
+  }catch(e){
+   Alert.alert("Unduh QR",msg(e));
+  }finally{
+   setBusy(false);
+  }
+ };
+
+ const share=async()=>{
+  if(!qrReady||busy)return;
+  try{
+   await shareQr(ref.current,p.gps==="true");
+  }catch(e){
+   Alert.alert("Bagikan QR",msg(e));
+  }
+ };
+
+ return <Screen>
+  <BackHeader title="QR Berhasil Dibuat"/>
+  <SoftCard className="items-center">
+   <Badge>Aktif</Badge>
+   <Text className="mt-3 text-[22px] font-black text-gray-950" numberOfLines={2}>{p.title||"Sesi Absensi"}</Text>
+   <Text className="mt-1 text-center text-xs leading-5 text-gray-600">QR ini diperbarui otomatis setiap 10 menit. Screenshot hanya valid selama token yang terlihat masih aktif.</Text>
+   <View className="mt-5 rounded-[24px] border border-[#C5C8B8] bg-white p-4 shadow-sm">
+    <QRCode
+      getRef={(value:any)=>{ref.current=value;setQrReady(Boolean(value));}}
+      value={createQrPayload({qr_id:p.qr_id||"",token,token_expires_at:expires||undefined,gps_enabled:p.gps==="true"})}
+      size={240}
+    />
+   </View>
+   <View className="mt-4 flex-row items-center gap-2">
+    <View className="h-2.5 w-2.5 rounded-full bg-[#3E5219]"/>
+    <Text className="text-xs font-semibold text-gray-600">{expires?("Token aktif sampai "+new Date(expires).toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"})):"Menyiapkan token…"}</Text>
+   </View>
+  </SoftCard>
+
+  <GlassCard>
+   <View className="flex-row items-start gap-3">
+    <View className="h-10 w-10 items-center justify-center rounded-2xl bg-[#E4F1D2]">
+     <AppIcon name="verified" size={20} color="#3E5219"/>
+    </View>
+    <View className="flex-1">
+     <Text className="text-sm font-black text-gray-950">QR siap dibagikan</Text>
+     <Text className="mt-1 text-xs leading-5 text-gray-500">Tombol Bagikan dan Unduh menggunakan gambar QR yang sama. Validitas token tetap diperiksa server saat peserta melakukan absensi.</Text>
+    </View>
+   </View>
+  </GlassCard>
+
+  <View className="flex-row gap-3">
+   <SecondaryButton className="flex-1" disabled={!qrReady||busy} onPress={()=>void share()}>
+    <View className="flex-row items-center gap-2">
+     <AppIcon name="share" size={18} color="#3E5219"/>
+     <Text className="font-bold text-gray-800">Bagikan</Text>
+    </View>
+   </SecondaryButton>
+   <SecondaryButton className="flex-1" disabled={!qrReady||busy} onPress={()=>void download()}>
+    <View className="flex-row items-center gap-2">
+     <AppIcon name="download" size={18} color="#3E5219"/>
+     <Text className="font-bold text-gray-800">{busy?"Menyimpan…":"Unduh"}</Text>
+    </View>
+   </SecondaryButton>
+  </View>
+
+  <PrimaryButton onPress={()=>router.push({pathname:"/screens/active-qr",params:{...p,token,token_expires_at:expires}})}>
+   <ButtonText>Lihat Sesi</ButtonText>
+  </PrimaryButton>
+ </Screen>;
+}
 export function ActiveQrWiredScreen(){
  const p=useLocalSearchParams<Record<string,string>>(); const router=useRouter(); const ref=useRef<any>(null);
  const [token,setToken]=useState(p.token||""); const [expires,setExpires]=useState(p.token_expires_at||""); const [rotating,setRotating]=useState(false); const [now,setNow]=useState(0); const [info,setInfo]=useState<any|null>(null);
