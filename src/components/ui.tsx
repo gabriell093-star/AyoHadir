@@ -459,7 +459,7 @@ export function RowButton({
   onPress?: () => void;
   trailing?: string;
 }) {
-  const iconName = ICON_ALIASES[icon] ?? "info";
+  const iconName = icon in APP_ICON_ANDROID ? (icon as AppIconName) : ICON_ALIASES[icon] ?? "info";
   const trailingIcon = trailing === "›" ? "chevron_right" : null;
 
   return (
