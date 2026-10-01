@@ -212,7 +212,7 @@ export function CreateSessionWiredScreen(){
 
     {step===1?<View className="gap-4">
      <SoftCard>
-      <Text className="text-xs font-black uppercase tracking-[2px] text-[#3E5219]">Langkah 1 dari 4</Text>
+      <Text className="text-xs font-black uppercase tracking-[2px] text-[#3E5219]">Langkah 1 dari 3</Text>
       <Text className="mt-2 text-2xl font-black text-gray-950">Info Dasar</Text>
       <Text className="mt-1 text-xs leading-5 text-gray-600">Tentukan nama sesi dan siapa yang dapat melakukan absensi.</Text>
      </SoftCard>
@@ -241,7 +241,7 @@ export function CreateSessionWiredScreen(){
 
     {step===2?<View className="gap-4">
      <SoftCard>
-      <Text className="text-xs font-black uppercase tracking-[2px] text-[#3E5219]">Langkah 2 dari 4</Text>
+      <Text className="text-xs font-black uppercase tracking-[2px] text-[#3E5219]">Langkah 2 dari 3</Text>
       <Text className="mt-2 text-2xl font-black text-gray-950">Waktu</Text>
       <Text className="mt-1 text-xs leading-5 text-gray-600">Sesi berlaku minimal 1 jam dan maksimal 24 jam.</Text>
      </SoftCard>
@@ -264,7 +264,7 @@ export function CreateSessionWiredScreen(){
 
     {step===3?<View className="gap-4">
      <SoftCard>
-      <Text className="text-xs font-black uppercase tracking-[2px] text-[#3E5219]">Langkah 3 dari 4</Text>
+      <Text className="text-xs font-black uppercase tracking-[2px] text-[#3E5219]">Langkah 3 dari 3</Text>
       <Text className="mt-2 text-2xl font-black text-gray-950">Lokasi</Text>
       <Text className="mt-1 text-xs leading-5 text-gray-600">GPS opsional. Saat aktif, lokasi perangkat saat QR dibuat menjadi titik pusat.</Text>
      </SoftCard>
