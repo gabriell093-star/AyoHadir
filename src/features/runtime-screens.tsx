@@ -1,18 +1,10 @@
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Image, Linking, Modal, Pressable, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Image, Modal, Pressable, Text, TextInput, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import { useAuth } from "@/auth/auth-context";
 import { supabase } from "@/lib/supabase";
 import { AyoHadirLogo, AppIcon, Badge, BackHeader, ButtonText, DangerButton, GlassCard, PrimaryButton, RowButton, Screen, SecondaryButton, UI } from "@/components/ui";
-
-function TextButton({ children, onPress, tone = "green" }: { children: string; onPress?: () => void; tone?: "green" | "gray" | "red" }) {
-  return (
-    <Pressable onPress={onPress}>
-      <Text className={"text-sm font-bold " + (tone === "green" ? "text-[#3E5219]" : tone === "red" ? "text-red-600" : "text-gray-600")}>{children}</Text>
-    </Pressable>
-  );
-}
 
 function Brand() {
   return (
@@ -90,24 +82,6 @@ export function WelcomeScreen() {
         </View>
         <Text className="mt-7 text-center text-xs leading-5 text-gray-400">AyoHadir! untuk absensi QR yang ringkas dan transparan.</Text>
       </View>
-    </Screen>
-  );
-}
-
-export function LoginFailedScreen() {
-  const router = useRouter();
-  return (
-    <Screen scroll={false} contentClassName="justify-center px-6">
-      <View className="absolute inset-0 bg-[#F2F5E8] opacity-60" />
-      <GlassCard className="w-full max-w-md self-center p-6">
-        <Brand />
-        <View className="mt-6 rounded-2xl border border-red-100 bg-red-50 px-4 py-3">
-          <Text className="text-sm font-bold text-red-700">Email atau kata sandi salah.</Text>
-          <Text className="mt-1 text-xs leading-5 text-red-600">Periksa kembali data yang dimasukkan, atau gunakan pemulihan password.</Text>
-        </View>
-        <PrimaryButton className="mt-5" onPress={() => router.replace("/sign-in")}><ButtonText>Masuk lagi</ButtonText></PrimaryButton>
-        <TextButton onPress={() => router.push("/forgot-password")}>Lupa Kata Sandi?</TextButton>
-      </GlassCard>
     </Screen>
   );
 }
@@ -355,69 +329,6 @@ export function ProfileSettingsScreen() {
     </Screen>
   );
 }
-
-export function PermissionsAccessScreen() {
-  const router = useRouter();
-  return (
-    <Screen scroll={false} contentClassName="justify-center px-6">
-      <GlassCard className="w-full max-w-md self-center">
-        <View className="h-16 w-16 items-center justify-center rounded-full bg-[#F2F5E8]"><Text className="text-3xl text-[#3E5219]">✓</Text></View>
-        <Text className="mt-4 text-2xl font-black text-gray-950">Enable Features</Text>
-        <Text className="mt-2 text-sm leading-5 text-gray-500">Berikan akses kamera dan lokasi agar scanner dan verifikasi GPS bekerja sesuai pengaturan sesi.</Text>
-        <View className="mt-5 gap-3"><RowButton icon="⌗" title="Camera Access" subtitle="Diperlukan untuk scan QR" /><RowButton icon="⌖" title="Precise Location" subtitle="Diperlukan saat GPS diaktifkan" /></View>
-        <PrimaryButton className="mt-5" onPress={() => Linking.openSettings()}><ButtonText>Allow Permissions</ButtonText></PrimaryButton>
-        <SecondaryButton className="mt-3" onPress={() => router.back()}><Text className="text-sm font-bold text-gray-800">Not Now</Text></SecondaryButton>
-      </GlassCard>
-    </Screen>
-  );
-}
-
-export function PermissionNeededScreen() {
-  const router = useRouter();
-  return (
-    <Screen scroll={false} contentClassName="justify-center px-6">
-      <GlassCard className="w-full max-w-md self-center items-center">
-        <View className="h-16 w-16 items-center justify-center rounded-full bg-amber-50"><Text className="text-3xl text-amber-600">!</Text></View>
-        <Text className="mt-4 text-center text-2xl font-black text-gray-950">Permissions Needed</Text>
-        <Text className="mt-2 text-center text-sm leading-5 text-gray-500">Akses perangkat yang diperlukan belum diberikan, sehingga fitur tertentu tidak dapat digunakan.</Text>
-        <PrimaryButton className="mt-5 w-full" onPress={() => Linking.openSettings()}><ButtonText>Open System Settings</ButtonText></PrimaryButton>
-        <SecondaryButton className="mt-3 w-full" onPress={() => router.back()}><Text className="text-sm font-bold text-gray-800">Go Back</Text></SecondaryButton>
-      </GlassCard>
-    </Screen>
-  );
-}
-
-export function NotificationsPermissionScreen() {
-  const router = useRouter();
-  return (
-    <Screen scroll={false} contentClassName="justify-center px-6">
-      <GlassCard className="w-full max-w-md self-center">
-        <View className="items-center">
-          <View className="h-16 w-16 items-center justify-center rounded-full bg-[#F2F5E8]">
-            <Text className="text-3xl text-[#3E5219]">◉</Text>
-          </View>
-          <Text className="mt-4 text-center text-2xl font-black text-gray-950">Notifikasi AyoHadir</Text>
-          <Text className="mt-2 text-center text-sm leading-5 text-gray-500">
-            Notifikasi absensi, QR, dan sinkronisasi tersedia langsung di pusat notifikasi aplikasi.
-          </Text>
-        </View>
-        <View className="mt-5">
-          <RowButton icon="✓" title="Absensi" subtitle="Pembaruan saat absensi berhasil atau selesai disinkronkan." />
-          <RowButton icon="↻" title="Sinkronisasi" subtitle="Pembaruan saat data offline berhasil atau tertunda." />
-          <RowButton icon="◷" title="QR" subtitle="Peringatan QR yang hampir kedaluwarsa atau sudah berakhir." />
-        </View>
-        <PrimaryButton className="mt-4" onPress={() => router.push("/notifications")}>
-          <ButtonText>Lihat Notifikasi</ButtonText>
-        </PrimaryButton>
-        <SecondaryButton className="mt-3" onPress={() => router.back()}>
-          <Text className="text-sm font-bold text-gray-800">Nanti</Text>
-        </SecondaryButton>
-      </GlassCard>
-    </Screen>
-  );
-}
-
-
 
 export function CancellationSubmittedScreen() {
   const router = useRouter();
