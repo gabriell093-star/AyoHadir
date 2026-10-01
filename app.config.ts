@@ -56,13 +56,9 @@ const config: ExpoConfig = {
   extra: {
     supabaseUrl,
     supabasePublishableKey,
-    ...(process.env.EAS_PROJECT_ID
-      ? {
-          eas: {
-            projectId: process.env.EAS_PROJECT_ID
-          }
-        }
-      : {})
+    eas: {
+      projectId: "ace4e045-28f8-456f-8db6-17840e335450"
+    }
   }
 };
 
