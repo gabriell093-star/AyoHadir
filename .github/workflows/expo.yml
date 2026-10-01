@@ -160,10 +160,21 @@ jobs:
           if [ "$REMAINDER" -ne 0 ]; then NORMALIZED_BASE64="${NORMALIZED_BASE64}$(printf '=%0.s' $(seq 1 $((4 - REMAINDER))))"; fi
           printf "%s" "$NORMALIZED_BASE64" | base64 --decode --ignore-garbage > "$KEYSTORE"
           test -s "$KEYSTORE" || { echo "Decoded keystore is empty"; exit 1; }
-          keytool -list -storetype PKCS12 -keystore "$KEYSTORE" -storepass "$ANDROID_KEYSTORE_PASSWORD" -alias "$ANDROID_KEY_ALIAS" >/dev/null || {
-            echo "Decoded keystore is not a valid PKCS12 keystore for the supplied password/alias."
+          KEYTOOL_OUTPUT="$(mktemp)"
+          if ! keytool -list -storetype PKCS12 -keystore "$KEYSTORE" -storepass "$ANDROID_KEYSTORE_PASSWORD" >"$KEYTOOL_OUTPUT" 2>&1; then
+            echo "Decoded keystore cannot be opened with ANDROID_KEYSTORE_PASSWORD."
+            sed -E 's/[Pp]assword[^[:space:]]*/[REDACTED]/g' "$KEYTOOL_OUTPUT" | tail -n 3
+            rm -f "$KEYTOOL_OUTPUT"
             exit 1
-          }
+          fi
+          if ! grep -q "Alias name: ${ANDROID_KEY_ALIAS}" "$KEYTOOL_OUTPUT"; then
+            echo "Keystore password is valid, but ANDROID_KEY_ALIAS does not exist in the keystore."
+            echo "Available alias names:"
+            grep "Alias name:" "$KEYTOOL_OUTPUT" | sed -E 's/(Alias name: ).*/\1[REDACTED]/' || true
+            rm -f "$KEYTOOL_OUTPUT"
+            exit 1
+          fi
+          rm -f "$KEYTOOL_OUTPUT"
           {
             echo "storeFile=$KEYSTORE"
             echo "storePassword=$ANDROID_KEYSTORE_PASSWORD"
