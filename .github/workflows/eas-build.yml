@@ -17,7 +17,7 @@ jobs:
   build:
     name: Build Android with Expo EAS
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 180
     env:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -71,44 +71,59 @@ jobs:
           npx eas-cli@latest env:set --name SUPABASE_PUBLISHABLE_KEY --value "$SUPABASE_PUBLISHABLE_KEY" --environment production --visibility sensitive --non-interactive
 
       - name: Build production APK with EAS
-        run: npx eas-cli@latest build --platform android --profile production-apk --non-interactive --wait --clear-cache
-
-      - name: Find completed EAS build
         shell: bash
         run: |
           set -euo pipefail
-          npx eas-cli@latest build:list \
+          npx eas-cli@latest build \
             --platform android \
-            --build-profile production-apk \
-            --status finished \
-            --limit 1 \
-            --json > "$RUNNER_TEMP/eas-build-list.json"
+            --profile production-apk \
+            --non-interactive \
+            --wait \
+            --clear-cache \
+            --json > "$RUNNER_TEMP/eas-build.json"
+
           BUILD_ID="$(node -e '
             const fs=require("fs");
-            const x=JSON.parse(fs.readFileSync(process.argv[1],"utf8"));
-            const row=Array.isArray(x) ? x[0] : (x.builds?.[0] ?? x.data?.[0] ?? x.data?.builds?.[0]);
+            const raw=fs.readFileSync(process.argv[1],"utf8").trim();
+            const x=JSON.parse(raw);
+            const row=Array.isArray(x) ? x[0] : (x.build ?? x.data?.build ?? x.data?.[0] ?? x);
             if (!row?.id) process.exit(2);
             process.stdout.write(row.id);
-          ' "$RUNNER_TEMP/eas-build-list.json")"
+          ' "$RUNNER_TEMP/eas-build.json")"
+
           test -n "$BUILD_ID"
           echo "EAS_BUILD_ID=$BUILD_ID" >> "$GITHUB_ENV"
+          echo "EAS build completed: $BUILD_ID"
+
+      - name: Verify completed EAS build artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx eas-cli@latest build:view "$EAS_BUILD_ID" --json > "$RUNNER_TEMP/eas-build-view.json"
+          node -e '
+            const fs=require("fs");
+            const x=JSON.parse(fs.readFileSync(process.argv[1],"utf8"));
+            const row=x.build ?? x.data?.build ?? x;
+            if (!row?.id) process.exit(2);
+            if (row.status !== "FINISHED" && row.status !== "finished") process.exit(3);
+            if (!row.artifacts?.buildUrl) process.exit(4);
+            console.log("EAS status:", row.status);
+            console.log("APK artifact is available.");
+          ' "$RUNNER_TEMP/eas-build-view.json"
 
       - name: Download APK from EAS
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p artifacts
-          cd artifacts
-          npx eas-cli@latest build:download --build-id "$EAS_BUILD_ID" --non-interactive
-          APK_COUNT="$(find . -maxdepth 2 -type f -name '*.apk' | wc -l)"
-          test "$APK_COUNT" -ge 1 || { echo "No APK was downloaded from EAS."; exit 1; }
-          APK="$(find . -maxdepth 2 -type f -name '*.apk' | head -n 1)"
-          cp "$APK" "../AyoHadir-Android-release.apk"
+          npx eas-cli@latest build:download --build-id "$EAS_BUILD_ID" --non-interactive --output artifacts/AyoHadir-Android-release.apk
+          test -s artifacts/AyoHadir-Android-release.apk
+          file artifacts/AyoHadir-Android-release.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: AyoHadir-Android-release-EAS
-          path: AyoHadir-Android-release.apk
+          path: artifacts/AyoHadir-Android-release.apk
           if-no-files-found: error
           retention-days: 14
