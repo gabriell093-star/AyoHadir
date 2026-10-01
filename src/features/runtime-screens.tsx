@@ -112,50 +112,66 @@ export function LoginFailedScreen() {
   );
 }
 
-export function ProfileScreen() {
-  const router = useRouter();
-  const { profile, user } = useAuth();
-  const name = profile?.display_name || "Pengguna";
-  const verified = Boolean(user?.email_confirmed_at);
-  const [logoutVisible, setLogoutVisible] = useState(false);
+export function ProfileScreen(){
+ const router=useRouter();
+ const {profile,user}=useAuth();
+ const name=profile?.display_name||"Pengguna";
+ const verified=Boolean(user?.email_confirmed_at);
+ const [logoutVisible,setLogoutVisible]=useState(false);
 
-  const goSettings = (section: string) =>
-    router.push(("/screens/settings/" + section) as any);
+ const goSettings=(section:string)=>router.push(("/screens/settings/"+section) as any);
 
-  return (
-    <>
-      <Screen bottomNav="profile">
-        <View className="flex-row items-end justify-between">
-          <View className="flex-1">
-            <Text className="text-xs font-bold uppercase tracking-[2px] text-[#3E5219]">Akun Saya</Text>
-            <Text className="mt-1 text-[30px] font-black text-gray-950">Profil</Text>
-          </View>
-          <Pressable onPress={() => router.push("/screens/profile-settings")} className="h-11 w-11 items-center justify-center rounded-full border border-[#C5C8B8] bg-white">
-            <AppIcon name="settings" size={21} color="#3E5219" />
-          </Pressable>
-        </View>
+ return <>
+  <Screen bottomNav="profile">
+   <View className="pt-1">
+    <Text className="text-xs font-black uppercase tracking-[2px] text-[#3E5219]">Akun Saya</Text>
+    <View className="mt-1 flex-row items-center justify-between">
+     <Text className="text-[28px] font-black text-gray-950">Profil</Text>
+     <Pressable onPress={()=>router.push("/screens/profile-settings")} className="h-11 w-11 items-center justify-center rounded-full border border-[#C5C8B8]/40 bg-white">
+      <AppIcon name="settings" size={21} color={UI.greenDark}/>
+     </Pressable>
+    </View>
+   </View>
 
-        <GlassCard className="items-center rounded-[24px] border-[#C5C8B8] bg-[#F4F3F1] p-6">
-          <AvatarView uri={profile?.avatar_url} name={name} size={112} />
-          <Text className="mt-4 text-xl font-black text-gray-950">{name}</Text>
-          <Text className="mt-1 text-sm text-gray-500">{user?.email || "Belum ada email"}</Text>
-          <View className="mt-3 items-center">
-            <Badge tone={verified ? "green" : "yellow"}>{verified ? "✓ Email Terverifikasi" : "Email Belum Terverifikasi"}</Badge>
-          </View>
-        </GlassCard>
+   <GlassCard className="items-center overflow-hidden rounded-[28px] bg-[#F4F3F1] p-6">
+    <View className="absolute -right-12 -top-12 h-32 w-32 rounded-full bg-[#E4F1D2]"/>
+    <View className="absolute -bottom-16 -left-12 h-36 w-36 rounded-full bg-[#F5F5DC]"/>
+    <AvatarView uri={profile?.avatar_url} name={name} size={118}/>
+    <Text className="mt-4 text-[22px] font-black text-gray-950">{name}</Text>
+    <Text className="mt-1 max-w-full text-center text-sm text-gray-500">{user?.email||"Belum ada email"}</Text>
+    <View className="mt-3">
+     <Badge tone={verified?"green":"yellow"}>{verified?"✓ Email Terverifikasi":"Email Belum Terverifikasi"}</Badge>
+    </View>
+    <PrimaryButton className="mt-5 w-full" onPress={()=>router.push("/screens/profile-settings")}>
+     <View className="flex-row items-center gap-2"><AppIcon name="edit" size={18} color="#FFFFFF"/><Text className="font-bold text-white">Edit Profil</Text></View>
+    </PrimaryButton>
+   </GlassCard>
 
-        <GlassCard className="overflow-hidden rounded-[22px] p-2">
-          <RowButton icon="person" title="Edit Profile" subtitle="Ubah nama dan foto profil" onPress={() => router.push("/screens/profile-settings")} />
-          <RowButton icon="devices" title="Perangkat" subtitle="Lihat perangkat dan sesi aplikasi" onPress={() => goSettings("devices")} />
-          <RowButton icon="logout" title="Keluar" subtitle="Keluar dari akun pada perangkat ini" onPress={() => setLogoutVisible(true)} trailing="›" />
-        </GlassCard>
-      </Screen>
+   <View className="pt-1">
+    <Text className="mb-2 px-1 text-xs font-black uppercase tracking-[2px] text-gray-500">Pengaturan</Text>
+    <GlassCard className="overflow-hidden p-2">
+     <RowButton icon="location_on" title="Pengaturan Lokasi" subtitle="Preferensi GPS dan validasi lokasi" onPress={()=>goSettings("location")} trailing="›"/>
+     <RowButton icon="tune" title="Preferensi Aplikasi" subtitle="Sinkronisasi dan pengalaman penggunaan" onPress={()=>goSettings("preferences")} trailing="›"/>
+     <RowButton icon="devices" title="Perangkat" subtitle="Periksa sesi aplikasi pada perangkat ini" onPress={()=>goSettings("devices")} trailing="›"/>
+    </GlassCard>
+   </View>
 
-      <LogoutConfirmModal visible={logoutVisible} onClose={() => setLogoutVisible(false)} />
-    </>
-  );
+   <View className="pt-1">
+    <Text className="mb-2 px-1 text-xs font-black uppercase tracking-[2px] text-gray-500">Bantuan & Legal</Text>
+    <GlassCard className="overflow-hidden p-2">
+     <RowButton icon="help" title="Pusat Bantuan" subtitle="Panduan membuat QR, scan, offline, dan pembatalan" onPress={()=>goSettings("help")} trailing="›"/>
+     <RowButton icon="info" title="Kebijakan Privasi" onPress={()=>goSettings("privacy")} trailing="›"/>
+     <RowButton icon="description" title="Syarat & Ketentuan" onPress={()=>goSettings("terms")} trailing="›"/>
+    </GlassCard>
+   </View>
+
+   <SecondaryButton className="border-red-200 bg-red-50" onPress={()=>setLogoutVisible(true)}>
+    <View className="flex-row items-center gap-2"><AppIcon name="logout" size={18} color="#BA1A1A"/><Text className="font-bold text-red-700">Keluar dari akun</Text></View>
+   </SecondaryButton>
+  </Screen>
+  <LogoutConfirmModal visible={logoutVisible} onClose={()=>setLogoutVisible(false)}/>
+ </>;
 }
-
 export function ProfileSettingsScreen() {
   const router = useRouter();
   const { profile, user, updateDisplayName, updateAvatarUrl } = useAuth();
