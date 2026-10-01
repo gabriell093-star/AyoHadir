@@ -849,31 +849,32 @@ export function HistorySessionWiredScreen(){
 }
 
 export function NotificationsWiredScreen(){
- const {user}=useAuth(); const router=useRouter(); const [items,setItems]=useState<any[]>([]);
- const load=async()=>{if(!user?.id)return;const{data}=await supabase.from("notifications").select("id,title,body,type,read_at,created_at,data").eq("user_id",user.id).order("created_at",{ascending:false}).limit(100);setItems(data??[]);};
- const mark=async(id:string)=>{const{error}=await supabase.rpc("mark_notification_read",{p_notification_id:id});if(!error)setItems(current=>current.map(item=>item.id===id?{...item,read_at:item.read_at??new Date().toISOString()}:item));};
+ const {user}=useAuth();
+ const router=useRouter();
+ const [items,setItems]=useState<any[]>([]);
+ const [loading,setLoading]=useState(false);
+
+ const load=async()=>{
+  if(!user?.id)return;
+  setLoading(true);
+  try{
+   const {data}=await supabase.from("notifications").select("id,title,body,type,read_at,created_at,data").eq("user_id",user.id).order("created_at",{ascending:false}).limit(100);
+   setItems(data??[]);
+  }finally{setLoading(false);}
+ };
+ const mark=async(id:string)=>{
+  const {error}=await supabase.rpc("mark_notification_read",{p_notification_id:id});
+  if(!error)setItems(current=>current.map(item=>item.id===id?{...item,read_at:item.read_at??new Date().toISOString()}:item));
+ };
+ const markAll=async()=>{await Promise.all(items.filter(item=>!item.read_at).map(item=>mark(item.id)));};
  const openNotification=async(item:any)=>{
   await mark(item.id);
   const data=item.data??{};
-  if(item.type==="attendance_success"||item.type==="attendance_sync_complete"){
-   if(data.attendance_id) router.push({pathname:"/screens/attendance-proof",params:{attendance_id:String(data.attendance_id)}});
-   return;
-  }
-  if(item.type==="qr_expiring"){
-   if(data.qr_id) router.push({pathname:"/screens/active-qr",params:{qr_id:String(data.qr_id),title:String(data.qr_name??"Sesi QR")}});
-   return;
-  }
-  if(item.type==="qr_expired"){
-   if(data.qr_id) router.push({pathname:"/screens/history-session",params:{qr_id:String(data.qr_id)}});
-   return;
-  }
-  if(item.type==="cancellation_requested"){
-   router.push("/screens/cancellation-review");
-   return;
-  }
-  if(item.type==="cancellation_approved"||item.type==="cancellation_rejected"||item.type==="attendance_cancelled"){
-   if(data.attendance_id) router.push({pathname:"/screens/cancellation-submitted",params:{attendance_id:String(data.attendance_id)}});
-  }
+  if((item.type==="attendance_success"||item.type==="attendance_sync_complete")&&data.attendance_id){router.push({pathname:"/screens/attendance-proof",params:{attendance_id:String(data.attendance_id)}});return;}
+  if(item.type==="qr_expiring"&&data.qr_id){router.push({pathname:"/screens/active-qr",params:{qr_id:String(data.qr_id),title:String(data.qr_name??"Sesi QR")}});return;}
+  if(item.type==="qr_expired"&&data.qr_id){router.push({pathname:"/screens/history-session",params:{qr_id:String(data.qr_id)}});return;}
+  if(item.type==="cancellation_requested"){router.push("/screens/cancellation-review");return;}
+  if((item.type==="cancellation_approved"||item.type==="cancellation_rejected"||item.type==="attendance_cancelled")&&data.attendance_id){router.push({pathname:"/screens/cancellation-submitted",params:{attendance_id:String(data.attendance_id)}});}
  };
  useEffect(()=>{
   void load();
@@ -885,25 +886,56 @@ export function NotificationsWiredScreen(){
    .subscribe();
   return()=>{void supabase.removeChannel(channel);};
  },[user?.id]);
+ const unread=items.filter(item=>!item.read_at).length;
 
  return <Screen bottomNav="notifications">
-  <View className="flex-row items-center justify-between">
-   <View><Text className="text-[28px] font-black text-gray-950">Notifikasi</Text><Text className="mt-1 text-sm text-gray-500">Pembaruan absensi, QR, dan sinkronisasi.</Text></View>
-   <Pressable onPress={()=>void load()} className="rounded-full bg-[#E4F1D2] px-3 py-2"><Text className="text-xs font-bold text-[#3E5219]">Refresh</Text></Pressable>
+  <View>
+   <Text className="text-xs font-black uppercase tracking-[2px] text-[#3E5219]">Pembaruan</Text>
+   <View className="mt-1 flex-row items-center justify-between">
+    <Text className="text-[28px] font-black text-gray-950">Notifikasi</Text>
+    {unread?<Badge tone="yellow">{unread} baru</Badge>:<Badge tone="green">Semua dibaca</Badge>}
+   </View>
+   <Text className="mt-1 text-sm leading-5 text-gray-500">Absensi, QR, pembatalan, dan sinkronisasi Anda.</Text>
   </View>
+
+  <View className="flex-row items-center justify-between rounded-2xl border border-[#C5C8B8]/25 bg-white px-4 py-3">
+   <View className="flex-row items-center gap-2">
+    <View className="h-2.5 w-2.5 rounded-full bg-[#3E5219]"/>
+    <Text className="text-xs font-semibold text-gray-600">{unread} belum dibaca</Text>
+   </View>
+   <View className="flex-row items-center gap-4">
+    {unread?<Pressable onPress={()=>void markAll()}><Text className="text-xs font-bold text-[#3E5219]">Tandai dibaca</Text></Pressable>:null}
+    <Pressable onPress={()=>void load()} disabled={loading}><Text className="text-xs font-bold text-[#3E5219]">{loading?"Memuat…":"Segarkan"}</Text></Pressable>
+   </View>
+  </View>
+
   {items.length?items.map(item=><Pressable key={item.id} onPress={()=>void openNotification(item)}>
-   <GlassCard className={item.read_at?"opacity-70":""}>
-    <View className="flex-row items-start justify-between">
-     <Text className="flex-1 text-sm font-black text-gray-900">{item.title||item.type||"Notifikasi"}</Text>
-     {!item.read_at?<Badge tone="yellow">Baru</Badge>:null}
+   <GlassCard className={item.read_at?"opacity-70":"p-4"}>
+    <View className="flex-row items-start">
+     <View className={"h-12 w-12 items-center justify-center rounded-2xl "+(item.read_at?"bg-[#F4F3F1]":"bg-[#E4F1D2]")}>
+      <AppIcon
+       name={item.type==="attendance_success"?"check_circle":item.type==="attendance_sync_complete"?"cloud_done":item.type==="qr_expiring"?"timer":item.type==="qr_expired"?"lock_clock":item.type==="cancellation_requested"?"assignment_late":"notifications_active"}
+       size={21}
+       color={item.read_at?"#75796B":"#3E5219"}
+      />
+     </View>
+     <View className="ml-3 flex-1">
+      <View className="flex-row items-start justify-between gap-2">
+       <Text className="flex-1 text-sm font-black text-gray-950">{item.title||"Notifikasi AyoHadir"}</Text>
+       {!item.read_at?<View className="mt-1 h-2.5 w-2.5 rounded-full bg-[#3E5219]"/>:null}
+      </View>
+      <Text className="mt-2 text-sm leading-5 text-gray-600">{item.body||""}</Text>
+      <Text className="mt-2 text-[11px] font-semibold text-gray-400">{dateTimeText(item.created_at)}</Text>
+     </View>
     </View>
-    <Text className="mt-2 text-sm leading-5 text-gray-600">{item.body||""}</Text>
-    <Text className="mt-2 text-[11px] text-gray-400">{item.created_at||""}</Text>
    </GlassCard>
-  </Pressable>):<GlassCard><Text className="font-bold text-gray-900">Belum ada notifikasi.</Text></GlassCard>}
+  </Pressable>):<GlassCard className="items-center py-10">
+   <View className="h-12 w-12 items-center justify-center rounded-2xl bg-[#F2F5E8]"><AppIcon name="notifications_active" size={24} color="#3E5219"/></View>
+   <Text className="mt-3 text-base font-black text-gray-950">Belum ada notifikasi</Text>
+   <Text className="mt-1 max-w-xs text-center text-xs leading-5 text-gray-500">Pembaruan absensi, QR, dan sinkronisasi akan muncul di sini.</Text>
+  </GlassCard>}
  </Screen>;
 }
-
 export function EditQrWiredScreen(){
  const p=useLocalSearchParams<Record<string,string>>(); const router=useRouter();
  const [loaded,setLoaded]=useState(false); const [busy,setBusy]=useState(false); const [error,setError]=useState("");
