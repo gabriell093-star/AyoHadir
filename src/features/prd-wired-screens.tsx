@@ -55,14 +55,11 @@ const buildSchedule=(startText:string,endText:string)=>{
 };
 const timeText=(d:Date)=>`${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
 const RadiusSlider=({value,onChange}:{value:number;onChange:(value:number)=>void})=>{
- const widthRef=useRef(1);
- const clamp=(x:number)=>Math.max(5,Math.min(3000,Math.round(5+(x/widthRef.current)*2995)));
- const responder=useRef(PanResponder.create({
-  onStartShouldSetPanResponder:()=>true,
-  onMoveShouldSetPanResponder:()=>true,
-  onPanResponderGrant:(event)=>onChange(clamp(event.nativeEvent.locationX)),
-  onPanResponderMove:(event)=>onChange(clamp(event.nativeEvent.locationX)),
- }));
+ const [width,setWidth]=useState(1);
+ const updateFromTouch=(x:number)=>{
+  const safeWidth=Math.max(1,width);
+  onChange(Math.max(5,Math.min(3000,Math.round(5+(Math.max(0,Math.min(safeWidth,x))/safeWidth)*2995))));
+ };
  const progress=(value-5)/2995;
  return <View className="mt-5">
   <View className="flex-row items-center justify-between">
@@ -71,12 +68,13 @@ const RadiusSlider=({value,onChange}:{value:number;onChange:(value:number)=>void
   </View>
   <View
    className="mt-4 h-10 justify-center"
-   onLayout={(event)=>{widthRef.current=event.nativeEvent.layout.width;}}
-   {...responder.current.panHandlers}
+   onLayout={(event)=>setWidth(event.nativeEvent.layout.width)}
+   onTouchStart={(event)=>updateFromTouch(event.nativeEvent.locationX)}
+   onTouchMove={(event)=>updateFromTouch(event.nativeEvent.locationX)}
   >
    <View className="h-2 rounded-full bg-[#C5C8B8]/55"/>
-   <View className="absolute left-0 h-2 rounded-full bg-[#3E5219]" style={{width:Math.max(8,progress*100)+"%" as any}}/>
-   <View className="absolute h-7 w-7 rounded-full border-2 border-white bg-[#3E5219] shadow-sm" style={{left:Math.max(0,Math.min(widthRef.current-28,progress*widthRef.current-14))}}/>
+   <View className="absolute left-0 h-2 rounded-full bg-[#3E5219]" style={{width:Math.max(8,progress*100)+"%"}}/>
+   <View className="absolute h-7 w-7 rounded-full border-2 border-white bg-[#3E5219] shadow-sm" style={{left:Math.max(0,Math.min(width-28,progress*width-14))}}/>
   </View>
   <View className="mt-1 flex-row justify-between">
    <Text className="text-[10px] font-semibold text-gray-400">5 m</Text>
@@ -518,7 +516,7 @@ export function ActiveQrWiredScreen(){
  const [rotating,setRotating]=useState(false);
  const [saving,setSaving]=useState(false);
  const [qrReady,setQrReady]=useState(false);
- const [now,setNow]=useState(Date.now());
+ const [now,setNow]=useState(0);
  const [info,setInfo]=useState<any|null>(null);
 
  const loadInfo=async()=>{
