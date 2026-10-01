@@ -22,6 +22,7 @@ jobs:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+      NPM_CONFIG_LEGACY_PEER_DEPS: "true"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -47,16 +48,16 @@ jobs:
           test -n "${SUPABASE_PUBLISHABLE_KEY:-}" || { echo "Missing SUPABASE_PUBLISHABLE_KEY"; exit 1; }
 
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        run: npm install --legacy-peer-deps --no-audit --no-fund
 
       - name: Create deterministic npm lockfile for EAS archive
-        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+        run: npm install --package-lock-only --legacy-peer-deps --ignore-scripts --no-audit --no-fund
 
       - name: Verify npm lockfile
         run: |
           set -euo pipefail
           test -s package-lock.json
-          npm ci --ignore-scripts --no-audit --no-fund
+          npm ci --legacy-peer-deps --ignore-scripts --no-audit --no-fund
           echo "package-lock.json verified."
 
       - name: Validate EAS project configuration
