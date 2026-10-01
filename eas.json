@@ -1,7 +1,15 @@
 {
+  "cli": {
+    "appVersionSource": "local"
+  },
   "build": {
     "production": {
       "environment": "production",
+      "node": "24.21.0",
+      "env": {
+        "EAS_NO_FROZEN_LOCKFILE": "1",
+        "EAS_BUILD_DISABLE_NPM_CACHE": "1"
+      },
       "android": {
         "image": "latest",
         "buildType": "app-bundle"
@@ -10,7 +18,6 @@
     "production-apk": {
       "extends": "production",
       "android": {
-        "image": "latest",
         "buildType": "apk"
       }
     }

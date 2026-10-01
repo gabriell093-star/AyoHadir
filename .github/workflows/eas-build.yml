@@ -30,6 +30,7 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 24
+          cache: npm
 
       - name: Check Expo token
         run: |
@@ -47,6 +48,12 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
+      - name: Create deterministic npm lockfile for EAS archive
+        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+
+      - name: Validate EAS project configuration
+        run: npx expo config --type public --json > "$RUNNER_TEMP/expo-config.json"
+
       - name: Sync Supabase variables to EAS production environment
         shell: bash
         run: |
@@ -55,7 +62,7 @@ jobs:
           npx eas-cli@latest env:set --name SUPABASE_PUBLISHABLE_KEY --value "$SUPABASE_PUBLISHABLE_KEY" --environment production --visibility sensitive --non-interactive
 
       - name: Build production APK with EAS
-        run: npx eas-cli@latest build --platform android --profile production-apk --non-interactive --wait
+        run: npx eas-cli@latest build --platform android --profile production-apk --non-interactive --wait --clear-cache --verbose-logs
 
       - name: Find completed EAS build
         shell: bash
