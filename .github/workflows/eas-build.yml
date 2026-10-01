@@ -1,4 +1,4 @@
-name: EAS Android Production
+name: Android APK Release
 
 on:
   workflow_dispatch:
@@ -10,22 +10,57 @@ permissions:
   contents: read
 
 concurrency:
-  group: eas-android-production-${{ github.ref }}
+  group: android-apk-release-\${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   build:
-    name: Build Android with Expo EAS
-    runs-on: ubuntu-latest
-    timeout-minutes: 180
+    name: Build signed Android APK
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
     env:
-      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-      SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+      EXPO_TOKEN: \${{ secrets.EXPO_TOKEN }}
+      SUPABASE_URL: \${{ secrets.SUPABASE_URL }}
+      SUPABASE_PUBLISHABLE_KEY: \${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
       NPM_CONFIG_LEGACY_PEER_DEPS: "true"
+      ANDROID_HOME: /usr/local/lib/android/sdk
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+      EAS_LOCAL_BUILD_SKIP_CLEANUP: "1"
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Configure Android SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -x "\$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          yes | "\$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
+          "\$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
+            "platform-tools" \
+            "platforms;android-36" \
+            "build-tools;36.0.0" \
+            "ndk;27.1.12297006"
+          echo "\$ANDROID_HOME/platform-tools" >> "\$GITHUB_PATH"
+          echo "\$ANDROID_HOME/cmdline-tools/latest/bin" >> "\$GITHUB_PATH"
+          echo "\$ANDROID_HOME/build-tools/36.0.0" >> "\$GITHUB_PATH"
+          echo "ANDROID_NDK=\$ANDROID_HOME/ndk/27.1.12297006" >> "\$GITHUB_ENV"
+          echo "ANDROID_NDK_HOME=\$ANDROID_HOME/ndk/27.1.12297006" >> "\$GITHUB_ENV"
+          echo "ANDROID_NDK_ROOT=\$ANDROID_HOME/ndk/27.1.12297006" >> "\$GITHUB_ENV"
+
+      - name: Verify Android toolchain
+        run: |
+          set -euo pipefail
+          java -version
+          adb version
+          test -d "\$ANDROID_NDK_HOME"
 
       - name: Set up Node
         uses: actions/setup-node@v6
@@ -33,97 +68,47 @@ jobs:
           node-version: 24
           package-manager-cache: false
 
-      - name: Check Expo token
+      - name: Check required secrets
         run: |
           set -euo pipefail
-          test -n "${EXPO_TOKEN:-}" || {
-            echo "Missing GitHub Actions secret EXPO_TOKEN."
-            exit 1
-          }
+          test -n "\${EXPO_TOKEN:-}" || { echo "Missing EXPO_TOKEN."; exit 1; }
+          test -n "\${SUPABASE_URL:-}" || { echo "Missing SUPABASE_URL."; exit 1; }
+          test -n "\${SUPABASE_PUBLISHABLE_KEY:-}" || { echo "Missing SUPABASE_PUBLISHABLE_KEY."; exit 1; }
 
-      - name: Check Supabase build variables
-        run: |
-          set -euo pipefail
-          test -n "${SUPABASE_URL:-}" || { echo "Missing SUPABASE_URL"; exit 1; }
-          test -n "${SUPABASE_PUBLISHABLE_KEY:-}" || { echo "Missing SUPABASE_PUBLISHABLE_KEY"; exit 1; }
-
-      - name: Install dependencies
+      - name: Install JavaScript dependencies
         run: npm install --legacy-peer-deps --no-audit --no-fund
 
-      - name: Create deterministic npm lockfile for EAS archive
-        run: npm install --package-lock-only --legacy-peer-deps --ignore-scripts --no-audit --no-fund
-
-      - name: Verify npm lockfile
+      - name: Create and verify package lockfile
         run: |
           set -euo pipefail
+          npm install --package-lock-only --legacy-peer-deps --ignore-scripts --no-audit --no-fund
           test -s package-lock.json
           npm ci --legacy-peer-deps --ignore-scripts --no-audit --no-fund
-          echo "package-lock.json verified."
 
-      - name: Validate EAS project configuration
-        run: npx expo config --type public --json > "$RUNNER_TEMP/expo-config.json"
+      - name: Validate Expo configuration
+        run: npx expo config --type public --json > "\$RUNNER_TEMP/expo-config.json"
 
-      - name: Sync Supabase variables to EAS production environment
-        shell: bash
-        run: |
-          set -euo pipefail
-          npx eas-cli@latest env:set --name SUPABASE_URL --value "$SUPABASE_URL" --environment production --visibility sensitive --non-interactive
-          npx eas-cli@latest env:set --name SUPABASE_PUBLISHABLE_KEY --value "$SUPABASE_PUBLISHABLE_KEY" --environment production --visibility sensitive --non-interactive
-
-      - name: Build production APK with EAS
-        shell: bash
-        run: |
-          set -euo pipefail
-          npx eas-cli@latest build \
-            --platform android \
-            --profile production-apk \
-            --non-interactive \
-            --wait \
-            --clear-cache \
-            --json > "$RUNNER_TEMP/eas-build.json"
-
-          BUILD_ID="$(node -e '
-            const fs=require("fs");
-            const raw=fs.readFileSync(process.argv[1],"utf8").trim();
-            const x=JSON.parse(raw);
-            const row=Array.isArray(x) ? x[0] : (x.build ?? x.data?.build ?? x.data?.[0] ?? x);
-            if (!row?.id) process.exit(2);
-            process.stdout.write(row.id);
-          ' "$RUNNER_TEMP/eas-build.json")"
-
-          test -n "$BUILD_ID"
-          echo "EAS_BUILD_ID=$BUILD_ID" >> "$GITHUB_ENV"
-          echo "EAS build completed: $BUILD_ID"
-
-      - name: Verify completed EAS build artifact
-        shell: bash
-        run: |
-          set -euo pipefail
-          npx eas-cli@latest build:view "$EAS_BUILD_ID" --json > "$RUNNER_TEMP/eas-build-view.json"
-          node -e '
-            const fs=require("fs");
-            const x=JSON.parse(fs.readFileSync(process.argv[1],"utf8"));
-            const row=x.build ?? x.data?.build ?? x;
-            if (!row?.id) process.exit(2);
-            if (row.status !== "FINISHED" && row.status !== "finished") process.exit(3);
-            if (!row.artifacts?.buildUrl) process.exit(4);
-            console.log("EAS status:", row.status);
-            console.log("APK artifact is available.");
-          ' "$RUNNER_TEMP/eas-build-view.json"
-
-      - name: Download APK from EAS
+      - name: Build signed production APK locally with EAS
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p artifacts
-          npx eas-cli@latest build:download --build-id "$EAS_BUILD_ID" --non-interactive --output artifacts/AyoHadir-Android-release.apk
+          npx eas-cli@latest build \
+            --platform android \
+            --profile production-apk \
+            --local \
+            --non-interactive \
+            --output artifacts/AyoHadir-Android-release.apk
           test -s artifacts/AyoHadir-Android-release.apk
           file artifacts/AyoHadir-Android-release.apk
+          sha256sum artifacts/AyoHadir-Android-release.apk | tee artifacts/AyoHadir-Android-release.apk.sha256
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: AyoHadir-Android-release-EAS
-          path: artifacts/AyoHadir-Android-release.apk
+          name: AyoHadir-Android-release
+          path: |
+            artifacts/AyoHadir-Android-release.apk
+            artifacts/AyoHadir-Android-release.apk.sha256
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 30
