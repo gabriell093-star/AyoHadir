@@ -154,16 +154,167 @@ jobs:
           test -n "${ANDROID_KEY_PASSWORD:-}" || { echo "Missing ANDROID_KEY_PASSWORD"; exit 1; }
           KEYSTORE="$RUNNER_TEMP/ayohadir-release.keystore"
           PROPERTIES="$RUNNER_TEMP/ayohadir-signing.properties"
-          NORMALIZED_BASE64="$(printf "%s" "$ANDROID_KEYSTORE_BASE64" | sed -E 's/[^A-Za-z0-9+\/=]//g')"
-          test -n "$NORMALIZED_BASE64" || { echo "ANDROID_KEYSTORE_BASE64 is empty after normalization"; exit 1; }
-          REMAINDER=$(( ${#NORMALIZED_BASE64} % 4 ))
-          if [ "$REMAINDER" -ne 0 ]; then NORMALIZED_BASE64="${NORMALIZED_BASE64}$(printf '=%0.s' $(seq 1 $((4 - REMAINDER))))"; fi
-          printf "%s" "$NORMALIZED_BASE64" | base64 --decode --ignore-garbage > "$KEYSTORE"
-          test -s "$KEYSTORE" || { echo "Decoded keystore is empty"; exit 1; }
-          keytool -list -storetype PKCS12 -keystore "$KEYSTORE" -storepass "$ANDROID_KEYSTORE_PASSWORD" -alias "$ANDROID_KEY_ALIAS" >/dev/null || {
-            echo "Decoded keystore is not a valid PKCS12 keystore for the supplied password/alias."
+          if ! printf "%s" "$ANDROID_KEYSTORE_BASE64" | grep -Eq '^[A-Za-z0-9+/=]+
+          KEYTOOL_OUTPUT="$(mktemp)"
+          if ! keytool -list -storetype PKCS12 -keystore "$KEYSTORE" -storepass "$ANDROID_KEYSTORE_PASSWORD" >"$KEYTOOL_OUTPUT" 2>&1; then
+            echo "Decoded keystore cannot be opened with ANDROID_KEYSTORE_PASSWORD."
+            sed -E 's/[Pp]assword[^[:space:]]*/[REDACTED]/g' "$KEYTOOL_OUTPUT" | tail -n 3
+            rm -f "$KEYTOOL_OUTPUT"
             exit 1
+          fi
+          if ! grep -q "Alias name: ${ANDROID_KEY_ALIAS}" "$KEYTOOL_OUTPUT"; then
+            echo "Keystore password is valid, but ANDROID_KEY_ALIAS does not exist in the keystore."
+            echo "Available alias names:"
+            grep "Alias name:" "$KEYTOOL_OUTPUT" | sed -E 's/(Alias name: ).*/\1[REDACTED]/' || true
+            rm -f "$KEYTOOL_OUTPUT"
+            exit 1
+          fi
+          rm -f "$KEYTOOL_OUTPUT"
+          {
+            echo "storeFile=$KEYSTORE"
+            echo "storePassword=$ANDROID_KEYSTORE_PASSWORD"
+            echo "keyAlias=$ANDROID_KEY_ALIAS"
+            echo "keyPassword=$ANDROID_KEY_PASSWORD"
+          } > "$PROPERTIES"
+          chmod 600 "$KEYSTORE" "$PROPERTIES"
+          echo "AYOHADIR_SIGNING_PROPERTIES=$PROPERTIES" >> "$GITHUB_ENV"
+
+      - name: Generate temporary release signing key
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.build_apk == true && inputs.signing_mode == 'temporary_test' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          KEYSTORE="$RUNNER_TEMP/ayohadir-release.keystore"
+          PROPERTIES="$RUNNER_TEMP/ayohadir-signing.properties"
+          PASSWORD="$(openssl rand -hex 24)"
+          echo "::add-mask::$PASSWORD"
+          keytool -genkeypair -v \
+            -keystore "$KEYSTORE" \
+            -storepass "$PASSWORD" \
+            -keypass "$PASSWORD" \
+            -alias ayohadir \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=AyoHadir, OU=Mobile, O=AyoHadir, C=ID"
+          {
+            echo "storeFile=$KEYSTORE"
+            echo "storePassword=$PASSWORD"
+            echo "keyAlias=ayohadir"
+            echo "keyPassword=$PASSWORD"
+          } > "$PROPERTIES"
+          chmod 600 "$KEYSTORE" "$PROPERTIES"
+          echo "AYOHADIR_SIGNING_PROPERTIES=$PROPERTIES" >> "$GITHUB_ENV"
+
+      - name: Install required Android SDK components
+        shell: bash
+        run: |
+          set -euo pipefail
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null 2>&1 || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-36" "build-tools;36.0.0" "ndk;27.1.12297006"
+
+      - name: Verify required NDK
+        shell: bash
+        run: |
+          test -d "$ANDROID_HOME/ndk/27.1.12297006"
+          echo "NDK 27.1.12297006 is installed."
+
+      - name: Generate Android project
+        run: npx expo prebuild --platform android --non-interactive
+
+      - name: Limit Android build to ARM64 phones
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -q '^reactNativeArchitectures=' android/gradle.properties; then
+            sed -i 's/^reactNativeArchitectures=.*/reactNativeArchitectures=arm64-v8a/' android/gradle.properties
+          else
+            echo 'reactNativeArchitectures=arm64-v8a' >> android/gradle.properties
+          fi
+
+      - name: Configure release signing
+        working-directory: android
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat >> app/build.gradle <<'EOF'
+
+          android {
+              signingConfigs {
+                  release {
+                      def signingPropertiesPath = System.getenv("AYOHADIR_SIGNING_PROPERTIES")
+                      if (signingPropertiesPath == null) {
+                          throw new GradleException("Missing Android signing properties")
+                      }
+                      def signingProperties = new Properties()
+                      file(signingPropertiesPath).withInputStream { signingProperties.load(it) }
+                      storeFile file(signingProperties["storeFile"])
+                      storePassword signingProperties["storePassword"]
+                      keyAlias signingProperties["keyAlias"]
+                      keyPassword signingProperties["keyPassword"]
+                  }
+              }
+              buildTypes {
+                  release {
+                      signingConfig signingConfigs.release
+                  }
+              }
           }
+          EOF
+
+      - name: Build release APK
+        working-directory: android
+        run: ./gradlew assembleRelease --no-daemon --stacktrace
+
+      - name: Verify release APK signature and debug state
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="android/app/build/outputs/apk/release/app-release.apk"
+          BUILD_TOOLS="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -n 1)"
+          "$BUILD_TOOLS/apksigner" verify --verbose "$APK"
+          "$BUILD_TOOLS/aapt2" dump badging "$APK" | tee "$RUNNER_TEMP/badging.txt"
+          if grep -q "application-debuggable" "$RUNNER_TEMP/badging.txt"; then
+            echo "Release APK is debuggable."
+            exit 1
+          fi
+
+      - name: Remove signing material
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          rm -f "${AYOHADIR_SIGNING_PROPERTIES:-}" "$RUNNER_TEMP/ayohadir-signing.properties" "$RUNNER_TEMP/ayohadir-release.keystore"
+
+      - name: Upload release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: AyoHadir-Android-release-${{ github.event_name == 'push' && 'stable_public' || inputs.signing_mode }}
+          path: android/app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: error
+          retention-days: 14
+ || [ $(( ${#ANDROID_KEYSTORE_BASE64} % 4 )) -ne 0 ]; then
+            echo "ANDROID_KEYSTORE_BASE64 is malformed. Paste the exact single-line output of: base64 -w 0 /tmp/ayohadir-release.keystore"
+            exit 1
+          fi
+          printf "%s" "$ANDROID_KEYSTORE_BASE64" | base64 --decode --strict > "$KEYSTORE"
+          test -s "$KEYSTORE" || { echo "Decoded keystore is empty"; exit 1; }
+          echo "Decoded keystore size: $(wc -c < "$KEYSTORE") bytes"
+          echo "Decoded keystore SHA-256: $(sha256sum "$KEYSTORE" | cut -d" " -f1)"
+          KEYTOOL_OUTPUT="$(mktemp)"
+          if ! keytool -list -storetype PKCS12 -keystore "$KEYSTORE" -storepass "$ANDROID_KEYSTORE_PASSWORD" >"$KEYTOOL_OUTPUT" 2>&1; then
+            echo "Decoded keystore cannot be opened with ANDROID_KEYSTORE_PASSWORD."
+            sed -E 's/[Pp]assword[^[:space:]]*/[REDACTED]/g' "$KEYTOOL_OUTPUT" | tail -n 3
+            rm -f "$KEYTOOL_OUTPUT"
+            exit 1
+          fi
+          if ! grep -q "Alias name: ${ANDROID_KEY_ALIAS}" "$KEYTOOL_OUTPUT"; then
+            echo "Keystore password is valid, but ANDROID_KEY_ALIAS does not exist in the keystore."
+            echo "Available alias names:"
+            grep "Alias name:" "$KEYTOOL_OUTPUT" | sed -E 's/(Alias name: ).*/\1[REDACTED]/' || true
+            rm -f "$KEYTOOL_OUTPUT"
+            exit 1
+          fi
+          rm -f "$KEYTOOL_OUTPUT"
           {
             echo "storeFile=$KEYSTORE"
             echo "storePassword=$ANDROID_KEYSTORE_PASSWORD"
