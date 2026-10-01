@@ -156,6 +156,8 @@ jobs:
           PROPERTIES="$RUNNER_TEMP/ayohadir-signing.properties"
           NORMALIZED_BASE64="$(printf "%s" "$ANDROID_KEYSTORE_BASE64" | sed -E 's/[^A-Za-z0-9+\/=]//g')"
           test -n "$NORMALIZED_BASE64" || { echo "ANDROID_KEYSTORE_BASE64 is empty after normalization"; exit 1; }
+          REMAINDER=$(( ${#NORMALIZED_BASE64} % 4 ))
+          if [ "$REMAINDER" -ne 0 ]; then NORMALIZED_BASE64="${NORMALIZED_BASE64}$(printf '=%0.s' $(seq 1 $((4 - REMAINDER))))"; fi
           printf "%s" "$NORMALIZED_BASE64" | base64 --decode --ignore-garbage > "$KEYSTORE"
           test -s "$KEYSTORE" || { echo "Decoded keystore is empty"; exit 1; }
           keytool -list -storetype PKCS12 -keystore "$KEYSTORE" -storepass "$ANDROID_KEYSTORE_PASSWORD" -alias "$ANDROID_KEY_ALIAS" >/dev/null || {
