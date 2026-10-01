@@ -1,0 +1,18 @@
+{
+  "build": {
+    "production": {
+      "environment": "production",
+      "android": {
+        "image": "latest",
+        "buildType": "app-bundle"
+      }
+    },
+    "production-apk": {
+      "extends": "production",
+      "android": {
+        "image": "latest",
+        "buildType": "apk"
+      }
+    }
+  }
+}
