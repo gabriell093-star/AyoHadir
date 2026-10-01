@@ -490,8 +490,193 @@ export function ActiveQrWiredScreen(){
  </Screen>;
 }
 
-export function ScanQrWiredScreen(){const router=useRouter();const[permission,requestPermission]=useCameraPermissions();const[torch,setTorch]=useState(false);const[busy,setBusy]=useState(false);const[error,setError]=useState("");const scan=async(raw:string)=>{if(busy)return;setBusy(true);setError("");try{const qr=parseQrPayload(raw),scanned_at=new Date().toISOString(),client_event_id=Crypto.randomUUID(),device_id_hash=await getDeviceIdHash(),device_name=getDeviceName();let loc:any=null;const collectLocation=qr.gps_enabled===true;try{if(collectLocation){let permission=(await Location.getForegroundPermissionsAsync());if(!permission.granted)permission=await Location.requestForegroundPermissionsAsync();if(!permission.granted)throw new Error("Izin lokasi diperlukan untuk QR ini.");loc=await Location.getCurrentPositionAsync({accuracy:Location.Accuracy.High});}}catch(e){throw e}const online=await fetch("https://sqrvntrxoytjnbgticpd.supabase.co/auth/v1/health").then(r=>r.status<500).catch(()=>false);if(!online){if(!qr.token_expires_at||Date.parse(qr.token_expires_at)<=Date.parse(scanned_at))throw new Error("QR expired atau masa berlaku tidak tersedia untuk mode offline.");await enqueueAttendance({client_event_id,qr_id:qr.qr_id,token:qr.token,token_expires_at:qr.token_expires_at,scanned_at,device_id_hash,latitude:loc?.coords.latitude??null,longitude:loc?.coords.longitude??null,accuracy:loc?.coords.accuracy??null,device_name});router.replace({pathname:"/screens/attendance-proof",params:{queued:"true",client_event_id,device_name}});return;}const r=await invokeEdgeFunction<any>("record-attendance",{qr_id:qr.qr_id,token:qr.token,scanned_at,device_id_hash,latitude:loc?.coords.latitude??null,longitude:loc?.coords.longitude??null,accuracy_meters:loc?.coords.accuracy??null,device_name,client_event_id,sync_status:"online"});const attendance=r?.attendance??r;router.replace({pathname:"/screens/attendance-proof",params:{attendance_id:String(pick(attendance,"attendance_id","id")||""),unique_code:String(pick(attendance,"unique_code")||""),attendance_status:String(pick(attendance,"attendance_status","status")||""),location_verified:pick(attendance,"location_verified")===true?"Terverifikasi":pick(attendance,"location_verified")===false?"Tidak terverifikasi":"",server_recorded_at:String(pick(attendance,"server_recorded_at")||""),device_name}});}catch(e){setError(attendanceMsg(msg(e)));}finally{setBusy(false);}};const album=async()=>{try{const r=await ImagePicker.launchImageLibraryAsync({mediaTypes:["images"],quality:1});if(r.canceled)return;const uri=r.assets[0]?.uri;if(!uri)throw new Error("Gambar tidak ditemukan.");const codes=await Camera.scanFromURLAsync(uri,["qr"]);if(!codes.length)throw new Error("QR tidak ditemukan pada gambar yang dipilih.");await scan(codes[0].data);}catch(e){setError(attendanceMsg(msg(e)));}};if(!permission?.granted)return <Screen><BackHeader title="Scan QR"/><GlassCard><Text className="text-lg font-black">Izin kamera diperlukan</Text><PrimaryButton className="mt-5" onPress={requestPermission}><ButtonText>Izinkan Kamera</ButtonText></PrimaryButton><SecondaryButton className="mt-3" onPress={()=>void album()}><Text className="font-bold">Dari Album</Text></SecondaryButton></GlassCard></Screen>;return <View className="flex-1 bg-black"><CameraView style={{flex:1}} facing="back" enableTorch={torch} barcodeScannerSettings={{barcodeTypes:["qr"]}} onBarcodeScanned={({data})=>void scan(data)}><View className="flex-1 items-center justify-center"><View className="h-64 w-64 rounded-3xl border-2 border-white"/><Text className="mt-5 rounded-full bg-black/60 px-4 py-2 text-white">Arahkan QR ke dalam bingkai</Text></View><View className="absolute bottom-0 left-0 right-0 flex-row justify-around bg-black/70 pb-10 pt-4"><Pressable onPress={()=>void album()}><Text className="font-bold text-white">Dari Album</Text></Pressable><Pressable onPress={()=>setTorch(v=>!v)}><Text className="font-bold text-white">Flash</Text></Pressable></View>{busy?<View className="absolute inset-0 items-center justify-center"><ActivityIndicator size="large" color="#FFF"/></View>:null}{error?<View className="absolute left-5 right-5 top-16 rounded-2xl bg-white p-4"><Text className="font-bold text-red-700">{error}</Text><Pressable className="mt-3" onPress={()=>setError("")}><Text className="font-bold text-[#3E5219]">Tutup</Text></Pressable></View>:null}</CameraView></View>}
+export function ScanQrWiredScreen(){
+ const router=useRouter();
+ const [permission,requestPermission]=useCameraPermissions();
+ const [torch,setTorch]=useState(false);
+ const [busy,setBusy]=useState(false);
+ const [error,setError]=useState("");
+ const [albumBusy,setAlbumBusy]=useState(false);
 
+ const scan=async(raw:string)=>{
+  if(busy)return;
+  setBusy(true);
+  setError("");
+  try{
+   const qr=parseQrPayload(raw);
+   const scanned_at=new Date().toISOString();
+   const client_event_id=Crypto.randomUUID();
+   const device_id_hash=await getDeviceIdHash();
+   const device_name=getDeviceName();
+   let loc:any=null;
+
+   if(qr.gps_enabled===true){
+    let locationPermission=await Location.getForegroundPermissionsAsync();
+    if(!locationPermission.granted) locationPermission=await Location.requestForegroundPermissionsAsync();
+    if(!locationPermission.granted) throw new Error("Izin lokasi diperlukan untuk QR ini.");
+    loc=await Location.getCurrentPositionAsync({accuracy:Location.Accuracy.High});
+   }
+
+   const online=await fetch("https://sqrvntrxoytjnbgticpd.supabase.co/auth/v1/health")
+    .then(response=>response.status<500)
+    .catch(()=>false);
+
+   if(!online){
+    if(!qr.token_expires_at||Date.parse(qr.token_expires_at)<=Date.parse(scanned_at)){
+     throw new Error("QR expired atau masa berlaku tidak tersedia untuk mode offline.");
+    }
+    await enqueueAttendance({
+     client_event_id,
+     qr_id:qr.qr_id,
+     token:qr.token,
+     token_expires_at:qr.token_expires_at,
+     scanned_at,
+     device_id_hash,
+     latitude:loc?.coords.latitude??null,
+     longitude:loc?.coords.longitude??null,
+     accuracy:loc?.coords.accuracy??null,
+     device_name
+    });
+    router.replace({pathname:"/screens/attendance-proof",params:{queued:"true",client_event_id,device_name}});
+    return;
+   }
+
+   const response=await invokeEdgeFunction<any>("record-attendance",{
+    qr_id:qr.qr_id,
+    token:qr.token,
+    scanned_at,
+    device_id_hash,
+    latitude:loc?.coords.latitude??null,
+    longitude:loc?.coords.longitude??null,
+    accuracy_meters:loc?.coords.accuracy??null,
+    device_name,
+    client_event_id,
+    sync_status:"online"
+   });
+
+   const attendance=response?.attendance??response;
+   router.replace({
+    pathname:"/screens/attendance-proof",
+    params:{
+     attendance_id:String(pick(attendance,"attendance_id","id")||""),
+     unique_code:String(pick(attendance,"unique_code")||""),
+     attendance_status:String(pick(attendance,"attendance_status","status")||""),
+     location_verified:pick(attendance,"location_verified")===true?"Terverifikasi":pick(attendance,"location_verified")===false?"Tidak terverifikasi":"",
+     server_recorded_at:String(pick(attendance,"server_recorded_at")||""),
+     device_name
+    }
+   });
+  }catch(e){
+   setError(attendanceMsg(msg(e)));
+  }finally{
+   setBusy(false);
+  }
+ };
+
+ const album=async()=>{
+  if(albumBusy||busy)return;
+  setAlbumBusy(true);
+  setError("");
+  try{
+   const result=await ImagePicker.launchImageLibraryAsync({
+    mediaTypes:["images"],
+    allowsEditing:true,
+    aspect:[1,1],
+    quality:1
+   });
+   if(result.canceled||!result.assets[0])return;
+   const uri=result.assets[0].uri;
+   if(!uri)throw new Error("Gambar tidak ditemukan.");
+
+   const codes=await Camera.scanFromURLAsync(uri,["qr"]);
+   if(!codes.length){
+    throw new Error("QR tidak ditemukan. Pilih screenshot yang menampilkan QR sebesar mungkin di area gambar.");
+   }
+   await scan(codes[0].data);
+  }catch(e){
+   setError(attendanceMsg(msg(e)));
+  }finally{
+   setAlbumBusy(false);
+  }
+ };
+
+ if(!permission?.granted){
+  return <Screen contentClassName="justify-center">
+   <View className="items-center">
+    <View className="h-16 w-16 items-center justify-center rounded-full bg-[#E4F1D2]">
+     <AppIcon name="qr_code_scanner" size={30} color="#3E5219"/>
+    </View>
+    <Text className="mt-4 text-[24px] font-black text-gray-950">Pindai QR</Text>
+    <Text className="mt-2 text-center text-sm leading-5 text-gray-500">Gunakan kamera untuk scan langsung, atau pilih screenshot QR dari galeri.</Text>
+   </View>
+   <PrimaryButton className="mt-6" onPress={requestPermission}>
+    <ButtonText>Izinkan Kamera</ButtonText>
+   </PrimaryButton>
+   <SecondaryButton className="mt-3" onPress={()=>void album()} disabled={albumBusy}>
+    <Text className="font-bold text-gray-800">{albumBusy?"Membuka galeri…":"Pilih Screenshot dari Album"}</Text>
+   </SecondaryButton>
+  </Screen>;
+ }
+
+ return <View className="flex-1 bg-black">
+  <CameraView
+   style={{flex:1}}
+   facing="back"
+   enableTorch={torch}
+   barcodeScannerSettings={{barcodeTypes:["qr"]}}
+   onBarcodeScanned={({data})=>void scan(data)}
+  >
+   <View className="flex-1 bg-black/10">
+    <View className="px-5 pb-4 pt-5">
+     <View className="flex-row items-center justify-between">
+      <Pressable onPress={()=>router.back()} className="h-11 w-11 items-center justify-center rounded-full bg-black/45">
+       <AppIcon name="arrow_back" size={22} color="#FFFFFF"/>
+      </Pressable>
+      <View className="rounded-full bg-black/45 px-4 py-2">
+       <Text className="text-xs font-bold text-white">Pindai QR</Text>
+      </View>
+      <Pressable onPress={()=>setTorch(value=>!value)} className="h-11 w-11 items-center justify-center rounded-full bg-black/45">
+       <AppIcon name="flash_on" size={21} color="#FFFFFF"/>
+      </Pressable>
+     </View>
+    </View>
+
+    <View className="flex-1 items-center justify-center px-8">
+     <View className="h-72 w-72 rounded-[30px] border-2 border-white"/>
+     <Text className="mt-6 rounded-full bg-black/55 px-4 py-2 text-center text-xs font-semibold text-white">
+      Arahkan QR aktif ke dalam bingkai
+     </Text>
+    </View>
+
+    <View className="rounded-t-[30px] bg-black/75 px-5 pb-8 pt-5">
+     <View className="flex-row items-center gap-3">
+      <View className="h-10 w-10 items-center justify-center rounded-2xl bg-white/10">
+       <AppIcon name="verified" size={20} color="#FFFFFF"/>
+      </View>
+      <View className="flex-1">
+       <Text className="text-sm font-black text-white">Token QR tetap diverifikasi server</Text>
+       <Text className="mt-1 text-xs leading-5 text-white/70">Screenshot boleh dipindai, tetapi token lama tetap ditolak setelah kedaluwarsa.</Text>
+      </View>
+     </View>
+     <View className="mt-4 flex-row gap-3">
+      <Pressable onPress={()=>void album()} disabled={albumBusy||busy} className="flex-1 items-center justify-center rounded-2xl bg-white px-4 py-4">
+       <View className="flex-row items-center gap-2">
+        <AppIcon name="photo_camera" size={19} color="#3E5219"/>
+        <Text className="font-bold text-[#3E5219]">{albumBusy?"Memproses…":"Dari Album"}</Text>
+       </View>
+      </Pressable>
+      <Pressable onPress={()=>setTorch(value=>!value)} className="h-[54px] w-[54px] items-center justify-center rounded-2xl border border-white/20 bg-white/10">
+       <AppIcon name="flash_on" size={20} color="#FFFFFF"/>
+      </Pressable>
+     </View>
+    </View>
+
+    {busy?<View className="absolute inset-0 items-center justify-center bg-black/30"><ActivityIndicator size="large" color="#FFFFFF"/></View>:null}
+    {error?<View className="absolute left-5 right-5 top-20 rounded-2xl border border-red-100 bg-white p-4"><Text className="text-sm font-bold leading-5 text-red-700">{error}</Text><Pressable className="mt-3" onPress={()=>setError("")}><Text className="font-bold text-[#3E5219]">Tutup</Text></Pressable></View>:null}
+   </View>
+  </CameraView>
+ </View>;
+}
 export function AttendanceProofWiredScreen(){
  const p=useLocalSearchParams<Record<string,string>>(); const router=useRouter(); const {profile}=useAuth();
  const statusLabel=p.attendance_status==="late"?"Terlambat":p.attendance_status==="cancelled"?"Dibatalkan":p.attendance_status==="present"?"Hadir":p.attendance_status||"";
