@@ -154,7 +154,7 @@ jobs:
           test -n "${ANDROID_KEY_PASSWORD:-}" || { echo "Missing ANDROID_KEY_PASSWORD"; exit 1; }
           KEYSTORE="$RUNNER_TEMP/ayohadir-release.keystore"
           PROPERTIES="$RUNNER_TEMP/ayohadir-signing.properties"
-          printf "%s" "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$KEYSTORE"
+          printf "%s" "$ANDROID_KEYSTORE_BASE64" | tr -d ' \t\r\n' | base64 --decode > "$KEYSTORE"
           {
             echo "storeFile=$KEYSTORE"
             echo "storePassword=$ANDROID_KEYSTORE_PASSWORD"
