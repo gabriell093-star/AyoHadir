@@ -154,7 +154,14 @@ jobs:
           test -n "${ANDROID_KEY_PASSWORD:-}" || { echo "Missing ANDROID_KEY_PASSWORD"; exit 1; }
           KEYSTORE="$RUNNER_TEMP/ayohadir-release.keystore"
           PROPERTIES="$RUNNER_TEMP/ayohadir-signing.properties"
-          printf "%s" "$ANDROID_KEYSTORE_BASE64" | tr -d ' \t\r\n' | base64 --decode > "$KEYSTORE"
+          NORMALIZED_BASE64="$(printf "%s" "$ANDROID_KEYSTORE_BASE64" | sed -E 's/[^A-Za-z0-9+\/=]//g')"
+          test -n "$NORMALIZED_BASE64" || { echo "ANDROID_KEYSTORE_BASE64 is empty after normalization"; exit 1; }
+          printf "%s" "$NORMALIZED_BASE64" | base64 --decode --ignore-garbage > "$KEYSTORE"
+          test -s "$KEYSTORE" || { echo "Decoded keystore is empty"; exit 1; }
+          keytool -list -storetype PKCS12 -keystore "$KEYSTORE" -storepass "$ANDROID_KEYSTORE_PASSWORD" -alias "$ANDROID_KEY_ALIAS" >/dev/null || {
+            echo "Decoded keystore is not a valid PKCS12 keystore for the supplied password/alias."
+            exit 1
+          }
           {
             echo "storeFile=$KEYSTORE"
             echo "storePassword=$ANDROID_KEYSTORE_PASSWORD"
