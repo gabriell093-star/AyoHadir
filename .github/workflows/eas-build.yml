@@ -30,10 +30,11 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 24
-          cache: npm
+          package-manager-cache: false
 
       - name: Check Expo token
         run: |
+          set -euo pipefail
           test -n "${EXPO_TOKEN:-}" || {
             echo "Missing GitHub Actions secret EXPO_TOKEN."
             exit 1
@@ -51,6 +52,13 @@ jobs:
       - name: Create deterministic npm lockfile for EAS archive
         run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
 
+      - name: Verify npm lockfile
+        run: |
+          set -euo pipefail
+          test -s package-lock.json
+          npm ci --ignore-scripts --no-audit --no-fund
+          echo "package-lock.json verified."
+
       - name: Validate EAS project configuration
         run: npx expo config --type public --json > "$RUNNER_TEMP/expo-config.json"
 
@@ -62,7 +70,7 @@ jobs:
           npx eas-cli@latest env:set --name SUPABASE_PUBLISHABLE_KEY --value "$SUPABASE_PUBLISHABLE_KEY" --environment production --visibility sensitive --non-interactive
 
       - name: Build production APK with EAS
-        run: npx eas-cli@latest build --platform android --profile production-apk --non-interactive --wait --clear-cache --verbose-logs
+        run: npx eas-cli@latest build --platform android --profile production-apk --non-interactive --wait --clear-cache
 
       - name: Find completed EAS build
         shell: bash
