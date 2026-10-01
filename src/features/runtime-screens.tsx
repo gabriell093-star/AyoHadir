@@ -4,7 +4,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import { useAuth } from "@/auth/auth-context";
 import { supabase } from "@/lib/supabase";
-import { AyoHadirLogo, AppIcon, Badge, BackHeader, ButtonText, DangerButton, GlassCard, PrimaryButton, RowButton, Screen, SecondaryButton } from "@/components/ui";
+import { AyoHadirLogo, AppIcon, Badge, BackHeader, ButtonText, DangerButton, GlassCard, PrimaryButton, RowButton, Screen, SecondaryButton, UI } from "@/components/ui";
 
 function TextButton({ children, onPress, tone = "green" }: { children: string; onPress?: () => void; tone?: "green" | "gray" | "red" }) {
   return (
