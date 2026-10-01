@@ -38,7 +38,7 @@ const msg=(e:unknown)=>{
 };
 const pick=(d:any,...keys:string[])=>{for(const k of keys){const v=d?.[k]??d?.data?.[k]??d?.result?.[k]??d?.attendance?.[k]??d?.data?.attendance?.[k];if(v!==undefined&&v!==null)return v;}return undefined;};
 const parseTime=(s:string)=>{
- const m=/^(\d{1,2}):(\d{2})$/.exec(s.trim());
+ const m=/^(\d{1,2})[:.](\d{2})$/.exec(s.trim());
  const d=new Date();
  if(!m)return new Date(Number.NaN);
  const hour=Number(m[1]),minute=Number(m[2]);
@@ -53,7 +53,7 @@ const buildSchedule=(startText:string,endText:string)=>{
  if(end.getTime()<=start.getTime()) end.setDate(end.getDate()+1);
  return {start,end,durationHours:(end.getTime()-start.getTime())/3600000};
 };
-const timeText=(d:Date)=>d.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit",hour12:false});
+const timeText=(d:Date)=>`${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
 const dateTimeText=(value:string|undefined)=>{
  if(!value)return "-";
  const date=new Date(value);
@@ -119,7 +119,7 @@ export function CreateSessionWiredScreen(){
   }
 
   if(step===2){
-   if(!/^\d{1,2}:\d{2}$/.test(start.trim())||!/^\d{1,2}:\d{2}$/.test(end.trim()))return setError("Waktu mulai dan selesai harus menggunakan format HH:mm.");
+   if(!/^\d{1,2}[:.]\d{2}$/.test(start.trim())||!/^\d{1,2}[:.]\d{2}$/.test(end.trim()))return setError("Waktu mulai dan selesai harus menggunakan format HH:mm.");
    const schedule=buildSchedule(start,end);
    if(!schedule)return setError("Waktu mulai dan selesai tidak valid.");
    if(schedule.durationHours<1||schedule.durationHours>24)return setError("Durasi sesi harus antara 1 dan 24 jam.");
