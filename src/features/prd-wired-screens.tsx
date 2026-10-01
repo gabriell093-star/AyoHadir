@@ -916,12 +916,36 @@ export function QrHubWiredScreen(){
  const router=useRouter();
  return <Screen scroll={false} contentClassName="justify-end">
   <View className="flex-1"/>
-  <View className="rounded-t-[28px] border border-gray-100 bg-white p-6 shadow-sm">
-   <View className="mx-auto h-1.5 w-12 rounded-full bg-gray-200"/>
-   <Text className="mt-5 text-xl font-black text-gray-950">Aksi QR</Text>
-   <Text className="mt-1 text-sm text-gray-500">Pilih aksi yang ingin dilakukan.</Text>
-   <PrimaryButton className="mt-5" onPress={()=>router.push("/screens/create-session")}><ButtonText>Buat QR</ButtonText></PrimaryButton>
-   <SecondaryButton className="mt-3" onPress={()=>router.push("/screens/scan-qr")}><Text className="text-sm font-bold text-gray-800">Scan QR</Text></SecondaryButton>
+  <View className="rounded-t-[30px] border-t border-[#C5C8B8]/30 bg-white px-5 pb-8 pt-3 shadow-sm">
+   <View className="mx-auto h-1.5 w-12 rounded-full bg-[#D9DCD1]"/>
+   <View className="mt-6">
+    <Text className="text-xs font-black uppercase tracking-[2px] text-[#3E5219]">Pusat QR</Text>
+    <Text className="mt-1 text-[24px] font-black text-gray-950">Apa yang ingin Anda lakukan?</Text>
+    <Text className="mt-2 text-sm leading-5 text-gray-500">Buat sesi baru atau pindai QR untuk mencatat kehadiran.</Text>
+   </View>
+   <Pressable onPress={()=>router.push("/screens/create-session")} className="mt-6 rounded-[24px] border border-[#C5C8B8]/30 bg-[#F5F5DC] p-5">
+    <View className="flex-row items-center">
+     <View className="h-12 w-12 items-center justify-center rounded-2xl bg-[#3E5219]"><AppIcon name="qr_code_2" size={25} color="#FFFFFF"/></View>
+     <View className="ml-4 flex-1">
+      <Text className="text-lg font-black text-gray-950">Buat QR</Text>
+      <Text className="mt-1 text-xs leading-5 text-gray-600">Atur waktu, peserta, batas terlambat, dan GPS.</Text>
+     </View>
+     <AppIcon name="chevron_right" size={21} color="#7D846F"/>
+    </View>
+   </Pressable>
+   <Pressable onPress={()=>router.push("/screens/scan-qr")} className="mt-3 rounded-[24px] border border-[#C5C8B8]/30 bg-white p-5">
+    <View className="flex-row items-center">
+     <View className="h-12 w-12 items-center justify-center rounded-2xl bg-[#E4F1D2]"><AppIcon name="qr_code_scanner" size={25} color="#3E5219"/></View>
+     <View className="ml-4 flex-1">
+      <Text className="text-lg font-black text-gray-950">Scan QR</Text>
+      <Text className="mt-1 text-xs leading-5 text-gray-500">Gunakan kamera atau pilih screenshot QR dari album.</Text>
+     </View>
+     <AppIcon name="chevron_right" size={21} color="#7D846F"/>
+    </View>
+   </Pressable>
+   <View className="mt-5 rounded-2xl border border-[#DDE8C9] bg-[#F2F5E8] p-4">
+    <View className="flex-row items-start gap-3"><AppIcon name="verified" size={20} color="#3E5219"/><Text className="flex-1 text-xs leading-5 text-[#2F4014]">QR memakai token dinamis. Gambar QR dapat dibagikan, tetapi token lama tetap diverifikasi server saat absensi.</Text></View>
+   </View>
   </View>
  </Screen>;
 }
