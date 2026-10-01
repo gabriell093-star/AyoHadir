@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: android-apk-release-\${{ github.ref }}
+  group: android-apk-release-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -19,9 +19,9 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     env:
-      EXPO_TOKEN: \${{ secrets.EXPO_TOKEN }}
-      SUPABASE_URL: \${{ secrets.SUPABASE_URL }}
-      SUPABASE_PUBLISHABLE_KEY: \${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
       NPM_CONFIG_LEGACY_PEER_DEPS: "true"
       ANDROID_HOME: /usr/local/lib/android/sdk
       ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
@@ -71,9 +71,12 @@ jobs:
       - name: Check required secrets
         run: |
           set -euo pipefail
-          test -n "\${EXPO_TOKEN:-}" || { echo "Missing EXPO_TOKEN."; exit 1; }
-          test -n "\${SUPABASE_URL:-}" || { echo "Missing SUPABASE_URL."; exit 1; }
-          test -n "\${SUPABASE_PUBLISHABLE_KEY:-}" || { echo "Missing SUPABASE_PUBLISHABLE_KEY."; exit 1; }
+          test -n "${EXPO_TOKEN:-}" || { echo "Missing EXPO_TOKEN."; exit 1; }
+          test -n "${SUPABASE_URL:-}" || { echo "Missing SUPABASE_URL."; exit 1; }
+          test -n "${SUPABASE_PUBLISHABLE_KEY:-}" || { echo "Missing SUPABASE_PUBLISHABLE_KEY."; exit 1; }
+
+      - name: Verify Expo authentication
+        run: npx eas-cli@latest whoami
 
       - name: Install JavaScript dependencies
         run: npm install --legacy-peer-deps --no-audit --no-fund
