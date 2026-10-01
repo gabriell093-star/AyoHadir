@@ -73,7 +73,7 @@ const RadiusSlider=({value,onChange}:{value:number;onChange:(value:number)=>void
    onTouchMove={(event)=>updateFromTouch(event.nativeEvent.locationX)}
   >
    <View className="h-2 rounded-full bg-[#C5C8B8]/55"/>
-   <View className="absolute left-0 h-2 rounded-full bg-[#3E5219]" style={{width:Math.max(8,progress*100)+"%"}}/>
+   <View className="absolute left-0 h-2 rounded-full bg-[#3E5219]" style={{width:`${Math.max(8,progress*100)}%` as `${number}%`}}/>
    <View className="absolute h-7 w-7 rounded-full border-2 border-white bg-[#3E5219] shadow-sm" style={{left:Math.max(0,Math.min(width-28,progress*width-14))}}/>
   </View>
   <View className="mt-1 flex-row justify-between">
