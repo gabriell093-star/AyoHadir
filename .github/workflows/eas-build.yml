@@ -1,0 +1,110 @@
+name: EAS Android Production
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+concurrency:
+  group: eas-android-production-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build Android with Expo EAS
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Check Expo token
+        run: |
+          test -n "${EXPO_TOKEN:-}" || {
+            echo "Missing GitHub Actions secret EXPO_TOKEN."
+            exit 1
+          }
+
+      - name: Check Supabase build variables
+        run: |
+          set -euo pipefail
+          test -n "${SUPABASE_URL:-}" || { echo "Missing SUPABASE_URL"; exit 1; }
+          test -n "${SUPABASE_PUBLISHABLE_KEY:-}" || { echo "Missing SUPABASE_PUBLISHABLE_KEY"; exit 1; }
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Initialize or link EAS project
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx eas-cli@latest init --force --non-interactive --json > "$RUNNER_TEMP/eas-init.json"
+          PROJECT_ID="$(node -e '
+            const fs=require("fs");
+            const x=JSON.parse(fs.readFileSync(process.argv[1],"utf8"));
+            const id=x.projectId ?? x.id ?? x.project?.id ?? x.data?.projectId ?? x.data?.id ?? x.data?.project?.id;
+            if (!id) process.exit(2);
+            process.stdout.write(id);
+          ' "$RUNNER_TEMP/eas-init.json")"
+          test -n "$PROJECT_ID"
+          echo "EAS_PROJECT_ID=$PROJECT_ID" >> "$GITHUB_ENV"
+          echo "EAS project initialized/linked."
+
+      - name: Sync Supabase variables to EAS production environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx eas-cli@latest env:set --name SUPABASE_URL --value "$SUPABASE_URL" --environment production --visibility sensitive --non-interactive
+          npx eas-cli@latest env:set --name SUPABASE_PUBLISHABLE_KEY --value "$SUPABASE_PUBLISHABLE_KEY" --environment production --visibility sensitive --non-interactive
+
+      - name: Build production APK with EAS
+        run: npx eas-cli@latest build --platform android --profile production-apk --non-interactive --wait
+
+      - name: Find completed EAS build
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx eas-cli@latest build:list             --platform android             --build-profile production-apk             --status finished             --limit 1             --json > "$RUNNER_TEMP/eas-build-list.json"
+          BUILD_ID="$(node -e '
+            const fs=require("fs");
+            const x=JSON.parse(fs.readFileSync(process.argv[1],"utf8"));
+            const row=Array.isArray(x) ? x[0] : (x.builds?.[0] ?? x.data?.[0] ?? x.data?.builds?.[0]);
+            if (!row?.id) process.exit(2);
+            process.stdout.write(row.id);
+          ' "$RUNNER_TEMP/eas-build-list.json")"
+          test -n "$BUILD_ID"
+          echo "EAS_BUILD_ID=$BUILD_ID" >> "$GITHUB_ENV"
+
+      - name: Download APK from EAS
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          cd artifacts
+          npx eas-cli@latest build:download --build-id "$EAS_BUILD_ID" --non-interactive
+          APK_COUNT="$(find . -maxdepth 2 -type f -name '*.apk' | wc -l)"
+          test "$APK_COUNT" -ge 1 || { echo "No APK was downloaded from EAS."; exit 1; }
+          APK="$(find . -maxdepth 2 -type f -name '*.apk' | head -n 1)"
+          cp "$APK" "../AyoHadir-Android-release.apk"
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AyoHadir-Android-release-EAS
+          path: AyoHadir-Android-release.apk
+          if-no-files-found: error
+          retention-days: 14
