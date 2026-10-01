@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, Share, Switch, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Alert, KeyboardAvoidingView, PanResponder, Platform, Pressable, ScrollView, Share, Switch, Text, TextInput, View } from "react-native";
 import { Camera, CameraView, useCameraPermissions } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 import * as Linking from "expo-linking";
@@ -54,6 +54,39 @@ const buildSchedule=(startText:string,endText:string)=>{
  return {start,end,durationHours:(end.getTime()-start.getTime())/3600000};
 };
 const timeText=(d:Date)=>`${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+const RadiusSlider=({value,onChange}:{value:number;onChange:(value:number)=>void})=>{
+ const widthRef=useRef(1);
+ const clamp=(x:number)=>Math.max(5,Math.min(3000,Math.round(5+(x/widthRef.current)*2995)));
+ const responder=useRef(PanResponder.create({
+  onStartShouldSetPanResponder:()=>true,
+  onMoveShouldSetPanResponder:()=>true,
+  onPanResponderGrant:(event)=>onChange(clamp(event.nativeEvent.locationX)),
+  onPanResponderMove:(event)=>onChange(clamp(event.nativeEvent.locationX)),
+ }).current);
+ const progress=(value-5)/2995;
+ return <View className="mt-5">
+  <View className="flex-row items-center justify-between">
+   <Text className="text-sm font-bold text-gray-900">Radius</Text>
+   <Text className="text-sm font-black text-[#3E5219]">{value} meter</Text>
+  </View>
+  <View
+   className="mt-4 h-10 justify-center"
+   onLayout={(event)=>{widthRef.current=event.nativeEvent.layout.width;}}
+   {...responder.current.panHandlers}
+  >
+   <View className="h-2 rounded-full bg-[#C5C8B8]/55"/>
+   <View className="absolute left-0 h-2 rounded-full bg-[#3E5219]" style={{width:Math.max(8,progress*100)+"%" as any}}/>
+   <View className="absolute h-7 w-7 rounded-full border-2 border-white bg-[#3E5219] shadow-sm" style={{left:Math.max(0,Math.min(widthRef.current-28,progress*widthRef.current-14))}}/>
+  </View>
+  <View className="mt-1 flex-row justify-between">
+   <Text className="text-[10px] font-semibold text-gray-400">5 m</Text>
+   <Text className="text-[10px] font-semibold text-gray-400">3.000 m</Text>
+  </View>
+  <View className="mt-3 flex-row flex-wrap gap-2">
+   {[5,50,150,500,1000,3000].map(rm=><Pressable key={rm} onPress={()=>onChange(rm)} className={"rounded-full border px-4 py-2.5 "+(value===rm?"border-[#3E5219] bg-[#3E5219]":"border-[#C5C8B8] bg-white")}><Text className={"text-xs font-bold "+(value===rm?"text-white":"text-[#45483C]")}>{rm} m</Text></Pressable>)}
+  </View>
+ </View>;
+};
 const dateTimeText=(value:string|undefined)=>{
  if(!value)return "-";
  const date=new Date(value);
@@ -179,7 +212,7 @@ export function CreateSessionWiredScreen(){
 
     {step===1?<View className="gap-4">
      <SoftCard>
-      <Text className="text-xs font-black uppercase tracking-[2px] text-[#3E5219]">Langkah 1 dari 3</Text>
+      <Text className="text-xs font-black uppercase tracking-[2px] text-[#3E5219]">Langkah 1 dari 4</Text>
       <Text className="mt-2 text-2xl font-black text-gray-950">Info Dasar</Text>
       <Text className="mt-1 text-xs leading-5 text-gray-600">Tentukan nama sesi dan siapa yang dapat melakukan absensi.</Text>
      </SoftCard>
@@ -208,7 +241,7 @@ export function CreateSessionWiredScreen(){
 
     {step===2?<View className="gap-4">
      <SoftCard>
-      <Text className="text-xs font-black uppercase tracking-[2px] text-[#3E5219]">Langkah 2 dari 3</Text>
+      <Text className="text-xs font-black uppercase tracking-[2px] text-[#3E5219]">Langkah 2 dari 4</Text>
       <Text className="mt-2 text-2xl font-black text-gray-950">Waktu</Text>
       <Text className="mt-1 text-xs leading-5 text-gray-600">Sesi berlaku minimal 1 jam dan maksimal 24 jam.</Text>
      </SoftCard>
@@ -231,7 +264,7 @@ export function CreateSessionWiredScreen(){
 
     {step===3?<View className="gap-4">
      <SoftCard>
-      <Text className="text-xs font-black uppercase tracking-[2px] text-[#3E5219]">Langkah 3 dari 3</Text>
+      <Text className="text-xs font-black uppercase tracking-[2px] text-[#3E5219]">Langkah 3 dari 4</Text>
       <Text className="mt-2 text-2xl font-black text-gray-950">Lokasi</Text>
       <Text className="mt-1 text-xs leading-5 text-gray-600">GPS opsional. Saat aktif, lokasi perangkat saat QR dibuat menjadi titik pusat.</Text>
      </SoftCard>
@@ -241,9 +274,7 @@ export function CreateSessionWiredScreen(){
        <Switch value={gps} onValueChange={setGps}/>
       </View>
       {gps?<View className="mt-5">
-       <View className="flex-row items-center justify-between"><Text className="text-sm font-bold text-gray-900">Radius</Text><Text className="text-sm font-black text-[#3E5219]">{radius} meter</Text></View>
-       <TextInput value={String(radius)} onChangeText={v=>setRadius(Math.max(5,Math.min(3000,Number(v.replace(/\D/g,""))||5)))} keyboardType="number-pad" maxLength={4} className="mt-3 rounded-2xl border border-[#C5C8B8] bg-white px-4 py-3.5 text-base text-gray-900"/>
-       <View className="mt-3 flex-row flex-wrap gap-2">{[5,50,150,500,1000,3000].map(rm=><Pressable key={rm} onPress={()=>setRadius(rm)} className={"rounded-full border px-4 py-2.5 "+(radius===rm?"border-[#3E5219] bg-[#3E5219]":"border-[#C5C8B8] bg-white")}><Text className={"text-xs font-bold "+(radius===rm?"text-white":"text-[#45483C]")}>{rm} m</Text></Pressable>)}</View>
+       <RadiusSlider value={radius} onChange={setRadius}/>
        <View className="mt-4 rounded-2xl border border-[#DDE8C9] bg-[#F2F5E8] p-4"><Text className="text-xs leading-5 text-[#2F4014]">Lokasi tepat akan diminta saat Anda menekan “Buat QR” pada halaman review.</Text></View>
       </View>:<View className="mt-4"><OfflineBanner text="GPS nonaktif. QR tetap dapat dibuat tanpa verifikasi lokasi."/></View>}
      </GlassCard>
